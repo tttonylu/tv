@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灯辰文化 · 维格表云同步版</title>
+    <style>
+        /* =========================================
+           🎨 视觉风格：新中式 · 磨砂 · 宗师气场
+           ========================================= */
+        :root {
+            /* 背景图：您可以换成本地图片 url('bg.jpg') */
+            --bg-image: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png');
+            
+            --glass-bg: rgba(20, 20, 20, 0.85);
+            --glass-border: rgba(212, 175, 55, 0.5);
+            
+            --font-title: "KaiTi", "STKaiti", "BiauKai", serif; 
+            --font-body: "Songti SC", "SimSun", serif; 
+            
+            --color-gold: #d4af37;
+            --color-red: #c02c38;
+            --color-green: #4a6b22;
+            --text-main: #f0f0f0;
+        }
+
+        body {
+            margin: 0; background: var(--bg-image); background-size: cover; background-attachment: fixed;
+            color: var(--text-main); font-family: var(--font-body); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* 顶部 */
+        header {
+            height: 12vh; display: flex; justify-content: center; align-items: center;
+            border-bottom: 3px double var(--color-gold); background: rgba(0,0,0,0.6); position: relative;
+        }
+        .brand {
+            font-family: var(--font-title); font-size: 3em; color: var(--color-gold); letter-spacing: 8px; font-weight: bold;
+            text-shadow: 0 2px 10px #000; background: linear-gradient(to bottom, #ffd700, #cfb53b);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .date-info { position: absolute; right: 40px; text-align: right; color: rgba(255,255,255,0.7); }
+
+        main { flex: 1; display: flex; padding: 30px; gap: 30px; }
+
+        /* 面板通用 */
+        .glass-panel {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px;
+            backdrop-filter: blur(12px); box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        /* 左侧 */
+        .sidebar { flex: 2.5; display: flex; flex-direction: column; gap: 20px; }
+        .stat-card { padding: 25px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+        .stat-num { font-family: 'Times New Roman'; font-size: 4em; color: var(--color-gold); font-weight: bold; }
+        .marquee-box { flex: 1; padding: 20px; overflow: hidden; position: relative; }
+        .marquee-content { position: absolute; width: 100%; animation: scrollUp 25s linear infinite; }
+        .future-item { padding: 12px 0; border-bottom: 1px dashed #444; font-size: 1.1em; display: flex; justify-content: space-between; }
+        @keyframes scrollUp { 0% { top: 100%; } 100% { top: -200%; } }
+
+        /* 右侧大师 */
+        .master-grid { flex: 7.5; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
+        .master-card { display: flex; flex-direction: column; align-items: center; padding: 20px; transition: transform 0.3s; }
+        
+        .avatar-frame {
+            width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--color-gold);
+            padding: 3px; background: #000; margin-bottom: 15px; box-shadow: 0 5px 20px #000; overflow: hidden;
+        }
+        .avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        
+        .master-name { font-family: var(--font-title); font-size: 2em; color: var(--color-gold); margin-bottom: 15px; letter-spacing: 3px; }
+        .status-badge { margin-top: auto; padding: 8px 0; width: 80%; text-align: center; font-size: 1.4em; border-radius: 4px; font-family: var(--font-title); }
+        .client-info-box { min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 10px; }
+        .c-name { font-size: 1.6em; color: #fff; font-weight: bold; margin-bottom: 5px; }
+        .c-time { color: #888; font-family: 'Times New Roman'; font-size: 1.2em; }
+
+        /* 状态变色 */
+        .busy { border-color: var(--color-red); box-shadow: 0 0 25px rgba(192, 44, 56, 0.4); }
+        .busy .avatar-frame { border-color: var(--color-red); }
+        .busy .status-badge { background: var(--color-red); color: #fff; }
+
+        .free { border-color: var(--color-green); }
+        .free .avatar-frame { filter: grayscale(100%); opacity: 0.7; }
+        .free .status-badge { border: 1px solid var(--color-green); color: var(--color-green); }
+
+        /* 加载条 */
+        #loader { position: fixed; top:0; left:0; width:0%; height:3px; background:var(--color-gold); transition: width 0.5s; z-index:9999;}
+    </style>
+</head>
+<body>
+
+<div id="loader"></div>
+
+<header>
+    <div class="brand">灯辰文化命理服务中心</div>
+    <div class="date-info">
+        <div id="lunar" style="font-family: var(--font-title); font-size: 1.3em;">数据同步中...</div>
+        <div id="clock" style="font-family: 'Times New Roman'; font-size: 1.5em; margin-top: 5px;">00:00:00</div>
+    </div>
+</header>
+
+<main>
+    <aside class="sidebar glass-panel">
+        <div class="stat-card"><div class="stat-label">今日结缘</div><div class="stat-num" id="count-total">0</div></div>
+        <div class="stat-card"><div class="stat-label">等待接引</div><div class="stat-num" id="count-wait" style="color:#fff">0</div></div>
+        <div class="marquee-box">
+            <div style="text-align:center; color:var(--color-gold); border-bottom:2px solid var(--color-red); padding-bottom:10px; margin-bottom:10px; font-family:var(--font-title);">📅 月度排期概览</div>
+            <div class="marquee-content" id="future-list"></div>
+        </div>
+    </aside>
+
+    <div class="master-grid" id="master-grid"></div>
+</main>
+
+<script>
+    // ==========================================
+    // 🔴 配置区 (请填入您的维格表信息)
+    // ==========================================
+    const VIKA_CONFIG = {
+        // 您的 API Token (以 usk 开头)
+        TOKEN: "uskRMINs8MRQZD07iTNuNnl", 
+        // 您的表格 ID (以 dst 开头)
+        DATASHEET_ID: "dstmgbUypiy0LbUzwF" 
+    };
+
+    // ==========================================
+    // 🧠 核心逻辑
+    // ==========================================
+    
+    // 1. 从维格表拉取数据
+    async function fetchData() {
+        showLoading(50);
+        const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_CONFIG.DATASHEET_ID}/records?viewId=&fieldKey=name`;
+        
+        try {
+            const response = await fetch(url, {
+                headers: { "Authorization": `Bearer ${VIKA_CONFIG.TOKEN}` }
+            });
+            const json = await response.json();
+            
+            if (json.code === 200) {
+                processData(json.data.records);
+                document.getElementById('lunar').innerText = "乙巳年 · 顺颂时祺";
+            } else {
+                console.error("Vika Error:", json.message);
+                document.getElementById('lunar').innerText = "数据配置错误";
+            }
+        } catch (err) {
+            console.error("Network Error:", err);
+        }
+        showLoading(100);
+    }
+
+    // 2. 处理数据 (将维格表数据转为大屏格式)
+    function processData(records) {
+        // 提取所有不重复的大师
+        const mastersMap = {};
+        const appointments = [];
+
+        records.forEach(r => {
+            const f = r.fields;
+            if (!f['大师']) return; // 跳过空行
+
+            // 提取大师信息 (如果有多行，取第一行出现的头像)
+            if (!mastersMap[f['大师']]) {
+                let avatarUrl = "";
+                // 维格表的附件是数组，取第一个
+                if (f['头像'] && f['头像'].length > 0) {
+                    avatarUrl = f['头像'][0].url; 
+                }
+                mastersMap[f['大师']] = { name: f['大师'], img: avatarUrl };
+            }
+
+            // 提取预约信息
+            if (f['日期'] && f['时间']) {
+                appointments.push({
+                    master: f['大师'],
+                    client: f['客户'] || "神秘缘主",
+                    date: f['日期'],
+                    start: f['时间'],
+                    duration: f['时长'] || 60
+                });
+            }
+        });
+
+        const masters = Object.values(mastersMap);
+        renderScreen(masters, appointments);
+    }
+
+    // 3. 渲染屏幕
+    function renderScreen(masters, appointments) {
+        renderGrid(masters, appointments);
+        renderSidebar(appointments);
+    }
+
+    function renderGrid(masters, appointments) {
+        const grid = document.getElementById('master-grid');
+        grid.innerHTML = '';
+        
+        const now = new Date();
+        const curMins = now.getHours() * 60 + now.getMinutes();
+        const todayStr = getTodayStr();
+
+        masters.forEach(m => {
+            // 筛选该大师今日预约
+            const myAppts = appointments.filter(a => a.master === m.name && a.date === todayStr);
+            
+            let status = 'free';
+            let active = null;
+            let next = null;
+
+            myAppts.forEach(a => {
+                const s = getMins(a.start);
+                const e = s + parseInt(a.duration);
+                if (curMins >= s && curMins < e) {
+                    status = 'busy';
+                    active = { ...a, end: formatTime(e) };
+                } else if (curMins < s) {
+                    if (!next || s < getMins(next.start)) next = a;
+                }
+            });
+
+            // 默认头像
+            const avatar = m.img || `https://via.placeholder.com/150/000000/FFFFFF/?text=${m.name[0]}`;
+
+            let infoHtml = '';
+            if (status === 'busy') {
+                infoHtml = `
+                    <div class="client-info-box">
+                        <div class="c-name">${active.client}</div>
+                        <div class="c-time">${active.start} - ${active.end}</div>
+                    </div>
+                    <div class="status-badge">推演中 · 勿扰</div>
+                `;
+            } else {
+                infoHtml = `
+                    <div class="client-info-box">
+                        <div style="color:#888;">${next ? '下一位: '+next.start : '今日空闲'}</div>
+                        <div style="color:#666;">${next ? next.client : ''}</div>
+                    </div>
+                    <div class="status-badge">虚位以待</div>
+                `;
+            }
+
+            const card = document.createElement('div');
+            card.className = `glass-panel master-card ${status}`;
+            card.innerHTML = `
+                <div class="avatar-frame"><img src="${avatar}" class="avatar-img"></div>
+                <div class="master-name">${m.name}</div>
+                ${infoHtml}
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function renderSidebar(appointments) {
+        const todayStr = getTodayStr();
+        const todayAppts = appointments.filter(a => a.date === todayStr);
+        
+        document.getElementById('count-total').innerText = todayAppts.length;
+        
+        const now = new Date();
+        const curMins = now.getHours() * 60 + now.getMinutes();
+        const wait = todayAppts.filter(a => (getMins(a.start) + parseInt(a.duration)) > curMins).length;
+        document.getElementById('count-wait').innerText = wait;
+
+        const listDiv = document.getElementById('future-list');
+        const futureAppts = appointments.filter(a => a.date > todayStr || (a.date === todayStr && getMins(a.start) > curMins));
+        
+        futureAppts.sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start));
+        
+        let html = '';
+        if (futureAppts.length === 0) html = '<div style="text-align:center; color:#666; padding:20px;">暂无排期</div>';
+        
+        futureAppts.forEach(a => {
+            html += `<div class="future-item">
+                        <span style="color:var(--color-gold)">${a.date.slice(5)} ${a.start}</span>
+                        <span>${a.master} · ${a.client}</span>
+                     </div>`;
+        });
+        
+        if (listDiv.innerHTML !== html) listDiv.innerHTML = html;
+    }
+
+    // 工具函数
+    function showLoading(percent) { document.getElementById('loader').style.width = percent + '%'; if(percent>=100) setTimeout(()=>document.getElementById('loader').style.width='0%', 500); }
+    function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-US', {hour12:false}); }
+    function getTodayStr() { return new Date().toISOString().split('T')[0]; }
+    function getMins(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
+    function formatTime(m) { let h=Math.floor(m/60), mm=m%60; if(h>=24) h-=24; return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; }
+
+    // 🚀 启动
+    setInterval(updateClock, 1000);
+    setInterval(fetchData, 30 * 1000); // 每30秒同步一次
+    fetchData(); // 立即同步
+
+</script>
+</body>
+</html>

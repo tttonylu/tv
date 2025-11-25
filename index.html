@@ -3,99 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>灯辰文化 · 维格表云同步版</title>
+    <title>灯辰文化 · 电视专用版</title>
     <style>
         /* =========================================
-           🎨 视觉风格：新中式 · 磨砂 · 宗师气场
+           🎨 视觉风格：电视专用优化 (高性能、大字号)
            ========================================= */
         :root {
-            /* 背景图：您可以换成本地图片 url('bg.jpg') */
+            /* 您提供的背景图 */
             --bg-image: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png');
             
-            --glass-bg: rgba(20, 20, 20, 0.85);
-            --glass-border: rgba(212, 175, 55, 0.5);
+            /* 加深背景色，提升文字对比度 */
+            --glass-bg: rgba(0, 0, 0, 0.75); 
+            --glass-border: rgba(212, 175, 55, 0.6);
             
             --font-title: "KaiTi", "STKaiti", "BiauKai", serif; 
             --font-body: "Songti SC", "SimSun", serif; 
             
-            --color-gold: #d4af37;
-            --color-red: #c02c38;
-            --color-green: #4a6b22;
-            --text-main: #f0f0f0;
+            --color-gold: #ffd700; /* 更亮的金色 */
+            --color-red: #ff4d4d;
+            --color-green: #4caf50;
+            --text-main: #ffffff;
         }
 
         body {
-            margin: 0; background: var(--bg-image); background-size: cover; background-attachment: fixed;
-            color: var(--text-main); font-family: var(--font-body); height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column;
+            margin: 0; 
+            background: var(--bg-image); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            font-family: var(--font-body); 
+            height: 100vh; 
+            overflow: hidden;
+            display: flex; 
+            flex-direction: column;
         }
 
-        /* 顶部 */
+        /* 顶部 - 增加高度占比 */
         header {
-            height: 12vh; display: flex; justify-content: center; align-items: center;
-            border-bottom: 3px double var(--color-gold); background: rgba(0,0,0,0.6); position: relative;
+            height: 12vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            border-bottom: 3px double var(--color-gold); 
+            background: rgba(0,0,0,0.6); 
+            position: relative;
         }
         .brand {
-            font-family: var(--font-title); font-size: 3em; color: var(--color-gold); letter-spacing: 8px; font-weight: bold;
-            text-shadow: 0 2px 10px #000; background: linear-gradient(to bottom, #ffd700, #cfb53b);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: var(--font-title); 
+            font-size: 5vh; /* 大字号 */
+            color: var(--color-gold); 
+            letter-spacing: 5px; 
+            font-weight: bold;
+            text-shadow: 0 2px 5px #000; 
         }
-        .date-info { position: absolute; right: 40px; text-align: right; color: rgba(255,255,255,0.7); }
+        .date-info { 
+            position: absolute; 
+            right: 30px; 
+            text-align: right; 
+            color: #ddd; 
+            font-size: 2.5vh;
+        }
 
-        main { flex: 1; display: flex; padding: 30px; gap: 30px; }
+        main { flex: 1; display: flex; padding: 2vh; gap: 2vh; }
 
-        /* 面板通用 */
+        /* 面板通用 - 移除模糊滤镜提升性能 */
         .glass-panel {
-            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px;
-            backdrop-filter: blur(12px); box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            background: var(--glass-bg); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
         }
 
-        /* 左侧 */
-        .sidebar { flex: 2.5; display: flex; flex-direction: column; gap: 20px; }
-        .stat-card { padding: 25px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.1); }
-        .stat-num { font-family: 'Times New Roman'; font-size: 4em; color: var(--color-gold); font-weight: bold; }
-        .marquee-box { flex: 1; padding: 20px; overflow: hidden; position: relative; }
+        /* 左侧数据栏 (占比 25%) */
+        .sidebar { flex: 25; display: flex; flex-direction: column; gap: 2vh; }
+        
+        .stat-card { padding: 2vh; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.2); }
+        .stat-label { font-size: 2.5vh; color: #ccc; margin-bottom: 1vh; font-family: var(--font-title);}
+        .stat-num { font-family: 'Times New Roman'; font-size: 7vh; color: var(--color-gold); font-weight: bold; line-height: 1;}
+        
+        .marquee-box { flex: 1; padding: 2vh; overflow: hidden; position: relative; }
         .marquee-content { position: absolute; width: 100%; animation: scrollUp 25s linear infinite; }
-        .future-item { padding: 12px 0; border-bottom: 1px dashed #444; font-size: 1.1em; display: flex; justify-content: space-between; }
+        .future-item { 
+            padding: 1.5vh 0; 
+            border-bottom: 1px dashed #555; 
+            font-size: 2.2vh; 
+            display: flex; justify-content: space-between; 
+        }
         @keyframes scrollUp { 0% { top: 100%; } 100% { top: -200%; } }
 
-        /* 右侧大师 */
-        .master-grid { flex: 7.5; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
-        .master-card { display: flex; flex-direction: column; align-items: center; padding: 20px; transition: transform 0.3s; }
+        /* 右侧大师阵列 (占比 75%) */
+        .master-grid { 
+            flex: 75; 
+            display: grid; 
+            /* 🔴 核心修复：强制一行 4 列 */
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 2vh; 
+        }
         
+        .master-card { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 2vh; 
+            transition: transform 0.3s; 
+        }
+        
+        /* 头像框 - 自适应高度 */
         .avatar-frame {
-            width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--color-gold);
-            padding: 3px; background: #000; margin-bottom: 15px; box-shadow: 0 5px 20px #000; overflow: hidden;
+            width: 16vh; height: 16vh; 
+            border-radius: 50%; 
+            border: 3px solid var(--color-gold);
+            padding: 3px; background: #000; margin-bottom: 2vh; 
+            box-shadow: 0 5px 20px #000; overflow: hidden;
         }
         .avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         
-        .master-name { font-family: var(--font-title); font-size: 2em; color: var(--color-gold); margin-bottom: 15px; letter-spacing: 3px; }
-        .status-badge { margin-top: auto; padding: 8px 0; width: 80%; text-align: center; font-size: 1.4em; border-radius: 4px; font-family: var(--font-title); }
-        .client-info-box { min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 10px; }
-        .c-name { font-size: 1.6em; color: #fff; font-weight: bold; margin-bottom: 5px; }
-        .c-time { color: #888; font-family: 'Times New Roman'; font-size: 1.2em; }
+        .master-name { font-family: var(--font-title); font-size: 3.5vh; color: var(--color-gold); margin-bottom: 2vh; letter-spacing: 3px; }
+        
+        .status-badge { 
+            margin-top: auto; padding: 1vh 0; width: 100%; text-align: center; 
+            font-size: 2.5vh; border-radius: 4px; font-family: var(--font-title); font-weight: bold;
+        }
+
+        .client-info-box { 
+            width: 100%;
+            min-height: 8vh; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            margin-bottom: 1vh; background: rgba(255,255,255,0.05); border-radius: 4px;
+        }
+        .c-name { font-size: 3vh; color: #fff; font-weight: bold; margin-bottom: 0.5vh; }
+        .c-time { color: #aaa; font-family: 'Times New Roman'; font-size: 2.2vh; }
 
         /* 状态变色 */
-        .busy { border-color: var(--color-red); box-shadow: 0 0 25px rgba(192, 44, 56, 0.4); }
+        .busy { border-color: var(--color-red); box-shadow: 0 0 20px rgba(192, 44, 56, 0.4); }
         .busy .avatar-frame { border-color: var(--color-red); }
         .busy .status-badge { background: var(--color-red); color: #fff; }
 
         .free { border-color: var(--color-green); }
-        .free .avatar-frame { filter: grayscale(100%); opacity: 0.7; }
+        .free .avatar-frame { filter: grayscale(100%); opacity: 0.8; }
         .free .status-badge { border: 1px solid var(--color-green); color: var(--color-green); }
 
         /* 加载条 */
-        #loader { position: fixed; top:0; left:0; width:0%; height:3px; background:var(--color-gold); transition: width 0.5s; z-index:9999;}
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display: flex; justify-content: center; align-items: center; color: var(--color-gold); font-size: 3vh;}
     </style>
 </head>
 <body>
 
-<div id="loader"></div>
+<div id="loader">正在连接维格表...</div>
 
 <header>
     <div class="brand">灯辰文化命理服务中心</div>
     <div class="date-info">
-        <div id="lunar" style="font-family: var(--font-title); font-size: 1.3em;">数据同步中...</div>
+        <div id="lunar" style="font-family: var(--font-title); font-size: 1.2em;">数据同步中...</div>
         <div id="clock" style="font-family: 'Times New Roman'; font-size: 1.5em; margin-top: 5px;">00:00:00</div>
     </div>
 </header>
@@ -105,7 +165,7 @@
         <div class="stat-card"><div class="stat-label">今日结缘</div><div class="stat-num" id="count-total">0</div></div>
         <div class="stat-card"><div class="stat-label">等待接引</div><div class="stat-num" id="count-wait" style="color:#fff">0</div></div>
         <div class="marquee-box">
-            <div style="text-align:center; color:var(--color-gold); border-bottom:2px solid var(--color-red); padding-bottom:10px; margin-bottom:10px; font-family:var(--font-title);">📅 月度排期概览</div>
+            <div style="text-align:center; color:var(--color-gold); border-bottom:2px solid var(--color-red); padding-bottom:10px; margin-bottom:10px; font-family:var(--font-title); font-size: 2.5vh;">📅 月度排期概览</div>
             <div class="marquee-content" id="future-list"></div>
         </div>
     </aside>
@@ -115,12 +175,10 @@
 
 <script>
     // ==========================================
-    // 🔴 配置区 (请填入您的维格表信息)
+    // 🔴 配置区 (已填入您的信息)
     // ==========================================
     const VIKA_CONFIG = {
-        // 您的 API Token (以 usk 开头)
         TOKEN: "uskRMINs8MRQZD07iTNuNnl", 
-        // 您的表格 ID (以 dst 开头)
         DATASHEET_ID: "dstmgbUypiy0LbUzwF" 
     };
 
@@ -130,7 +188,7 @@
     
     // 1. 从维格表拉取数据
     async function fetchData() {
-        showLoading(50);
+        // 构建请求 URL
         const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_CONFIG.DATASHEET_ID}/records?viewId=&fieldKey=name`;
         
         try {
@@ -142,37 +200,38 @@
             if (json.code === 200) {
                 processData(json.data.records);
                 document.getElementById('lunar').innerText = "乙巳年 · 顺颂时祺";
+                document.getElementById('loader').style.display = 'none'; // 隐藏加载
             } else {
                 console.error("Vika Error:", json.message);
-                document.getElementById('lunar').innerText = "数据配置错误";
+                document.getElementById('loader').innerText = "配置错误: " + json.message;
             }
         } catch (err) {
             console.error("Network Error:", err);
+            // 不隐藏加载条，显示重试状态
+            document.getElementById('loader').innerText = "网络连接中...";
         }
-        showLoading(100);
     }
 
-    // 2. 处理数据 (将维格表数据转为大屏格式)
+    // 2. 处理数据
     function processData(records) {
-        // 提取所有不重复的大师
         const mastersMap = {};
         const appointments = [];
 
         records.forEach(r => {
             const f = r.fields;
-            if (!f['大师']) return; // 跳过空行
+            if (!f['大师']) return;
 
-            // 提取大师信息 (如果有多行，取第一行出现的头像)
-            if (!mastersMap[f['大师']]) {
+            // 提取大师头像
+            // 如果 map 里没有这个大师，或者当前行有头像而 map 里没有，则更新
+            if (!mastersMap[f['大师']] || (f['头像'] && !mastersMap[f['大师']].img)) {
                 let avatarUrl = "";
-                // 维格表的附件是数组，取第一个
                 if (f['头像'] && f['头像'].length > 0) {
                     avatarUrl = f['头像'][0].url; 
                 }
                 mastersMap[f['大师']] = { name: f['大师'], img: avatarUrl };
             }
 
-            // 提取预约信息
+            // 提取预约
             if (f['日期'] && f['时间']) {
                 appointments.push({
                     master: f['大师'],
@@ -184,8 +243,11 @@
             }
         });
 
-        const masters = Object.values(mastersMap);
-        renderScreen(masters, appointments);
+        // 强制填满4个位置 (如果不够4个大师，补空位，保证布局不乱)
+        const mastersList = Object.values(mastersMap);
+        // 如果您希望顺序固定，可以在维格表里加一个序号列，或者在这里写死顺序
+        
+        renderScreen(mastersList, appointments);
     }
 
     // 3. 渲染屏幕
@@ -202,8 +264,8 @@
         const curMins = now.getHours() * 60 + now.getMinutes();
         const todayStr = getTodayStr();
 
+        // 遍历所有大师
         masters.forEach(m => {
-            // 筛选该大师今日预约
             const myAppts = appointments.filter(a => a.master === m.name && a.date === todayStr);
             
             let status = 'free';
@@ -221,8 +283,14 @@
                 }
             });
 
-            // 默认头像
-            const avatar = m.img || `https://via.placeholder.com/150/000000/FFFFFF/?text=${m.name[0]}`;
+            // 头像容错处理：如果没有图，显示文字头像
+            let avatarHtml = '';
+            if (m.img) {
+                // 增加 onerror 处理，防止链接失效导致裂图
+                avatarHtml = `<img src="${m.img}" class="avatar-img" onerror="this.style.display='none';this.parentNode.innerHTML='<div style=\'color:#d4af37;font-size:5vh;line-height:15vh;\'>${m.name[0]}</div>'">`;
+            } else {
+                avatarHtml = `<div style="color:var(--color-gold);font-size:5vh;line-height:15vh;text-align:center;">${m.name[0]}</div>`;
+            }
 
             let infoHtml = '';
             if (status === 'busy') {
@@ -236,8 +304,8 @@
             } else {
                 infoHtml = `
                     <div class="client-info-box">
-                        <div style="color:#888;">${next ? '下一位: '+next.start : '今日空闲'}</div>
-                        <div style="color:#666;">${next ? next.client : ''}</div>
+                        <div style="color:#aaa;">${next ? '下一位: '+next.start : '今日空闲'}</div>
+                        <div style="color:#888;">${next ? next.client : ''}</div>
                     </div>
                     <div class="status-badge">虚位以待</div>
                 `;
@@ -246,7 +314,7 @@
             const card = document.createElement('div');
             card.className = `glass-panel master-card ${status}`;
             card.innerHTML = `
-                <div class="avatar-frame"><img src="${avatar}" class="avatar-img"></div>
+                <div class="avatar-frame">${avatarHtml}</div>
                 <div class="master-name">${m.name}</div>
                 ${infoHtml}
             `;
@@ -284,7 +352,6 @@
     }
 
     // 工具函数
-    function showLoading(percent) { document.getElementById('loader').style.width = percent + '%'; if(percent>=100) setTimeout(()=>document.getElementById('loader').style.width='0%', 500); }
     function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-US', {hour12:false}); }
     function getTodayStr() { return new Date().toISOString().split('T')[0]; }
     function getMins(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }

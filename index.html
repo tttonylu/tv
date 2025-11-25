@@ -118,10 +118,192 @@
     // 🧠 核心逻辑 (ES5兼容写法，防止老浏览器报错)
     // ==========================================
     
-    var VIKA_TOKEN = localStorage.getItem('vika_token') || "";
-    var VIKA_ID = localStorage.getItem('vika_id') || "";
+    var VIKA_TOKEN = uskRMINs8MRQZD07iTNuNnl('vika_token') || "";
+    var VIKA_ID = dstmgbUypiy0LbUzwF('vika_id') || "";
 
     function init() {
         // 1. 检查是否有配置
         if (!VIKA_TOKEN || !VIKA_ID) {
-            document.getElementById('config-modal').style.display = '
+            document.getElementById('config-modal').style.display = 'flex';
+        } else {
+            document.getElementById('config-modal').style.display = 'none';
+            fetchData();
+            // 开启自动刷新
+            setInterval(fetchData, 30000);
+        }
+        
+        setInterval(updateClock, 1000);
+        updateClock();
+    }
+
+    function saveConfig() {
+        var t = document.getElementById('input-token').value.trim();
+        var i = document.getElementById('input-id').value.trim();
+        
+        if (!t.startsWith('usk')) {
+            document.getElementById('config-error').innerText = "Token 格式错误，必须以 usk 开头";
+            return;
+        }
+        if (!i.startsWith('dst')) {
+            document.getElementById('config-error').innerText = "ID 格式错误，必须以 dst 开头";
+            return;
+        }
+
+        localStorage.setItem('vika_token', t);
+        localStorage.setItem('vika_id', i);
+        
+        // 刷新页面
+        location.reload();
+    }
+
+    function log(msg, isError) {
+        var logBox = document.getElementById('debug-log');
+        if(isError) logBox.style.display = 'block';
+        var color = isError ? 'red' : '#0f0';
+        logBox.innerHTML += '<div style="color:'+color+'">'+msg+'</div>';
+    }
+
+    function fetchData() {
+        // 加上随机数防缓存
+        var url = "https://api.vika.cn/fusion/v1/datasheets/" + VIKA_ID + "/records?fieldKey=name&t=" + new Date().getTime();
+        
+        fetch(url, {
+            headers: { "Authorization": "Bearer " + VIKA_TOKEN }
+        })
+        .then(function(response) {
+            if (!response.ok) {
+                if(response.status === 401) throw new Error("Token 无效 (401)");
+                if(response.status === 404) throw new Error("表格 ID 错误 (404)");
+                throw new Error("服务器错误: " + response.status);
+            }
+            return response.json();
+        })
+        .then(function(json) {
+            if (json.code === 200) {
+                processData(json.data.records);
+                document.getElementById('lunar').innerText = "乙巳年 · 顺颂时祺";
+                // 成功连接，隐藏日志
+                document.getElementById('debug-log').style.display = 'none';
+            } else {
+                throw new Error("API Error: " + json.message);
+            }
+        })
+        .catch(function(err) {
+            log("连接失败: " + err.message, true);
+            // 如果是认证错误，弹出配置框让用户重填
+            if (err.message.includes("401") || err.message.includes("404")) {
+                document.getElementById('config-modal').style.display = 'flex';
+                document.getElementById('config-error').innerText = err.message;
+            }
+        });
+    }
+
+    function processData(records) {
+        var mastersMap = {};
+        var appointments = [];
+
+        records.forEach(function(r) {
+            var f = r.fields;
+            if (!f['大师']) return;
+
+            var avatarUrl = "";
+            var rawAvatar = f['头像'];
+            if (rawAvatar) {
+                if (Array.isArray(rawAvatar) && rawAvatar.length > 0) avatarUrl = rawAvatar[0].url;
+                else if (typeof rawAvatar === 'string') avatarUrl = rawAvatar;
+            }
+
+            if (!mastersMap[f['大师']] || (avatarUrl && !mastersMap[f['大师']].img)) {
+                mastersMap[f['大师']] = { name: f['大师'], img: avatarUrl };
+            }
+
+            if (f['日期'] && f['时间']) {
+                appointments.push({
+                    master: f['大师'],
+                    client: f['客户'] || "神秘缘主",
+                    date: f['日期'],
+                    start: f['时间'],
+                    duration: f['时长'] || 60
+                });
+            }
+        });
+
+        var mastersList = [];
+        for (var key in mastersMap) { mastersList.push(mastersMap[key]); }
+        
+        renderScreen(mastersList, appointments);
+    }
+
+    function renderScreen(masters, appointments) {
+        var grid = document.getElementById('master-grid');
+        grid.innerHTML = '';
+        var now = new Date();
+        var curMins = now.getHours() * 60 + now.getMinutes();
+        var todayStr = getTodayStr();
+
+        masters.forEach(function(m) {
+            var myAppts = appointments.filter(function(a) { return a.master === m.name && a.date === todayStr; });
+            var status = 'free';
+            var active = null;
+            var next = null;
+
+            myAppts.forEach(function(a) {
+                var s = getMins(a.start);
+                var e = s + parseInt(a.duration);
+                if (curMins >= s && curMins < e) { status = 'busy'; active = {client: a.client, start: a.start, end: formatTime(e)}; }
+                else if (curMins < s) { if(!next || s < getMins(next.start)) next = a; }
+            });
+
+            var avatarHtml = '';
+            if (m.img) {
+                avatarHtml = '<img src="' + m.img + '" class="avatar-img" onerror="this.style.display=\'none\'">';
+            } else {
+                avatarHtml = '<div style="width:100%;height:100%;background:#000;"></div>';
+            }
+
+            var infoHtml = status === 'busy' 
+                ? '<div class="client-info-box"><div class="c-name">' + active.client + '</div><div class="c-time">' + active.start + ' - ' + active.end + '</div></div><div class="status-badge">正在推演</div>'
+                : '<div class="client-info-box"><div style="color:#aaa;">' + (next?'下一位:'+next.start:'今日空闲') + '</div><div style="color:#888;">' + (next?next.client:'') + '</div></div><div class="status-badge">虚位以待</div>';
+
+            var card = document.createElement('div');
+            card.className = 'glass-panel master-card ' + status;
+            card.innerHTML = '<div class="avatar-frame">' + avatarHtml + '</div><div class="master-name">' + m.name + '</div>' + infoHtml;
+            grid.appendChild(card);
+        });
+        
+        renderSidebar(appointments);
+    }
+
+    function renderSidebar(appointments) {
+        var todayStr = getTodayStr();
+        var todayAppts = appointments.filter(function(a) { return a.date === todayStr; });
+        document.getElementById('count-total').innerText = todayAppts.length;
+        
+        var now = new Date(); var curMins = now.getHours()*60 + now.getMinutes();
+        var waitCount = todayAppts.filter(function(a) { return (getMins(a.start)+parseInt(a.duration))>curMins; }).length;
+        document.getElementById('count-wait').innerText = waitCount;
+
+        var listDiv = document.getElementById('future-list');
+        var futureAppts = appointments.filter(function(a) { return a.date > todayStr || (a.date === todayStr && getMins(a.start) > curMins); });
+        futureAppts.sort(function(a,b) { return (a.date+a.start).localeCompare(b.date+b.start); });
+        
+        var html = '';
+        if (futureAppts.length === 0) html = '<div style="text-align:center; color:#666; padding:20px;">暂无排期</div>';
+        
+        futureAppts.forEach(function(a) {
+            html += '<div class="future-item"><span style="color:var(--color-gold)">' + a.date.slice(5) + ' ' + a.start + '</span><span>' + a.master + '</span></div>';
+        });
+        if (listDiv.innerHTML !== html) listDiv.innerHTML = html;
+    }
+
+    function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-US', {hour12:false}); }
+    function getTodayStr() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+    function getMins(t) { var parts=t.split(':'); return parseInt(parts[0])*60 + parseInt(parts[1]); }
+    function formatTime(m) { var h=Math.floor(m/60); var mm=m%60; if(h>=24) h-=24; return String(h).padStart(2,'0') + ':' + String(mm).padStart(2,'0'); }
+
+    // 启动
+    init();
+
+</script>
+</body>
+</html>

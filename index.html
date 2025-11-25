@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer" />
-    <title>灯辰文化 · 强制诊断版</title>
+    <meta name="referrer" content="no-referrer">
+    <title>灯辰文化 · 终极运行版</title>
     <style>
-        /* 保持原有的美观样式 */
+        /* =========================================
+           🎨 视觉配置
+           ========================================= */
         :root {
             --bg-image: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png');
             --glass-bg: rgba(0, 0, 0, 0.75); --glass-border: rgba(212, 175, 55, 0.6);
@@ -39,32 +41,60 @@
         .busy { border-color: var(--color-red); } .busy .avatar-frame { border-color: var(--color-red); } .busy .status-badge { background: var(--color-red); color: #fff; }
         .free { border-color: var(--color-green); } .free .avatar-frame { filter: grayscale(100%); opacity: 0.8; } .free .status-badge { border: 1px solid var(--color-green); color: var(--color-green); }
 
-        /* 🔴 诊断日志框样式 */
-        #debug-console {
-            position: fixed; top: 0; left: 0; width: 100%; height: auto; max-height: 50vh;
-            background: rgba(0,0,0,0.9); border-bottom: 2px solid red;
-            color: #0f0; font-family: monospace; font-size: 14px;
-            padding: 10px; box-sizing: border-box; overflow-y: auto; z-index: 10000;
-            white-space: pre-wrap; pointer-events: none;
+        /* ⚙️ 设置弹窗样式 */
+        #config-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .config-box {
+            background: #222; padding: 40px; border: 2px solid var(--color-gold); border-radius: 10px; width: 500px;
+            text-align: center;
+        }
+        .config-box h2 { color: var(--color-gold); margin-bottom: 20px; font-family: var(--font-title); }
+        .config-input {
+            width: 90%; padding: 15px; margin-bottom: 20px; background: #333; border: 1px solid #555; color: #fff; font-size: 16px; border-radius: 5px;
+        }
+        .config-btn {
+            padding: 15px 40px; background: var(--color-gold); border: none; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 5px;
+        }
+        #debug-log {
+            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 200px; 
+            background: rgba(0,0,0,0.8); color: #0f0; font-size: 12px; 
+            overflow-y: auto; pointer-events: none; padding: 10px; box-sizing: border-box;
+            z-index: 9998; display: none;
         }
     </style>
 </head>
 <body>
 
-<div id="debug-console">正在初始化诊断程序...</div>
+<div id="debug-log"></div>
+
+<div id="config-modal" style="display:none;">
+    <div class="config-box">
+        <h2>⚙️ 系统初始化配置</h2>
+        <p style="color:#aaa; margin-bottom:20px;">请输入您的维格表信息 (仅需输入一次)</p>
+        
+        <input type="text" id="input-token" class="config-input" placeholder="粘贴 API Token (usk开头)">
+        <input type="text" id="input-id" class="config-input" placeholder="粘贴 表格 ID (dst开头)">
+        
+        <button class="config-btn" onclick="saveConfig()">保存并连接</button>
+        <p style="color:#ff4d4d; margin-top:15px; font-size:14px;" id="config-error"></p>
+    </div>
+</div>
 
 <header>
     <div class="brand">灯辰文化命理服务中心</div>
     <div class="date-info">
-        <div id="lunar" style="font-family: var(--font-title); font-size: 1.2em;">数据同步中</div>
+        <div id="lunar" style="font-family: var(--font-title); font-size: 1.2em;">系统启动中...</div>
         <div id="clock" style="font-family: 'Times New Roman'; font-size: 1.5em; margin-top: 5px;">00:00:00</div>
     </div>
 </header>
 
 <main>
     <aside class="sidebar glass-panel">
-        <div class="stat-card"><div class="stat-label">今日结缘</div><div class="stat-num" id="count-total">0</div></div>
-        <div class="stat-card"><div class="stat-label">等待接引</div><div class="stat-num" id="count-wait" style="color:#fff">0</div></div>
+        <div class="stat-card"><div class="stat-label">今日结缘</div><div class="stat-num" id="count-total">-</div></div>
+        <div class="stat-card"><div class="stat-label">等待接引</div><div class="stat-num" id="count-wait" style="color:#fff">-</div></div>
         <div class="marquee-box">
             <div style="text-align:center; color:var(--color-gold); border-bottom:2px solid var(--color-red); padding-bottom:10px; margin-bottom:10px; font-family:var(--font-title); font-size: 2.5vh;">📅 月度排期概览</div>
             <div class="marquee-content" id="future-list"></div>
@@ -74,104 +104,24 @@
 </main>
 
 <script>
-    // ==========================================
-    // 🔴 您的配置
-    // ==========================================
-    const VIKA_CONFIG = {
-        TOKEN: "uskRMINs8MRQZD07iTNuNnl", 
-        DATASHEET_ID: "dstmgbUypiy0LbUzwF" 
+    window.onerror = function(msg, url, line) {
+        const logBox = document.getElementById('debug-log');
+        logBox.style.display = 'block';
+        logBox.innerHTML += `<div style="color:red;">💥 严重错误: ${msg} (Line: ${line})</div>`;
+        // 如果出错，显示配置弹窗让用户重填
+        document.getElementById('config-modal').style.display = 'flex';
     };
+</script>
 
+<script>
     // ==========================================
-    // 🛠️ 屏幕日志工具
+    // 🧠 核心逻辑 (ES5兼容写法，防止老浏览器报错)
     // ==========================================
-    function log(msg, isError = false) {
-        const consoleBox = document.getElementById('debug-console');
-        const time = new Date().toLocaleTimeString();
-        const color = isError ? 'red' : '#0f0';
-        consoleBox.innerHTML += `<div style="color:${color}">[${time}] ${msg}</div>`;
-        consoleBox.scrollTop = consoleBox.scrollHeight;
-    }
+    
+    var VIKA_TOKEN = localStorage.getItem('vika_token') || "";
+    var VIKA_ID = localStorage.getItem('vika_id') || "";
 
-    // ==========================================
-    // 🧠 核心逻辑
-    // ==========================================
-    async function fetchData() {
-        log("1. 开始尝试连接维格表...");
-        const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_CONFIG.DATASHEET_ID}/records?fieldKey=name`;
-        
-        try {
-            log(`2. 正在请求 URL: ${url}`);
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: { "Authorization": `Bearer ${VIKA_CONFIG.TOKEN}` }
-            });
-
-            log(`3. 服务器响应状态码: ${response.status} (${response.statusText})`);
-
-            if (!response.ok) {
-                if(response.status === 401) log("❌ 错误 401: Token 错误。请检查 'usk' 开头的 Token。", true);
-                else if(response.status === 404) log("❌ 错误 404: 表格 ID 错误。请检查 'dst' 开头的 ID。", true);
-                else log(`❌ 请求失败，状态码: ${response.status}`, true);
-                return;
-            }
-
-            const json = await response.json();
-            log("4. 数据接收成功，正在解析 JSON...");
-            
-            if (json.code === 200) {
-                const records = json.data.records;
-                log(`✅ 成功! 获取到 ${records.length} 条数据。正在渲染...`);
-                
-                // 检查列名
-                if(records.length > 0) {
-                    const keys = Object.keys(records[0].fields);
-                    log(`   检测到的列名: ${keys.join(", ")}`);
-                    if(!keys.includes("大师")) {
-                        log("⚠️ 警告: 未检测到【大师】列，请检查维格表列名是否完全一致!", true);
-                    }
-                }
-
-                processData(records);
-                document.getElementById('lunar').innerText = "乙巳年 · 顺颂时祺";
-                
-                // 成功后 3秒 隐藏日志框
-                setTimeout(() => {
-                    document.getElementById('debug-console').style.display = 'none';
-                }, 3000);
-
-            } else {
-                log(`❌ Vika API 内部错误: ${json.message} (Code: ${json.code})`, true);
-            }
-        } catch (err) {
-            log(`❌ 网络/脚本错误: ${err.message}`, true);
-            console.error(err);
-        }
-    }
-
-    function processData(records) {
-        const mastersMap = {};
-        const appointments = [];
-
-        records.forEach(r => {
-            const f = r.fields;
-            if (!f['大师']) return;
-
-            let avatarUrl = "";
-            const rawAvatar = f['头像'];
-            if (rawAvatar) {
-                if (Array.isArray(rawAvatar) && rawAvatar.length > 0) avatarUrl = rawAvatar[0].url;
-                else if (typeof rawAvatar === 'string') avatarUrl = rawAvatar;
-            }
-
-            if (!mastersMap[f['大师']] || (avatarUrl && !mastersMap[f['大师']].img)) {
-                mastersMap[f['大师']] = { name: f['大师'], img: avatarUrl };
-            }
-
-            if (f['日期'] && f['时间']) {
-                appointments.push({
-                    master: f['大师'],
-                    client: f['客户'] || "神秘缘主",
-                    date: f['日期'],
-                    start: f['时间'],
-                    duration: f['时长'] || 60
+    function init() {
+        // 1. 检查是否有配置
+        if (!VIKA_TOKEN || !VIKA_ID) {
+            document.getElementById('config-modal').style.display = '

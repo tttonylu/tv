@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>灯辰文化 · 纯净实况版</title>
+    <title>灯辰文化 · 最终修正版</title>
     <style>
         /* =========================================
            🎨 视觉配置
@@ -28,7 +28,6 @@
             display: flex; flex-direction: column;
         }
 
-        /* 顶部优化：去掉冗余信息 */
         header {
             height: 12vh; display: flex; justify-content: center; align-items: center;
             border-bottom: 3px double var(--color-gold); background: rgba(0,0,0,0.6); position: relative;
@@ -38,7 +37,6 @@
             letter-spacing: 5px; font-weight: bold; text-shadow: 0 2px 5px #000; 
         }
         .date-info { position: absolute; right: 30px; text-align: right; color: #ddd; }
-        /* 只保留一个大时钟，去掉多余文字 */
         #clock { font-family: 'Times New Roman'; font-size: 4vh; font-weight: bold; color: var(--color-gold); }
         #date-text { font-size: 2vh; opacity: 0.8; margin-top: 5px; }
 
@@ -49,7 +47,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.8);
         }
 
-        /* 左侧 */
         .sidebar { flex: 25; display: flex; flex-direction: column; gap: 2vh; }
         .stat-card { padding: 2vh; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.2); }
         .stat-label { font-size: 2.5vh; color: #ccc; margin-bottom: 1vh; font-family: var(--font-title);}
@@ -62,7 +59,6 @@
         .future-item { padding: 1.5vh 0; border-bottom: 1px dashed #555; font-size: 2.2vh; display: flex; justify-content: space-between; }
         @keyframes scrollUp { 0% { top: 100%; } 100% { top: -300%; } }
 
-        /* 右侧大师区 */
         .master-grid { flex: 75; display: grid; grid-template-columns: repeat(auto-fit, minmax(22%, 1fr)); gap: 2vh; }
         .master-card { display: flex; flex-direction: column; align-items: center; padding: 2vh; transition: transform 0.3s; }
         
@@ -102,219 +98,4 @@
 </header>
 
 <main>
-    <aside class="sidebar glass-panel">
-        <div class="stat-card"><div class="stat-label">今日总缘主</div><div class="stat-num" id="count-total">0</div></div>
-        <div class="stat-card"><div class="stat-label">等待接引</div><div class="stat-num" id="count-wait" style="color:#fff">0</div></div>
-        <div class="marquee-box">
-            <div style="text-align:center; color:var(--color-gold); border-bottom:2px solid var(--color-red); padding-bottom:10px; margin-bottom:10px; font-family:var(--font-title); font-size: 2.5vh;">📅 预约实况</div>
-            <div class="marquee-content" id="future-list"></div>
-        </div>
-    </aside>
-    <div class="master-grid" id="master-grid"></div>
-</main>
-
-<script>
-    // ==========================================
-    // 🔴 您的配置
-    // ==========================================
-    const VIKA_CONFIG = {
-        TOKEN: "uskRMINs8MRQZD07iTNuNnl", 
-        DATASHEET_ID: "dstmgbUypiy0LbUzwF" 
-    };
-
-    // ==========================================
-    // 🧠 核心逻辑
-    // ==========================================
-    async function fetchData() {
-        const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_CONFIG.DATASHEET_ID}/records?fieldKey=name&t=${new Date().getTime()}`;
-        
-        try {
-            const response = await fetch(url, { headers: { "Authorization": `Bearer ${VIKA_CONFIG.TOKEN}` } });
-            const json = await response.json();
-            if (json.code === 200) {
-                const records = json.data.records;
-                
-                // 🔍 诊断信息：如果没有数据，提示用户
-                if (records.length === 0) {
-                    document.getElementById('debug-info').innerText = "连接成功，但表格是空的。请在维格表添加数据。";
-                } else {
-                    document.getElementById('loader').style.display = 'none';
-                    processData(records);
-                }
-            } else {
-                document.getElementById('debug-info').innerText = "API 错误: " + json.message;
-            }
-        } catch (err) {
-            document.getElementById('debug-info').innerText = "网络错误: " + err.message;
-        }
-    }
-
-    function processData(records) {
-        // 1. 动态提取大师 (完全基于表格数据，不杜撰)
-        const mastersMap = {};
-        const appointments = [];
-
-        records.forEach(r => {
-            const f = r.fields;
-            const name = f['大师'];
-            
-            // 必须有名字才算有效数据
-            if (!name) return;
-
-            // A. 提取大师信息
-            let avatarUrl = "";
-            const rawAvatar = f['头像'];
-            if (rawAvatar) {
-                if (Array.isArray(rawAvatar) && rawAvatar.length > 0) avatarUrl = rawAvatar[0].url;
-                else if (typeof rawAvatar === 'string') avatarUrl = rawAvatar;
-            }
-
-            // 如果Map里还没这个人，或者这个人现在有头像了，就更新进去
-            if (!mastersMap[name] || (avatarUrl && !mastersMap[name].img)) {
-                mastersMap[name] = { name: name, img: avatarUrl || "" };
-            }
-
-            // B. 提取预约
-            if (f['日期'] && f['时间']) {
-                // 兼容处理：如果用户不小心在状态里选了“取消”，则跳过
-                if (f['状态干预'] === '取消') return;
-
-                appointments.push({
-                    master: name,
-                    client: f['客户'] || "缘主",
-                    date: f['日期'], // YYYY-MM-DD
-                    start: f['时间'], // HH:MM
-                    duration: f['时长'] || 60,
-                    override: f['状态干预']
-                });
-            }
-        });
-
-        // 转为数组
-        const mastersList = Object.values(mastersMap);
-        
-        // 如果表格完全为空（或者没有大师名字），显示提示
-        if (mastersList.length === 0) {
-            document.getElementById('master-grid').innerHTML = '<div style="width:100%; text-align:center; color:#666; font-size:3vh; margin-top:20vh;">维格表暂无大师数据<br>请添加一行包含【大师】列的数据</div>';
-            return;
-        }
-
-        renderScreen(mastersList, appointments);
-    }
-
-    function renderScreen(masters, appointments) {
-        const grid = document.getElementById('master-grid');
-        grid.innerHTML = '';
-        
-        const now = new Date();
-        const curMins = now.getHours() * 60 + now.getMinutes();
-        const todayStr = getTodayStr();
-
-        masters.forEach(m => {
-            let status = 'free';
-            let active = null;
-            let next = null;
-
-            // 筛选该大师的所有预约 (仅限今日)
-            const myAppts = appointments.filter(a => a.master === m.name && a.date === todayStr);
-
-            myAppts.forEach(a => {
-                const s = getMins(a.start);
-                const e = s + parseInt(a.duration);
-
-                // 🧠 状态判定
-                if (a.override === '强制忙碌') {
-                    status = 'busy'; active = { client: a.client, start: a.start, end: '手动' };
-                } else if (a.override === '强制空闲') {
-                    // 跳过忙碌判定
-                } else if (curMins >= (s - 15) && curMins < s && status !== 'busy') {
-                    // 备场 (提前15分)
-                    status = 'preparing'; active = { client: a.client, start: a.start };
-                } else if (curMins >= s && curMins < e) {
-                    // 忙碌
-                    status = 'busy'; active = { client: a.client, start: a.start, end: formatTime(e) };
-                } else if (curMins < s) {
-                    // 寻找下一个
-                    if (!next || s < getMins(next.start)) next = a;
-                }
-            });
-
-            let avatarHtml = m.img ? `<img src="${m.img}" class="avatar-img" onerror="this.style.display='none'">` : `<div style="width:100%;height:100%;background:#000;"></div>`;
-
-            let infoHtml = '';
-            if (status === 'busy') {
-                infoHtml = `<div class="client-info-box"><div class="c-name">${active.client}</div><div class="c-time">${active.start} - ${active.end}</div></div><div class="status-badge">🛑 正在推演</div>`;
-            } else if (status === 'preparing') {
-                infoHtml = `<div class="client-info-box" style="border:1px solid var(--color-yellow);"><div class="c-name" style="color:var(--color-yellow);">${active.client}</div><div class="c-time">即将开始 ${active.start}</div></div><div class="status-badge">⚠️ 准备接引</div>`;
-            } else {
-                infoHtml = `<div class="client-info-box"><div style="color:#aaa;">${next?'下一位: '+next.start:'今日空闲'}</div><div style="color:#888;">${next?next.client:''}</div></div><div class="status-badge">🟢 虚位以待</div>`;
-            }
-
-            const card = document.createElement('div');
-            card.className = `glass-panel master-card ${status}`;
-            card.innerHTML = `<div class="avatar-frame">${avatarHtml}</div><div class="master-name">${m.name}</div>${infoHtml}`;
-            grid.appendChild(card);
-        });
-        
-        renderSidebar(appointments);
-    }
-
-    function renderSidebar(appointments) {
-        const todayStr = getTodayStr();
-        const now = new Date(); 
-        const curMins = now.getHours()*60 + now.getMinutes();
-
-        // 侧边栏：显示“未来” + “今天还没结束”的
-        let futureAppts = appointments.filter(a => {
-            if (a.date > todayStr) return true;
-            if (a.date === todayStr) {
-                return (getMins(a.start) + parseInt(a.duration)) > curMins;
-            }
-            return false;
-        });
-
-        futureAppts.sort((a,b) => {
-            if (a.date !== b.date) return a.date.localeCompare(b.date);
-            return a.start.localeCompare(b.start);
-        });
-
-        // 统计
-        const todayTotal = appointments.filter(a => a.date === todayStr).length;
-        const todayWait = futureAppts.filter(a => a.date === todayStr).length;
-        
-        document.getElementById('count-total').innerText = todayTotal;
-        document.getElementById('count-wait').innerText = todayWait;
-
-        const listDiv = document.getElementById('future-list');
-        let html = '';
-        
-        if (futureAppts.length === 0) {
-            html = '<div style="text-align:center; color:#666; padding:20px;">暂无待办预约</div>';
-            listDiv.classList.remove('scroll-active');
-        } else {
-            if (futureAppts.length > 5) listDiv.classList.add('scroll-active');
-            else listDiv.classList.remove('scroll-active');
-
-            futureAppts.slice(0, 30).forEach(a => {
-                let dateDisplay = a.date === todayStr ? "今日" : a.date.slice(5);
-                html += `<div class="future-item"><span style="color:var(--color-gold)">${dateDisplay} ${a.start}</span><span>${a.master} · ${a.client}</span></div>`;
-            });
-        }
-        if (listDiv.innerHTML !== html) listDiv.innerHTML = html;
-    }
-
-    function updateClock() { 
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-US', {hour12:false});
-        document.getElementById('date-text').innerText = now.toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'}) + " · 乙巳年";
-    }
-    function getTodayStr() { return new Date().toISOString().split('T')[0]; }
-    function getMins(t) { if(!t) return 0; const [h,m]=t.split(':').map(Number); return h*60+m; }
-    function formatTime(m) { let h=Math.floor(m/60), mm=m%60; if(h>=24) h-=24; return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; }
-
-    setInterval(updateClock, 1000);
-    setInterval(fetchData, 30 * 1000);
-    fetchData(); 
-</script>
-</body>
-</html>
+    <aside class="sidebar glass-

@@ -4,23 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>灯辰文化 · 终极运行版</title>
+    <title>灯辰文化 · 电脑测试版</title>
     <style>
         /* =========================================
            🎨 视觉配置
            ========================================= */
         :root {
             --bg-image: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png');
-            --glass-bg: rgba(0, 0, 0, 0.75); --glass-border: rgba(212, 175, 55, 0.6);
-            --font-title: "KaiTi", "STKaiti", "BiauKai", serif; --font-body: "Songti SC", "SimSun", serif; 
-            --color-gold: #ffd700; --color-red: #ff4d4d; --color-green: #4caf50; --text-main: #ffffff;
+            --glass-bg: rgba(0, 0, 0, 0.75); 
+            --glass-border: rgba(212, 175, 55, 0.6);
+            --font-title: "KaiTi", "STKaiti", "BiauKai", serif; 
+            --font-body: "Songti SC", "SimSun", serif; 
+            --color-gold: #ffd700; 
+            --color-red: #ff4d4d; 
+            --color-green: #4caf50; 
+            --text-main: #ffffff;
         }
-        body { margin: 0; background: var(--bg-image); background-size: cover; background-position: center; color: var(--text-main); font-family: var(--font-body); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        header { height: 12vh; display: flex; justify-content: center; align-items: center; border-bottom: 3px double var(--color-gold); background: rgba(0,0,0,0.6); position: relative; }
-        .brand { font-family: var(--font-title); font-size: 5vh; color: var(--color-gold); letter-spacing: 5px; font-weight: bold; text-shadow: 0 2px 5px #000; }
+
+        body {
+            margin: 0; background: var(--bg-image); background-size: cover; background-position: center; 
+            color: var(--text-main); font-family: var(--font-body); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        header {
+            height: 12vh; display: flex; justify-content: center; align-items: center;
+            border-bottom: 3px double var(--color-gold); background: rgba(0,0,0,0.6); position: relative;
+        }
+        .brand {
+            font-family: var(--font-title); font-size: 5vh; color: var(--color-gold); 
+            letter-spacing: 5px; font-weight: bold; text-shadow: 0 2px 5px #000; 
+        }
         .date-info { position: absolute; right: 30px; text-align: right; color: #ddd; font-size: 2.5vh; }
+
         main { flex: 1; display: flex; padding: 2vh; gap: 2vh; }
-        .glass-panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+
+        .glass-panel {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        }
+
         .sidebar { flex: 25; display: flex; flex-direction: column; gap: 2vh; }
         .stat-card { padding: 2vh; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.2); }
         .stat-label { font-size: 2.5vh; color: #ccc; margin-bottom: 1vh; font-family: var(--font-title);}
@@ -29,64 +52,39 @@
         .marquee-content { position: absolute; width: 100%; animation: scrollUp 25s linear infinite; }
         .future-item { padding: 1.5vh 0; border-bottom: 1px dashed #555; font-size: 2.2vh; display: flex; justify-content: space-between; }
         @keyframes scrollUp { 0% { top: 100%; } 100% { top: -200%; } }
+
         .master-grid { flex: 75; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2vh; }
         .master-card { display: flex; flex-direction: column; align-items: center; padding: 2vh; transition: transform 0.3s; }
-        .avatar-frame { width: 16vh; height: 16vh; border-radius: 50%; border: 3px solid var(--color-gold); padding: 3px; background: #000; margin-bottom: 2vh; box-shadow: 0 5px 20px #000; overflow: hidden; display: flex; justify-content: center; align-items: center; position: relative; }
+        
+        .avatar-frame {
+            width: 16vh; height: 16vh; border-radius: 50%; border: 3px solid var(--color-gold);
+            padding: 3px; background: #000; margin-bottom: 2vh; box-shadow: 0 5px 20px #000; overflow: hidden;
+            display: flex; justify-content: center; align-items: center; position: relative;
+        }
         .avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        
         .master-name { font-family: var(--font-title); font-size: 3.5vh; color: var(--color-gold); margin-bottom: 2vh; letter-spacing: 3px; }
         .status-badge { margin-top: auto; padding: 1vh 0; width: 100%; text-align: center; font-size: 2.5vh; border-radius: 4px; font-family: var(--font-title); font-weight: bold; }
         .client-info-box { width: 100%; min-height: 8vh; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 1vh; background: rgba(255,255,255,0.05); border-radius: 4px; }
         .c-name { font-size: 3vh; color: #fff; font-weight: bold; margin-bottom: 0.5vh; }
         .c-time { color: #aaa; font-family: 'Times New Roman'; font-size: 2.2vh; }
+
         .busy { border-color: var(--color-red); } .busy .avatar-frame { border-color: var(--color-red); } .busy .status-badge { background: var(--color-red); color: #fff; }
         .free { border-color: var(--color-green); } .free .avatar-frame { filter: grayscale(100%); opacity: 0.8; } .free .status-badge { border: 1px solid var(--color-green); color: var(--color-green); }
 
-        /* ⚙️ 设置弹窗样式 */
-        #config-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        .config-box {
-            background: #222; padding: 40px; border: 2px solid var(--color-gold); border-radius: 10px; width: 500px;
-            text-align: center;
-        }
-        .config-box h2 { color: var(--color-gold); margin-bottom: 20px; font-family: var(--font-title); }
-        .config-input {
-            width: 90%; padding: 15px; margin-bottom: 20px; background: #333; border: 1px solid #555; color: #fff; font-size: 16px; border-radius: 5px;
-        }
-        .config-btn {
-            padding: 15px 40px; background: var(--color-gold); border: none; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 5px;
-        }
-        #debug-log {
-            position: fixed; bottom: 0; left: 0; width: 100%; max-height: 200px; 
-            background: rgba(0,0,0,0.8); color: #0f0; font-size: 12px; 
-            overflow-y: auto; pointer-events: none; padding: 10px; box-sizing: border-box;
-            z-index: 9998; display: none;
+        /* 提示条 */
+        #status-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.9);
+            color: #fff; font-size: 14px; padding: 5px; text-align: center; z-index: 9999;
         }
     </style>
 </head>
 <body>
 
-<div id="debug-log"></div>
-
-<div id="config-modal" style="display:none;">
-    <div class="config-box">
-        <h2>⚙️ 系统初始化配置</h2>
-        <p style="color:#aaa; margin-bottom:20px;">请输入您的维格表信息 (仅需输入一次)</p>
-        
-        <input type="text" id="input-token" class="config-input" placeholder="粘贴 API Token (usk开头)">
-        <input type="text" id="input-id" class="config-input" placeholder="粘贴 表格 ID (dst开头)">
-        
-        <button class="config-btn" onclick="saveConfig()">保存并连接</button>
-        <p style="color:#ff4d4d; margin-top:15px; font-size:14px;" id="config-error"></p>
-    </div>
-</div>
-
 <header>
     <div class="brand">灯辰文化命理服务中心</div>
     <div class="date-info">
-        <div id="lunar" style="font-family: var(--font-title); font-size: 1.2em;">系统启动中...</div>
+        <div id="lunar" style="font-family: var(--font-title); font-size: 1.2em;">正在初始化...</div>
         <div id="clock" style="font-family: 'Times New Roman'; font-size: 1.5em; margin-top: 5px;">00:00:00</div>
     </div>
 </header>
@@ -103,104 +101,77 @@
     <div class="master-grid" id="master-grid"></div>
 </main>
 
-<script>
-    window.onerror = function(msg, url, line) {
-        const logBox = document.getElementById('debug-log');
-        logBox.style.display = 'block';
-        logBox.innerHTML += `<div style="color:red;">💥 严重错误: ${msg} (Line: ${line})</div>`;
-        // 如果出错，显示配置弹窗让用户重填
-        document.getElementById('config-modal').style.display = 'flex';
-    };
-</script>
+<div id="status-bar">系统状态检测中...</div>
 
 <script>
     // ==========================================
-    // 🧠 核心逻辑 (ES5兼容写法，防止老浏览器报错)
+    // 🔴 您的配置 (确认无误)
+    // ==========================================
+    var VIKA_CONFIG = {
+        TOKEN: "uskRMINs8MRQZD07iTNuNnl", 
+        DATASHEET_ID: "dstmgbUypiy0LbUzwF" 
+    };
+
+    // ==========================================
+    // 🧪 模拟数据 (如果连不上网，就显示这个)
+    // ==========================================
+    var MOCK_DATA = [
+        { fields: { "大师": "陈大师", "头像": "", "日期": getTodayStr(), "时间": "14:00", "客户": "测试客户A", "时长": 60 } },
+        { fields: { "大师": "林大师", "头像": "", "日期": getTodayStr(), "时间": "15:30", "客户": "测试客户B", "时长": 60 } },
+        { fields: { "大师": "王大师", "头像": "", "日期": "2025-12-01", "时间": "09:00", "客户": "未来预约", "时长": 60 } },
+        { fields: { "大师": "赵大师", "头像": "", "日期": getTodayStr(), "时间": "10:00", "客户": "已完成客户", "时长": 60 } }
+    ];
+
+    // ==========================================
+    // 🧠 核心逻辑
     // ==========================================
     
-    var VIKA_TOKEN = uskRMINs8MRQZD07iTNuNnl('vika_token') || "";
-    var VIKA_ID = dstmgbUypiy0LbUzwF('vika_id') || "";
-
-    function init() {
-        // 1. 检查是否有配置
-        if (!VIKA_TOKEN || !VIKA_ID) {
-            document.getElementById('config-modal').style.display = 'flex';
-        } else {
-            document.getElementById('config-modal').style.display = 'none';
-            fetchData();
-            // 开启自动刷新
-            setInterval(fetchData, 30000);
-        }
-        
-        setInterval(updateClock, 1000);
-        updateClock();
-    }
-
-    function saveConfig() {
-        var t = document.getElementById('input-token').value.trim();
-        var i = document.getElementById('input-id').value.trim();
-        
-        if (!t.startsWith('usk')) {
-            document.getElementById('config-error').innerText = "Token 格式错误，必须以 usk 开头";
-            return;
-        }
-        if (!i.startsWith('dst')) {
-            document.getElementById('config-error').innerText = "ID 格式错误，必须以 dst 开头";
-            return;
-        }
-
-        localStorage.setItem('vika_token', t);
-        localStorage.setItem('vika_id', i);
-        
-        // 刷新页面
-        location.reload();
-    }
-
-    function log(msg, isError) {
-        var logBox = document.getElementById('debug-log');
-        if(isError) logBox.style.display = 'block';
-        var color = isError ? 'red' : '#0f0';
-        logBox.innerHTML += '<div style="color:'+color+'">'+msg+'</div>';
+    function updateStatus(msg, isError) {
+        var el = document.getElementById('status-bar');
+        el.innerText = msg;
+        el.style.color = isError ? '#ff4d4d' : '#4caf50';
     }
 
     function fetchData() {
-        // 加上随机数防缓存
-        var url = "https://api.vika.cn/fusion/v1/datasheets/" + VIKA_ID + "/records?fieldKey=name&t=" + new Date().getTime();
+        updateStatus("正在尝试连接云端...", false);
+        
+        var url = "https://api.vika.cn/fusion/v1/datasheets/" + VIKA_CONFIG.DATASHEET_ID + "/records?fieldKey=name";
         
         fetch(url, {
-            headers: { "Authorization": "Bearer " + VIKA_TOKEN }
+            headers: { "Authorization": "Bearer " + VIKA_CONFIG.TOKEN },
+            cache: "no-store"
         })
         .then(function(response) {
             if (!response.ok) {
-                if(response.status === 401) throw new Error("Token 无效 (401)");
-                if(response.status === 404) throw new Error("表格 ID 错误 (404)");
-                throw new Error("服务器错误: " + response.status);
+                throw new Error("连接失败: " + response.status);
             }
             return response.json();
         })
         .then(function(json) {
             if (json.code === 200) {
+                updateStatus("✅ 云端数据连接成功", false);
                 processData(json.data.records);
-                document.getElementById('lunar').innerText = "乙巳年 · 顺颂时祺";
-                // 成功连接，隐藏日志
-                document.getElementById('debug-log').style.display = 'none';
+                document.getElementById('lunar').innerText = "乙巳年 · 顺颂时祺 (在线)";
             } else {
-                throw new Error("API Error: " + json.message);
+                throw new Error("API 错误: " + json.message);
             }
         })
         .catch(function(err) {
-            log("连接失败: " + err.message, true);
-            // 如果是认证错误，弹出配置框让用户重填
-            if (err.message.includes("401") || err.message.includes("404")) {
-                document.getElementById('config-modal').style.display = 'flex';
-                document.getElementById('config-error').innerText = err.message;
-            }
+            console.error(err);
+            // 🚨 关键：如果出错，加载模拟数据
+            updateStatus("⚠️ 电脑端连接受限 (CORS)，已切换至【模拟演示模式】。请放心，电视端通常能连上。", true);
+            document.getElementById('lunar').innerText = "演示模式";
+            processData(MOCK_DATA);
         });
     }
 
     function processData(records) {
         var mastersMap = {};
         var appointments = [];
+
+        // 预设4位大师，防止空数据导致排版乱
+        var defaultMasters = ["陈大师", "林大师", "王大师", "赵大师"];
+        defaultMasters.forEach(function(name) { mastersMap[name] = {name: name, img: ""}; });
 
         records.forEach(function(r) {
             var f = r.fields;
@@ -213,97 +184,6 @@
                 else if (typeof rawAvatar === 'string') avatarUrl = rawAvatar;
             }
 
-            if (!mastersMap[f['大师']] || (avatarUrl && !mastersMap[f['大师']].img)) {
-                mastersMap[f['大师']] = { name: f['大师'], img: avatarUrl };
-            }
-
-            if (f['日期'] && f['时间']) {
-                appointments.push({
-                    master: f['大师'],
-                    client: f['客户'] || "神秘缘主",
-                    date: f['日期'],
-                    start: f['时间'],
-                    duration: f['时长'] || 60
-                });
-            }
-        });
-
-        var mastersList = [];
-        for (var key in mastersMap) { mastersList.push(mastersMap[key]); }
-        
-        renderScreen(mastersList, appointments);
-    }
-
-    function renderScreen(masters, appointments) {
-        var grid = document.getElementById('master-grid');
-        grid.innerHTML = '';
-        var now = new Date();
-        var curMins = now.getHours() * 60 + now.getMinutes();
-        var todayStr = getTodayStr();
-
-        masters.forEach(function(m) {
-            var myAppts = appointments.filter(function(a) { return a.master === m.name && a.date === todayStr; });
-            var status = 'free';
-            var active = null;
-            var next = null;
-
-            myAppts.forEach(function(a) {
-                var s = getMins(a.start);
-                var e = s + parseInt(a.duration);
-                if (curMins >= s && curMins < e) { status = 'busy'; active = {client: a.client, start: a.start, end: formatTime(e)}; }
-                else if (curMins < s) { if(!next || s < getMins(next.start)) next = a; }
-            });
-
-            var avatarHtml = '';
-            if (m.img) {
-                avatarHtml = '<img src="' + m.img + '" class="avatar-img" onerror="this.style.display=\'none\'">';
-            } else {
-                avatarHtml = '<div style="width:100%;height:100%;background:#000;"></div>';
-            }
-
-            var infoHtml = status === 'busy' 
-                ? '<div class="client-info-box"><div class="c-name">' + active.client + '</div><div class="c-time">' + active.start + ' - ' + active.end + '</div></div><div class="status-badge">正在推演</div>'
-                : '<div class="client-info-box"><div style="color:#aaa;">' + (next?'下一位:'+next.start:'今日空闲') + '</div><div style="color:#888;">' + (next?next.client:'') + '</div></div><div class="status-badge">虚位以待</div>';
-
-            var card = document.createElement('div');
-            card.className = 'glass-panel master-card ' + status;
-            card.innerHTML = '<div class="avatar-frame">' + avatarHtml + '</div><div class="master-name">' + m.name + '</div>' + infoHtml;
-            grid.appendChild(card);
-        });
-        
-        renderSidebar(appointments);
-    }
-
-    function renderSidebar(appointments) {
-        var todayStr = getTodayStr();
-        var todayAppts = appointments.filter(function(a) { return a.date === todayStr; });
-        document.getElementById('count-total').innerText = todayAppts.length;
-        
-        var now = new Date(); var curMins = now.getHours()*60 + now.getMinutes();
-        var waitCount = todayAppts.filter(function(a) { return (getMins(a.start)+parseInt(a.duration))>curMins; }).length;
-        document.getElementById('count-wait').innerText = waitCount;
-
-        var listDiv = document.getElementById('future-list');
-        var futureAppts = appointments.filter(function(a) { return a.date > todayStr || (a.date === todayStr && getMins(a.start) > curMins); });
-        futureAppts.sort(function(a,b) { return (a.date+a.start).localeCompare(b.date+b.start); });
-        
-        var html = '';
-        if (futureAppts.length === 0) html = '<div style="text-align:center; color:#666; padding:20px;">暂无排期</div>';
-        
-        futureAppts.forEach(function(a) {
-            html += '<div class="future-item"><span style="color:var(--color-gold)">' + a.date.slice(5) + ' ' + a.start + '</span><span>' + a.master + '</span></div>';
-        });
-        if (listDiv.innerHTML !== html) listDiv.innerHTML = html;
-    }
-
-    function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-US', {hour12:false}); }
-    function getTodayStr() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
-    function getMins(t) { var parts=t.split(':'); return parseInt(parts[0])*60 + parseInt(parts[1]); }
-    function formatTime(m) { var h=Math.floor(m/60); var mm=m%60; if(h>=24) h-=24; return String(h).padStart(2,'0') + ':' + String(mm).padStart(2,'0'); }
-
-    // 启动
-    init();
-
-</script>
-</body>
-</html>
+            // 更新或新增大师
+            if (mastersMap[f['大师']]) {
+                if

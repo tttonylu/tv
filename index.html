@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer" />
-    <title>灯辰文化 · 弹窗诊断版</title>
+    <title>灯辰文化 · 强制诊断版</title>
     <style>
-        /* 样式保持不变，复用之前的美观样式 */
+        /* 保持原有的美观样式 */
         :root {
             --bg-image: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png');
             --glass-bg: rgba(0, 0, 0, 0.75); --glass-border: rgba(212, 175, 55, 0.6);
@@ -38,21 +38,20 @@
         .c-time { color: #aaa; font-family: 'Times New Roman'; font-size: 2.2vh; }
         .busy { border-color: var(--color-red); } .busy .avatar-frame { border-color: var(--color-red); } .busy .status-badge { background: var(--color-red); color: #fff; }
         .free { border-color: var(--color-green); } .free .avatar-frame { filter: grayscale(100%); opacity: 0.8; } .free .status-badge { border: 1px solid var(--color-green); color: var(--color-green); }
-        
-        #loader { 
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            background:#000; z-index:9999; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            color: var(--color-gold); font-size: 3vh; text-align: center;
+
+        /* 🔴 诊断日志框样式 */
+        #debug-console {
+            position: fixed; top: 0; left: 0; width: 100%; height: auto; max-height: 50vh;
+            background: rgba(0,0,0,0.9); border-bottom: 2px solid red;
+            color: #0f0; font-family: monospace; font-size: 14px;
+            padding: 10px; box-sizing: border-box; overflow-y: auto; z-index: 10000;
+            white-space: pre-wrap; pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-<div id="loader">
-    <div>正在连接...</div>
-    <div style="font-size: 1.5vh; color: #888; margin-top: 20px;">如果长时间停留，请检查 Token 和列名</div>
-</div>
+<div id="debug-console">正在初始化诊断程序...</div>
 
 <header>
     <div class="brand">灯辰文化命理服务中心</div>
@@ -76,7 +75,7 @@
 
 <script>
     // ==========================================
-    // 🔴 配置区 (请务必确认这里是最新的!)
+    // 🔴 您的配置
     // ==========================================
     const VIKA_CONFIG = {
         TOKEN: "uskRMINs8MRQZD07iTNuNnl", 
@@ -84,48 +83,69 @@
     };
 
     // ==========================================
-    // 🧠 诊断逻辑
+    // 🛠️ 屏幕日志工具
+    // ==========================================
+    function log(msg, isError = false) {
+        const consoleBox = document.getElementById('debug-console');
+        const time = new Date().toLocaleTimeString();
+        const color = isError ? 'red' : '#0f0';
+        consoleBox.innerHTML += `<div style="color:${color}">[${time}] ${msg}</div>`;
+        consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    // ==========================================
+    // 🧠 核心逻辑
     // ==========================================
     async function fetchData() {
+        log("1. 开始尝试连接维格表...");
         const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_CONFIG.DATASHEET_ID}/records?fieldKey=name`;
         
         try {
+            log(`2. 正在请求 URL: ${url}`);
             const response = await fetch(url, {
+                method: 'GET',
                 headers: { "Authorization": `Bearer ${VIKA_CONFIG.TOKEN}` }
             });
 
+            log(`3. 服务器响应状态码: ${response.status} (${response.statusText})`);
+
             if (!response.ok) {
-                // 🔴 错误捕获 1: 连接被拒绝
-                alert(`❌ 连接失败！\n错误代码: ${response.status}\n\n原因可能是：\n1. Token 填错了 (401)\n2. 表格 ID 填错了 (404)`);
+                if(response.status === 401) log("❌ 错误 401: Token 错误。请检查 'usk' 开头的 Token。", true);
+                else if(response.status === 404) log("❌ 错误 404: 表格 ID 错误。请检查 'dst' 开头的 ID。", true);
+                else log(`❌ 请求失败，状态码: ${response.status}`, true);
                 return;
             }
 
             const json = await response.json();
+            log("4. 数据接收成功，正在解析 JSON...");
             
             if (json.code === 200) {
-                // 连接成功，开始检查数据列名
                 const records = json.data.records;
-                if (records.length === 0) {
-                    alert("⚠️ 连接成功，但表格是空的！\n请在维格表里添加一行数据。");
-                    return;
-                }
+                log(`✅ 成功! 获取到 ${records.length} 条数据。正在渲染...`);
                 
-                // 检查第一行数据，看看有没有“大师”这一列
-                const firstRow = records[0].fields;
-                if (firstRow['大师'] === undefined) {
-                    // 🔴 错误捕获 2: 列名不对
-                    alert("❌ 列名错误！\n\n系统读不到数据。\n请检查您的维格表列名是否叫：\n\n大师、头像、客户、日期、时间、时长\n\n(注意：不要有空格，必须完全一致)");
-                    return;
+                // 检查列名
+                if(records.length > 0) {
+                    const keys = Object.keys(records[0].fields);
+                    log(`   检测到的列名: ${keys.join(", ")}`);
+                    if(!keys.includes("大师")) {
+                        log("⚠️ 警告: 未检测到【大师】列，请检查维格表列名是否完全一致!", true);
+                    }
                 }
 
                 processData(records);
-                document.getElementById('loader').style.display = 'none';
                 document.getElementById('lunar').innerText = "乙巳年 · 顺颂时祺";
+                
+                // 成功后 3秒 隐藏日志框
+                setTimeout(() => {
+                    document.getElementById('debug-console').style.display = 'none';
+                }, 3000);
+
             } else {
-                alert("❌ Vika API 报错: " + json.message);
+                log(`❌ Vika API 内部错误: ${json.message} (Code: ${json.code})`, true);
             }
         } catch (err) {
-            alert("❌ 网络错误: " + err.message + "\n\n请检查电脑/电视是否连网。");
+            log(`❌ 网络/脚本错误: ${err.message}`, true);
+            console.error(err);
         }
     }
 
@@ -155,77 +175,3 @@
                     date: f['日期'],
                     start: f['时间'],
                     duration: f['时长'] || 60
-                });
-            }
-        });
-
-        renderScreen(Object.values(mastersMap), appointments);
-    }
-
-    function renderScreen(masters, appointments) {
-        const grid = document.getElementById('master-grid');
-        grid.innerHTML = '';
-        const now = new Date();
-        const curMins = now.getHours() * 60 + now.getMinutes();
-        const todayStr = getTodayStr();
-
-        masters.forEach(m => {
-            const myAppts = appointments.filter(a => a.master === m.name && a.date === todayStr);
-            let status = 'free', active = null, next = null;
-
-            myAppts.forEach(a => {
-                const s = getMins(a.start), e = s + parseInt(a.duration);
-                if (curMins >= s && curMins < e) { status = 'busy'; active = {...a, end: formatTime(e)}; }
-                else if (curMins < s) { if(!next || s < getMins(next.start)) next = a; }
-            });
-
-            let avatarHtml = '';
-            if (m.img) {
-                avatarHtml = `<img src="${m.img}" class="avatar-img" onerror="this.style.display='none'">`;
-            } else {
-                avatarHtml = `<div style="width:100%;height:100%;background:#000;"></div>`;
-            }
-
-            let infoHtml = status === 'busy' 
-                ? `<div class="client-info-box"><div class="c-name">${active.client}</div><div class="c-time">${active.start} - ${active.end}</div></div><div class="status-badge">正在推演</div>`
-                : `<div class="client-info-box"><div style="color:#aaa;">${next?'下一位:'+next.start:'今日空闲'}</div><div style="color:#888;">${next?next.client:''}</div></div><div class="status-badge">虚位以待</div>`;
-
-            const card = document.createElement('div');
-            card.className = `glass-panel master-card ${status}`;
-            card.innerHTML = `<div class="avatar-frame">${avatarHtml}</div><div class="master-name">${m.name}</div>${infoHtml}`;
-            grid.appendChild(card);
-        });
-        
-        renderSidebar(appointments);
-    }
-
-    function renderSidebar(appointments) {
-        const todayStr = getTodayStr();
-        const todayAppts = appointments.filter(a => a.date === todayStr);
-        document.getElementById('count-total').innerText = todayAppts.length;
-        
-        const now = new Date(); const curMins = now.getHours()*60 + now.getMinutes();
-        document.getElementById('count-wait').innerText = todayAppts.filter(a => (getMins(a.start)+parseInt(a.duration))>curMins).length;
-
-        const listDiv = document.getElementById('future-list');
-        const futureAppts = appointments.filter(a => a.date > todayStr || (a.date === todayStr && getMins(a.start) > curMins));
-        futureAppts.sort((a,b) => (a.date+a.start).localeCompare(b.date+b.start));
-        
-        let html = '';
-        if (futureAppts.length === 0) html = '<div style="text-align:center; color:#666; padding:20px;">暂无排期</div>';
-        futureAppts.forEach(a => html += `<div class="future-item"><span style="color:var(--color-gold)">${a.date.slice(5)} ${a.start}</span><span>${a.master}</span></div>`);
-        if (listDiv.innerHTML !== html) listDiv.innerHTML = html;
-    }
-
-    function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-US', {hour12:false}); }
-    function getTodayStr() { return new Date().toISOString().split('T')[0]; }
-    function getMins(t) { const [h,m]=t.split(':').map(Number); return h*60+m; }
-    function formatTime(m) { let h=Math.floor(m/60), mm=m%60; if(h>=24) h-=24; return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; }
-
-    setInterval(updateClock, 1000);
-    // 自动刷新逻辑
-    setInterval(fetchData, 30 * 1000); 
-    fetchData(); 
-</script>
-</body>
-</html>

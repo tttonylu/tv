@@ -4,98 +4,126 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>灯辰文化 · 最终修正版</title>
+    <title>灯辰文化 · 屏幕日志诊断版</title>
     <style>
-        /* =========================================
-           🎨 视觉配置
-           ========================================= */
+        /* 视觉风格 */
         :root {
             --bg-image: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png');
-            --glass-bg: rgba(0, 0, 0, 0.85); 
-            --glass-border: rgba(212, 175, 55, 0.6);
-            --font-title: "KaiTi", "STKaiti", serif; 
-            --font-body: "Songti SC", "SimSun", serif; 
-            --color-gold: #ffd700; 
-            --color-red: #ff4d4d; 
-            --color-green: #4caf50; 
-            --color-yellow: #ffaa00; 
-            --text-main: #ffffff;
+            --glass-bg: rgba(0, 0, 0, 0.85); --glass-border: rgba(212, 175, 55, 0.6);
+            --font-title: "KaiTi", "STKaiti", serif; --font-body: "Songti SC", "SimSun", serif; 
+            --color-gold: #ffd700; --color-red: #ff4d4d; --color-green: #4caf50; --color-yellow: #ffaa00; --text-main: #ffffff;
         }
+        body { margin: 0; background: var(--bg-image); background-size: cover; background-position: center; color: var(--text-main); font-family: var(--font-body); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* 🔴 屏幕日志框 (专治各种不显示) */
+        #console-log {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999;
+            color: #0f0; font-family: monospace; font-size: 16px;
+            padding: 20px; box-sizing: border-box; overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .log-err { color: #ff4d4d; font-weight: bold; border: 1px solid red; padding: 10px; margin: 10px 0; }
+        .log-ok { color: #4caf50; }
+        .log-info { color: #888; }
 
-        body {
-            margin: 0; background: var(--bg-image); background-size: cover; background-position: center; 
-            color: var(--text-main); font-family: var(--font-body); height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-
-        header {
-            height: 12vh; display: flex; justify-content: center; align-items: center;
-            border-bottom: 3px double var(--color-gold); background: rgba(0,0,0,0.6); position: relative;
-        }
-        .brand {
-            font-family: var(--font-title); font-size: 5vh; color: var(--color-gold); 
-            letter-spacing: 5px; font-weight: bold; text-shadow: 0 2px 5px #000; 
-        }
+        /* 界面元素 */
+        header { height: 12vh; display: flex; justify-content: center; align-items: center; border-bottom: 3px double var(--color-gold); background: rgba(0,0,0,0.6); position: relative; }
+        .brand { font-family: var(--font-title); font-size: 5vh; color: var(--color-gold); letter-spacing: 5px; font-weight: bold; text-shadow: 0 2px 5px #000; }
         .date-info { position: absolute; right: 30px; text-align: right; color: #ddd; }
         #clock { font-family: 'Times New Roman'; font-size: 4vh; font-weight: bold; color: var(--color-gold); }
         #date-text { font-size: 2vh; opacity: 0.8; margin-top: 5px; }
-
         main { flex: 1; display: flex; padding: 2vh; gap: 2vh; }
-
-        .glass-panel {
-            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-        }
-
+        .glass-panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
         .sidebar { flex: 25; display: flex; flex-direction: column; gap: 2vh; }
         .stat-card { padding: 2vh; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.2); }
         .stat-label { font-size: 2.5vh; color: #ccc; margin-bottom: 1vh; font-family: var(--font-title);}
         .stat-num { font-family: 'Times New Roman'; font-size: 7vh; color: var(--color-gold); font-weight: bold; line-height: 1;}
-        
         .marquee-box { flex: 1; padding: 2vh; overflow: hidden; position: relative; }
         .marquee-content { position: absolute; width: 100%; }
         .scroll-active { animation: scrollUp 40s linear infinite; }
-        
         .future-item { padding: 1.5vh 0; border-bottom: 1px dashed #555; font-size: 2.2vh; display: flex; justify-content: space-between; }
         @keyframes scrollUp { 0% { top: 100%; } 100% { top: -300%; } }
-
         .master-grid { flex: 75; display: grid; grid-template-columns: repeat(auto-fit, minmax(22%, 1fr)); gap: 2vh; }
         .master-card { display: flex; flex-direction: column; align-items: center; padding: 2vh; transition: transform 0.3s; }
-        
-        .avatar-frame {
-            width: 16vh; height: 16vh; border-radius: 50%; border: 3px solid var(--color-gold);
-            padding: 3px; background: #000; margin-bottom: 2vh; box-shadow: 0 5px 20px #000; overflow: hidden;
-            display: flex; justify-content: center; align-items: center; position: relative;
-        }
+        .avatar-frame { width: 16vh; height: 16vh; border-radius: 50%; border: 3px solid var(--color-gold); padding: 3px; background: #000; margin-bottom: 2vh; box-shadow: 0 5px 20px #000; overflow: hidden; display: flex; justify-content: center; align-items: center; position: relative; }
         .avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        
         .master-name { font-family: var(--font-title); font-size: 3.5vh; color: var(--color-gold); margin-bottom: 2vh; letter-spacing: 3px; }
         .status-badge { margin-top: auto; padding: 1vh 0; width: 100%; text-align: center; font-size: 2.5vh; border-radius: 4px; font-family: var(--font-title); font-weight: bold; }
         .client-info-box { width: 100%; min-height: 8vh; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 1vh; background: rgba(255,255,255,0.05); border-radius: 4px; }
         .c-name { font-size: 3vh; color: #fff; font-weight: bold; margin-bottom: 0.5vh; }
         .c-time { color: #aaa; font-family: 'Times New Roman'; font-size: 2.2vh; }
-
         .busy { border-color: var(--color-red); } .busy .avatar-frame { border-color: var(--color-red); } .busy .status-badge { background: var(--color-red); color: #fff; }
         .preparing { border-color: var(--color-yellow); } .preparing .avatar-frame { border-color: var(--color-yellow); } .preparing .status-badge { background: var(--color-yellow); color: #000; }
         .free { border-color: var(--color-green); } .free .avatar-frame { filter: grayscale(100%); opacity: 0.8; } .free .status-badge { border: 1px solid var(--color-green); color: var(--color-green); }
-
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--color-gold); font-size: 3vh;}
     </style>
 </head>
 <body>
 
-<div id="loader">
-    <div>正在读取维格表...</div>
-    <div id="debug-info" style="font-size: 1.5vh; color: #666; margin-top: 20px;"></div>
+<div id="console-log">
+    <div style="color:#fff; font-size:20px; margin-bottom:20px;">🛠️ 系统自检启动...</div>
 </div>
 
 <header>
     <div class="brand">灯辰文化命理服务中心</div>
-    <div class="date-info">
-        <div id="clock">00:00:00</div>
-        <div id="date-text">...</div>
-    </div>
+    <div class="date-info"><div id="clock">00:00:00</div><div id="date-text">...</div></div>
 </header>
-
 <main>
-    <aside class="sidebar glass-
+    <aside class="sidebar glass-panel">
+        <div class="stat-card"><div class="stat-label">今日总缘主</div><div class="stat-num" id="count-total">0</div></div>
+        <div class="stat-card"><div class="stat-label">等待接引</div><div class="stat-num" id="count-wait" style="color:#fff">0</div></div>
+        <div class="marquee-box"><div style="text-align:center; color:var(--color-gold); border-bottom:2px solid var(--color-red); padding-bottom:10px; margin-bottom:10px; font-family:var(--font-title); font-size: 2.5vh;">📅 预约实况</div><div class="marquee-content" id="future-list"></div></div>
+    </aside>
+    <div class="master-grid" id="master-grid"></div>
+</main>
+
+<script>
+    // ==========================================
+    // 🔴 必须修改：请填入您自己的 Token 和 ID
+    // ==========================================
+    const VIKA_CONFIG = {
+        TOKEN: "uskRMINs8MRQZD07iTNuNnl",  // 👈 请确保这里是您自己的 Token
+        DATASHEET_ID: "dstmgbUypiy0LbUzwF" // 👈 请确保这里是您自己的 ID
+    };
+
+    // ==========================================
+    // 🛠️ 日志工具
+    // ==========================================
+    function log(msg, type='info') {
+        const box = document.getElementById('console-log');
+        const time = new Date().toLocaleTimeString();
+        let style = 'color:#fff';
+        if(type==='err') style = 'color:#ff4d4d; font-weight:bold;';
+        if(type==='ok') style = 'color:#4caf50;';
+        box.innerHTML += `<div style="${style}">[${time}] ${msg}</div>`;
+    }
+
+    // ==========================================
+    // 🧠 核心逻辑
+    // ==========================================
+    async function fetchData() {
+        log("1. 开始连接维格表 API...", 'info');
+        
+        // 检查配置格式
+        if(!VIKA_CONFIG.TOKEN.startsWith("usk")) {
+            log("❌ 错误：Token 格式不对！必须以 'usk' 开头。您填的是：" + VIKA_CONFIG.TOKEN, 'err');
+            return;
+        }
+        if(!VIKA_CONFIG.DATASHEET_ID.startsWith("dst")) {
+            log("❌ 错误：表格 ID 格式不对！必须以 'dst' 开头。您填的是：" + VIKA_CONFIG.DATASHEET_ID, 'err');
+            return;
+        }
+
+        const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_CONFIG.DATASHEET_ID}/records?fieldKey=name&t=${new Date().getTime()}`;
+        
+        try {
+            const response = await fetch(url, { headers: { "Authorization": `Bearer ${VIKA_CONFIG.TOKEN}` } });
+            
+            log(`2. 服务器响应状态: ${response.status}`, 'info');
+
+            if(response.status === 401) {
+                log("❌ 认证失败 (401)：Token 错误或过期。请重新去维格表生成 Token。", 'err');
+                return;
+            }
+            if(response.status === 404) {
+                log("❌ 找不到表格 (404)：Datas

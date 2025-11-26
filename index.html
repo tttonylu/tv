@@ -13,7 +13,7 @@
     <style>
         :root {
             /* 极简高透 + 中式配色 */
-            --bg-overlay: rgba(0, 0, 0, 0.7); 
+            --bg-overlay: rgba(0, 0, 0, 0.75); 
             --sidebar-bg: rgba(0, 0, 0, 0.5);
             --pillar-bg: rgba(255, 255, 255, 0.02);
             
@@ -51,9 +51,9 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === 1. Header (12vh) === */
+        /* === 1. Header === */
         .header {
-            flex: 0 0 12vh;
+            flex: 0 0 11vh;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -64,23 +64,23 @@
 
         .brand-box .brand-name {
             font-family: var(--font-art);
-            font-size: 2.8rem;
+            font-size: 2.6rem;
             color: var(--text-gold);
             letter-spacing: 0.2rem;
             text-shadow: 0 0 15px rgba(238, 187, 102, 0.4);
         }
-        .time-box { font-size: 1rem; color: #ccc; margin-top: 5px; }
+        .time-box { font-size: 0.9rem; color: #ccc; margin-top: 5px; }
         
         .stats-panel { display: flex; gap: 1vw; }
         .stat-item {
             text-align: center;
             background: rgba(255,255,255,0.05);
-            padding: 4px 12px;
+            padding: 2px 10px;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 4px;
         }
-        .stat-num { font-size: 1.8rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1; }
-        .stat-label { font-size: 0.75rem; color: #999; margin-top: 2px; }
+        .stat-num { font-size: 1.6rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1; }
+        .stat-label { font-size: 0.7rem; color: #999; }
 
 
         /* === 2. Main Body === */
@@ -90,24 +90,24 @@
             overflow: hidden; 
         }
 
-        /* --- 左侧：行程列表 (变窄, 无滚动条) --- */
+        /* --- 左侧：行程列表 (紧凑版) --- */
         .sidebar {
-            flex: 0 0 20%; /* 宽度调整为 20% */
+            flex: 0 0 18%; /* 宽度占比缩小 */
             background: var(--sidebar-bg);
-            border-right: 2px solid rgba(238, 187, 102, 0.2);
+            border-right: 1px solid rgba(238, 187, 102, 0.2);
             display: flex;
             flex-direction: column;
-            padding: 2vh 0;
+            padding: 1.5vh 0;
             position: relative;
         }
 
         .sidebar-title {
             text-align: center;
             color: var(--text-gold);
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-family: var(--font-art);
             margin-bottom: 1vh;
-            padding-bottom: 1vh;
+            padding-bottom: 0.5vh;
             border-bottom: 1px dashed rgba(255,255,255,0.1);
             letter-spacing: 2px;
         }
@@ -115,53 +115,55 @@
         .schedule-list {
             flex: 1;
             overflow: hidden; /* 隐藏滚动条 */
-            padding: 0 1vw;
+            padding: 0 0.8vw;
             display: flex;
             flex-direction: column;
-            gap: 0.5vh;
+            gap: 0; /* 移除间隙，靠padding控制 */
         }
 
         .schedule-item {
             display: flex;
             align-items: center;
-            padding: 1vh 0.5vw;
+            padding: 0.8vh 0.5vw; /* 紧凑 Padding */
             border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: background 0.3s;
         }
         
         .sc-time {
-            width: 3rem;
+            width: 2.8rem;
             font-weight: bold;
             color: var(--text-gold);
             font-family: 'Arial', sans-serif;
             text-align: left;
+            font-size: 0.9em;
+            line-height: 1.2;
         }
         
-        .sc-content { flex: 1; display: flex; flex-direction: column; }
-        .sc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
-        .sc-master { font-weight: bold; color: #fff; font-size: 1rem; }
-        .sc-status { font-size: 0.75rem; padding: 1px 4px; border-radius: 2px; }
-        .sc-client { color: #888; font-size: 0.85rem; }
+        .sc-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .sc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1px; }
+        .sc-master { font-weight: bold; color: #fff; font-size: 0.95rem; white-space: nowrap; }
+        .sc-status { font-size: 0.7rem; padding: 0 3px; border-radius: 2px; white-space: nowrap; }
+        .sc-client { color: #888; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* 状态标记 */
-        .st-done { color: #666; } 
-        .st-ing { color: var(--text-gold); }
-        .st-wait { color: #aaa; }
+        /* 状态样式 */
+        .st-done { color: #555; } 
+        .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
+        .st-wait { color: #aaa; background: rgba(255,255,255,0.1); }
 
-        /* 历史记录半透明 */
-        .item-past { opacity: 0.5; filter: grayscale(0.8); }
-        .item-current { background: rgba(238, 187, 102, 0.1); border-left: 2px solid var(--text-gold); }
+        /* 历史记录：非常淡 */
+        .item-past { opacity: 0.3; }
+        /* 今日记录：高亮 */
+        .item-current { background: rgba(238, 187, 102, 0.08); border-left: 2px solid var(--text-gold); }
 
 
-        /* --- 右侧：大师立柱 (云纹边框) --- */
+        /* --- 右侧：大师立柱 (云纹 + 竖排) --- */
         .master-stage {
             flex: 1; 
             display: flex; 
             flex-direction: row; 
-            padding: 2vh 2vw; /* 给边框留点呼吸空间 */
-            gap: 2vw; /* 立柱之间的间距 */
-            background: rgba(0,0,0,0.2);
+            padding: 2vh 2vw; 
+            gap: 2vw; 
         }
 
         .master-pillar {
@@ -174,35 +176,29 @@
             padding-top: 4vh;
             padding-bottom: 2vh;
             background: var(--pillar-bg);
-            /* 基础边框 */
             border: 1px solid rgba(238, 187, 102, 0.3);
             box-shadow: 0 0 20px rgba(0,0,0,0.5) inset;
         }
 
-        /* === 云纹角标设计 === */
+        /* 云纹角标 */
         .master-pillar::before, .master-pillar::after {
             content: ''; position: absolute; width: 40px; height: 40px;
             background-image: var(--cloud-pattern);
             background-size: contain; background-repeat: no-repeat;
-            opacity: 0.8;
+            opacity: 0.9;
         }
-        /* 左上 */
         .master-pillar::before { top: -2px; left: -2px; transform: rotate(0deg); }
-        /* 右下 */
         .master-pillar::after { bottom: -2px; right: -2px; transform: rotate(180deg); }
         
-        /* 增加另外两个角的伪元素需要额外标签，这里用 inset shadow 和 border 模拟整体感，只加两个角的云纹更有留白美感 */
-
-        /* 顶部状态光条 */
         .pillar-top-bar {
-            position: absolute; top: 10px; width: 60%; height: 4px;
-            background: currentColor; box-shadow: 0 0 15px currentColor;
+            position: absolute; top: 10px; width: 60%; height: 3px;
+            background: currentColor; box-shadow: 0 0 10px currentColor;
             border-radius: 2px;
         }
 
         .m-avatar {
-            width: 16vh; height: 16vh;
-            max-width: 150px; max-height: 150px;
+            width: 15vh; height: 15vh;
+            max-width: 140px; max-height: 140px;
             border-radius: 50%;
             border: 3px solid rgba(255,255,255,0.1);
             object-fit: cover;
@@ -224,7 +220,7 @@
         }
         .m-name {
             font-family: var(--font-main);
-            font-size: 3.5rem; 
+            font-size: 3.2rem; 
             font-weight: 900;
             color: #fff;
             writing-mode: vertical-rl; 
@@ -241,11 +237,11 @@
         }
         .status-seal {
             display: inline-block;
-            padding: 0.8vh 2vw;
-            font-size: 1.4rem;
+            padding: 0.6vh 1.5vw;
+            font-size: 1.3rem;
             font-family: var(--font-art);
             border: 2px solid currentColor;
-            border-radius: 8px;
+            border-radius: 6px;
             background: rgba(0,0,0,0.8);
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
@@ -369,7 +365,7 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
 
             const masters = {};
-            const allItems = []; // 用于侧边栏筛选
+            const allItems = []; 
             const marqueeData = [];
             
             let cToday = 0;
@@ -399,11 +395,17 @@
                 if(isToday) cToday++;
                 if(isTmr) cTmr++;
 
-                // 收集本月数据 (用于后续筛选)
+                // 收集本月数据 (用于筛选)
                 if (isThisMonth && inter !== '取消') {
-                    allItems.push({...item, isPast: end < now, isToday: isToday});
+                    // 标记状态：已结束(isPast)，进行中(isIng)，未开始(isFuture)
+                    let isPast = end < now;
+                    let isIng = start <= now && end > now;
+                    // 如果是强制忙碌/强制空闲，逻辑相同
+                    
+                    allItems.push({...item, isPast: isPast, isIng: isIng, isToday: isToday});
                 }
 
+                // 滚动栏数据 (今日未来 + 明日)
                 if (inter !== '取消') {
                     if (isToday && end > now) marqueeData.push({...item, tag:'今日'});
                     if (isTmr) marqueeData.push({...item, tag:'明日'});
@@ -422,19 +424,18 @@
             document.getElementById('stat-today').innerText = cToday;
             document.getElementById('stat-tmr').innerText = cTmr;
 
-            // === 2. 侧边栏逻辑 (Fixed, Recent Past + Future) ===
+            // === 2. 侧边栏逻辑 (只显示最近1条历史 + 所有未来) ===
             const sideList = document.getElementById('month-list');
             sideList.innerHTML = '';
             
-            // 分离过期和未来
             allItems.sort((a,b) => a.start - b.start);
-            const pastItems = allItems.filter(i => i.isPast);
-            const futureItems = allItems.filter(i => !i.isPast);
             
-            // 取最近结束的 2 个
-            const recentPast = pastItems.slice(-2); 
-            // 组合最终列表
-            const displayList = [...recentPast, ...futureItems];
+            const pastItems = allItems.filter(i => i.isPast);
+            const activeItems = allItems.filter(i => !i.isPast); // 包括进行中和未来
+            
+            // 策略：只取最近结束的 1 条 (仅作参照)，然后显示所有未完成的
+            const recentPast = pastItems.slice(-1); 
+            const displayList = [...recentPast, ...activeItems];
 
             if(displayList.length === 0) {
                 sideList.innerHTML = '<div style="text-align:center; color:#666; padding-top:2rem;">无更多行程</div>';
@@ -448,16 +449,15 @@
                     else if(d.isToday) cls += ' item-current';
 
                     // 状态字
-                    let stTxt = d.isPast ? '已结束' : '待开始';
-                    let stCls = d.isPast ? 'st-done' : 'st-wait';
-                    if(!d.isPast && d.start <= now && d.end > now) {
-                        stTxt = '进行中'; stCls = 'st-ing';
-                    }
+                    let stTxt = '待开始';
+                    let stCls = 'st-wait';
+                    if(d.isPast) { stTxt = '已结束'; stCls = 'st-done'; }
+                    else if(d.isIng) { stTxt = '进行中'; stCls = 'st-ing'; }
 
                     const div = document.createElement('div');
                     div.className = cls;
                     div.innerHTML = `
-                        <div class="sc-time">${dateTxt}<br><span style="font-size:0.8em;font-weight:normal;">${timeTxt}</span></div>
+                        <div class="sc-time">${dateTxt}<br><span style="font-weight:normal;">${timeTxt}</span></div>
                         <div class="sc-content">
                             <div class="sc-top">
                                 <span class="sc-master">${d.master}</span>

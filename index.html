@@ -20,10 +20,10 @@
             --text-white: #ffffff;
             
             /* 状态色 */
-            --s-busy: #d32f2f;   /* 忙 */
-            --s-free: #2e7d32;   /* 闲 */
-            --s-prep: #7b1fa2;   /* 备 */
-            --s-rest: #546e7a;   /* 休 */
+            --s-busy: #d32f2f;   
+            --s-free: #2e7d32;   
+            --s-prep: #7b1fa2;   
+            --s-rest: #546e7a;   
 
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
@@ -49,7 +49,7 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === Header === */
+        /* === 1. Header === */
         .header {
             flex: 0 0 12vh;
             display: flex;
@@ -74,51 +74,62 @@
         .stat-num { font-size: 1.8rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1.1; font-weight: bold; }
         .stat-label { font-size: 0.8rem; color: #aaa; margin-top: 5px; }
 
-        /* === Main === */
+        /* === 2. Main Body === */
         .main-body { flex: 1; display: flex; overflow: hidden; }
 
-        /* --- 左侧 Sidebar (优化版) --- */
+        /* --- 左侧 Sidebar (防挤压版) --- */
         .sidebar {
-            flex: 0 0 25%; /* 宽度增加到 25% */
+            flex: 0 0 25%; 
             background: var(--sidebar-bg);
             border-right: 1px solid rgba(238, 187, 102, 0.2);
             display: flex; flex-direction: column; padding: 2vh 0;
         }
         .sidebar-title {
-            text-align: center; color: var(--text-gold); font-size: 1.4rem;
-            font-family: var(--font-art); margin-bottom: 1.5vh; padding-bottom: 0.5vh;
+            text-align: center; color: var(--text-gold); font-size: 1.5rem;
+            font-family: var(--font-art); margin-bottom: 2vh; padding-bottom: 1vh;
             border-bottom: 1px dashed rgba(255,255,255,0.1); letter-spacing: 2px;
         }
-        .schedule-list { flex: 1; overflow: hidden; padding: 0 1.2vw; display: flex; flex-direction: column; gap: 0; }
+        .schedule-list { flex: 1; overflow: hidden; padding: 0 1.5vw; display: flex; flex-direction: column; gap: 0; }
         
+        /* 列表项样式优化 */
         .schedule-item {
-            display: flex; align-items: center; /* 垂直居中 */
-            padding: 1.2vh 0; /* 增加垂直间距 */
+            display: flex; align-items: center; 
+            padding: 1.8vh 0; /* 增大垂直间距 */
             border-bottom: 1px solid rgba(255,255,255,0.08); 
-            font-size: 1rem; /* 增大字号 */
+            font-size: 1.1rem; /* 增大字号 */
         }
         
         .sc-time-col {
-            width: 4.5rem; /* 增加宽度 */
-            text-align: left; padding-right: 0.8rem;
-            border-right: 1px solid rgba(255,255,255,0.15); margin-right: 0.8rem;
+            width: 5rem; /* 增加宽度防止日期换行 */
+            text-align: left; padding-right: 1rem;
+            border-right: 1px solid rgba(255,255,255,0.15); margin-right: 1rem;
             display: flex; flex-direction: column; justify-content: center;
-            flex-shrink: 0; /* 防止压缩 */
+            flex-shrink: 0;
         }
         .sc-date-txt { 
             font-family:'Arial'; font-weight:bold; color: var(--text-gold); 
-            font-size: 1.1rem; line-height: 1.2; margin-bottom: 2px;
+            font-size: 1.2rem; line-height: 1.2; margin-bottom: 4px;
         }
-        .sc-time-txt { font-family:'Arial'; color: #ccc; font-size: 0.9rem; }
+        .sc-time-txt { font-family:'Arial'; color: #ccc; font-size: 1rem; }
 
         .sc-content { 
             flex: 1; display: flex; flex-direction: column; justify-content: center; 
-            gap: 4px; /* 行间距 */
+            gap: 6px; overflow: hidden;
         }
         .sc-row-1 { display: flex; justify-content: space-between; align-items: center; }
-        .sc-master { font-weight: bold; font-size: 1.1rem; color: var(--text-gold); }
-        .sc-status { font-size: 0.8rem; padding: 2px 6px; border-radius: 3px; margin-left: 10px; }
-        .sc-row-2 { font-size: 0.9rem; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* 强制不换行 */
+        .sc-master { 
+            font-weight: bold; font-size: 1.2rem; color: var(--text-gold); 
+            white-space: nowrap; 
+        }
+        .sc-status { 
+            font-size: 0.9rem; padding: 2px 8px; border-radius: 4px; 
+            white-space: nowrap; margin-left: 10px;
+        }
+        .sc-row-2 { 
+            font-size: 1rem; color: #aaa; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        }
         
         /* 状态样式 */
         .st-done { color: #666; } .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
@@ -126,9 +137,9 @@
         .st-rest-item { color: #888; font-style: italic; border: 1px dashed #666; }
         
         .item-past { opacity: 0.5; filter: grayscale(1); }
-        .item-current { background: rgba(238, 187, 102, 0.08); border-left: 4px solid var(--text-gold); padding-left: 8px; }
+        .item-current { background: rgba(238, 187, 102, 0.08); border-left: 4px solid var(--text-gold); padding-left: 10px; }
 
-        /* Master Pillars */
+        /* --- Master Pillars --- */
         .master-stage { flex: 1; display: flex; flex-direction: row; padding: 3vh 2vw; gap: 2vw; }
         .master-pillar {
             flex: 1; height: 100%; position: relative;
@@ -422,14 +433,18 @@
             document.getElementById('s-month-total').innerText = cntMonthTotal;
             document.getElementById('s-all-done').innerText = cntAllDone;
 
-            // === Sidebar ===
+            // === Sidebar Logic (2 + 6) ===
             const sideList = document.getElementById('month-list');
             sideList.innerHTML = '';
+            
             allItems.sort((a,b) => a.start - b.start);
             const pastItems = allItems.filter(i => i.isPast);
             const activeItems = allItems.filter(i => !i.isPast);
+            
+            // 限制逻辑：2个历史 + 6个未来 = 8个
             const recentPast = pastItems.slice(-2); 
-            const displayList = [...recentPast, ...activeItems];
+            const nearFuture = activeItems.slice(0, 6);
+            const displayList = [...recentPast, ...nearFuture];
 
             if(displayList.length === 0) {
                 sideList.innerHTML = '<div style="text-align:center; color:#666; padding-top:2rem;">无更多待办</div>';

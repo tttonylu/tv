@@ -21,15 +21,14 @@
             --text-white: #ffffff;
             
             /* 状态色系 */
-            --s-busy: #d32f2f;   /* 忙碌：丹红 */
-            --s-free: #2e7d32;   /* 空闲：竹青 */
-            --s-prep: #7b1fa2;   /* 准备：紫气 */
-            --s-rest: #546e7a;   /* 休息：墨灰 (低调) */
+            --s-busy: #d32f2f;   /* 忙碌 */
+            --s-free: #2e7d32;   /* 空闲 */
+            --s-prep: #7b1fa2;   /* 准备 */
+            --s-rest: #546e7a;   /* 休息 */
 
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
 
-            /* 云纹 SVG */
             --cloud-pattern: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2,2 L20,2 Q35,2 35,17 L35,35' fill='none' stroke='%23eebb66' stroke-width='2'/%3E%3Cpath d='M6,6 L18,6 Q28,6 28,16 L28,28' fill='none' stroke='%23eebb66' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
         }
 
@@ -52,7 +51,7 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === 1. 顶部 Header === */
+        /* === 1. Header === */
         .header {
             flex: 0 0 12vh;
             display: flex;
@@ -93,15 +92,14 @@
         }
         .stat-label { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
 
-
-        /* === 2. Main Layout === */
+        /* === 2. Main Body === */
         .main-body {
             flex: 1;
             display: flex;
             overflow: hidden; 
         }
 
-        /* --- 左侧：行程列表 --- */
+        /* --- 左侧 Sidebar --- */
         .sidebar {
             flex: 0 0 20%; 
             background: var(--sidebar-bg);
@@ -160,7 +158,6 @@
         .sc-status { font-size: 0.75rem; padding: 0 4px; border-radius: 2px; }
         .sc-row-2 { font-size: 0.85rem; color: #999; display: flex; justify-content: space-between;}
         
-        /* 侧边栏样式 */
         .st-done { color: #555; } 
         .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
         .st-wait { color: #aaa; background: rgba(255,255,255,0.1); }
@@ -170,7 +167,7 @@
         .item-current { background: rgba(238, 187, 102, 0.1); border-left: 3px solid var(--text-gold); padding-left: 5px; }
 
 
-        /* --- 右侧：大师立柱 (Pillars) --- */
+        /* --- 右侧 Pillars --- */
         .master-stage {
             flex: 1; 
             display: flex; 
@@ -189,7 +186,6 @@
             padding-top: 4vh;
             padding-bottom: 2vh;
             background: var(--pillar-bg);
-            /* 默认金边 */
             border: 1px solid rgba(238, 187, 102, 0.4);
             box-shadow: 0 0 30px rgba(0,0,0,0.6) inset;
             transition: all 0.5s ease;
@@ -269,40 +265,27 @@
             min-height: 1.2em;
         }
 
-        /* === 状态配色 === */
+        /* 状态色 */
         .st-free { color: var(--s-free); }
         .st-busy { color: var(--s-busy); }
         .st-prep { color: var(--s-prep); }
-
-        /* === 【休息状态 Rest Mode】 === */
+        
+        /* 休息状态设计 */
         .st-rest {
             color: var(--s-rest);
-            border-color: rgba(100, 100, 100, 0.2); /* 边框变暗 */
-            background: rgba(0,0,0,0.4); /* 背景加深 */
+            border-color: rgba(100, 100, 100, 0.2);
+            background: rgba(0,0,0,0.4);
         }
-        /* 云纹变暗 */
         .st-rest::before, .st-rest::after { filter: grayscale(1) brightness(0.5); opacity: 0.2; }
-        
-        /* 头像黑白化，加重阴影 */
         .st-rest .m-avatar { 
             filter: grayscale(100%) brightness(0.6); 
-            border-color: #444;
-            box-shadow: none;
+            border-color: #444; box-shadow: none;
         }
-        /* 名字变灰 */
         .st-rest .m-name { color: #666; text-shadow: none; }
-        
-        /* 印章变虚线 */
         .st-rest .status-seal {
-            border: 2px dashed #666;
-            background: transparent;
-            color: #888;
-            box-shadow: none;
+            border: 2px dashed #666; background: transparent; color: #888; box-shadow: none;
         }
-        /* 光效消失 */
         .st-rest .pillar-light { display: none; }
-        
-        /* 客户栏 */
         .st-rest .current-client { color: #555; font-style: italic; }
 
 
@@ -360,7 +343,7 @@
 
     <div class="main-body">
         <aside class="sidebar">
-            <div class="sidebar-title">本月行程 (全馆)</div>
+            <div class="sidebar-title">本月待办 (全馆)</div>
             <div class="schedule-list" id="month-list"></div>
         </aside>
 
@@ -413,18 +396,15 @@
             }
         }
 
+        // 安全解析日期
         function parseVikaDate(dateStr, timeStr) {
-            if (!dateStr) return null; // 必须有日期
-            // 如果时间为空，默认设置为 00:00，防止休息记录被丢弃
-            let tStr = timeStr || "00:00"; 
-            
+            if (!dateStr) return null;
+            let tStr = timeStr || "00:00"; // 缺省时间补全，防止崩溃
             let ds = String(dateStr).replace(/\//g, '-');
             let dParts = ds.split('-'); 
             let tParts = tStr.split(':'); 
-            
             if (dParts.length < 3) return null;
             if (tParts.length < 2) tParts = [0, 0];
-
             return new Date(parseInt(dParts[0]), parseInt(dParts[1]) - 1, parseInt(dParts[2]), parseInt(tParts[0]), parseInt(tParts[1]));
         }
 
@@ -448,24 +428,26 @@
 
             records.forEach(r => {
                 const f = r.fields;
-                if(!f['大师'] || !f['日期']) return; // 只校验大师和日期，时间可缺省
+                // 关键修正：如果日期为空则跳过，但如果时间为空，允许parseVikaDate去补全
+                if(!f['大师'] || !f['日期']) return; 
 
                 const start = parseVikaDate(f['日期'], f['时间']);
                 if(!start) return;
                 
-                // 时长默认 60，如果是休息且没填时长，默认 1440 (全天)
-                let defaultDur = 60;
-                const inter = f['状态干预'];
-                const interStr = String(inter || "");
-                const isRest = ['休息', '请假', '外出', '停诊'].some(k => interStr.includes(k));
+                // 处理状态文本，防止 undefined 报错
+                const inter = String(f['状态干预'] || "");
+                const isRest = ['休息', '请假', '外出', '停诊'].some(kw => inter.includes(kw));
+                const isCancel = inter.includes('取消');
 
+                // 时长处理：如果是休息且未填时长，默认为全天(1440)，否则默认60
+                let defaultDur = 60;
                 if(isRest && !f['时长']) defaultDur = 1440;
                 
                 const end = new Date(start.getTime() + (f['时长']||defaultDur)*60000);
 
                 const item = {
                     client: f['客户'] || '善信',
-                    start: start, end: end, inter: interStr,
+                    start: start, end: end, inter: inter,
                     master: f['大师']
                 };
 
@@ -474,19 +456,19 @@
                 const isThisMonth = (start.getMonth() === now.getMonth()) && (start.getFullYear() === now.getFullYear());
                 const isPast = end < now;
 
-                if (!isRest && inter !== '取消') {
+                if (!isRest && !isCancel) {
                     if (isToday) cntTodayTotal++;
                     if (isToday && isPast) cntTodayDone++;
                     if (isThisMonth) cntMonthTotal++;
                     if (isPast) cntAllDone++;
                 }
 
-                if (isThisMonth && inter !== '取消') {
+                if (isThisMonth && !isCancel) {
                     let isIng = start <= now && end > now;
                     allItems.push({...item, isPast: isPast, isIng: isIng, isToday: isToday, isRest: isRest});
                 }
 
-                if (!isRest && inter !== '取消') {
+                if (!isRest && !isCancel) {
                     if (isToday && end > now) marqueeData.push({...item, tag:'今日'});
                     else if (isTmr) marqueeData.push({...item, tag:'明日'});
                 }
@@ -528,8 +510,11 @@
 
                     let stTxt = '待开始';
                     let stCls = 'st-wait';
-                    if(d.isRest) { stTxt = '休·沐'; stCls = 'st-rest-item'; }
-                    else {
+                    
+                    if (d.isRest) {
+                        stTxt = '休·沐'; 
+                        stCls = 'st-rest-item'; 
+                    } else {
                         if(d.isPast) { stTxt = '已结束'; stCls = 'st-done'; }
                         else if(d.isIng) { stTxt = '进行中'; stCls = 'st-ing'; }
                     }
@@ -596,15 +581,12 @@
                     
                     const isRest = ['休息', '请假', '外出', '停诊'].some(kw => t.inter.includes(kw));
 
-                    // 判定：如果今天有休息记录，且现在处于休息时间内 (若没填时间则默认全天)
-                    if(isRest && (busy || (t.inter && !t.start))) { // 只要是休息，优先级最高
-                         // 如果休息记录是全天的(busy=true because default 1440)，或者现在就在时间段内
-                         if(busy) {
-                            statusClass = 'st-rest'; 
-                            statusText = '休沐 · 暂离'; 
-                            clientText = '归期未定'; 
-                            break; 
-                         }
+                    // 如果是休息，且（时间吻合 或者 根本没填时间导致默认为全天）
+                    if(isRest && (busy || (t.inter && t.start.getHours()===0 && t.start.getMinutes()===0))) {
+                        statusClass = 'st-rest'; 
+                        statusText = '休沐 · 暂离'; 
+                        clientText = '归期未定'; 
+                        break; 
                     }
 
                     if((busy||prep) && t.inter.includes('忙碌')) {

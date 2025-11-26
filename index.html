@@ -12,16 +12,17 @@
 
     <style>
         :root {
-            --bg-overlay: rgba(0, 0, 0, 0.7);
-            --card-bg: rgba(30, 30, 30, 0.85); /* 卡片底色加深 */
+            /* 极简高透风格 */
+            --bg-overlay: rgba(0, 0, 0, 0.55); /* 遮罩减淡 */
+            --glass-bg: rgba(255, 255, 255, 0.03); /* 微弱的磨砂光感 */
             
-            --text-gold: #ffd700; 
+            --text-gold: #eebb66; 
             --text-white: #ffffff;
             --text-dim: #a0a0a0;
             
-            --s-busy: #c62828; 
+            --s-busy: #d32f2f; 
             --s-free: #2e7d32;
-            --s-prep: #6a1b9a;
+            --s-prep: #7b1fa2;
 
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
@@ -35,7 +36,7 @@
             font-family: var(--font-main);
             height: 100vh;
             width: 100vw;
-            overflow: hidden; 
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             color: var(--text-white);
@@ -46,381 +47,139 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === 1. 顶部 Header === */
+        /* === 1. 顶部区域 (Logo + 统计) === */
         .header {
-            flex: 0 0 10vh;
+            flex: 0 0 14vh; /* 占比 */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 4vw;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 0 3vw;
+            border-bottom: 1px solid rgba(238, 187, 102, 0.2);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
 
+        .brand-box { display: flex; flex-direction: column; }
         .brand-name {
             font-family: var(--font-art);
-            font-size: 3.5vh;
+            font-size: 3.5rem;
             color: var(--text-gold);
-            letter-spacing: 0.3rem;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            letter-spacing: 0.5rem;
+            text-shadow: 0 0 20px rgba(238, 187, 102, 0.3);
         }
-
-        .clock-box { text-align: right; }
-        .clock-time { font-size: 3vh; font-weight: bold; color: #fff; line-height: 1; }
-        .clock-date { font-size: 1.5vh; color: var(--text-gold); margin-top: 0.5vh; font-family: var(--font-art); }
-
-        /* === 2. 数据统计条 (新增总数和明日) === */
-        .stats-bar {
-            flex: 0 0 8vh;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        .time-box {
+            font-size: 1.2rem;
+            color: #ddd;
+            margin-top: 0.5rem;
         }
-
-        .stat-item { text-align: center; }
-        .stat-num { font-size: 3vh; color: var(--text-gold); font-weight: bold; font-family: var(--font-art); }
-        .stat-label { font-size: 1.5vh; color: #ccc; }
-
-        /* === 3. 滚动通告 (今日+明日) === */
-        .marquee-bar {
-            flex: 0 0 5vh;
-            background: rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-        }
-        .marquee-icon { 
-            padding: 0 2vw; background: var(--text-gold); color: #000; 
-            font-weight: bold; height: 100%; display: flex; align-items: center; font-size: 1.8vh;
-        }
-        .marquee-wrap { flex: 1; white-space: nowrap; position: relative; height: 100%; display: flex; align-items: center; overflow: hidden; }
-        .marquee-content { position: absolute; display: flex; animation: marquee 25s linear infinite; }
-        .mq-item { margin-right: 5vw; font-size: 2vh; color: #eee; display: flex; align-items: center; }
-        .mq-tag { padding: 2px 6px; border-radius: 4px; margin-right: 8px; font-size: 1.5vh; font-weight: bold; }
         
-        .tag-today { border: 1px solid var(--text-gold); color: var(--text-gold); }
-        .tag-tom { border: 1px solid #4fc3f7; color: #4fc3f7; }
-
-        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-
-        /* === 4. 大师列表 (竖向框布局) === */
-        .master-container {
-            flex: 1;
+        /* 顶部右侧：数据统计面板 */
+        .stats-panel {
             display: flex;
-            flex-direction: column; /* 依然是垂直排列 */
-            padding: 2vh 4vw;
-            gap: 2vh; /* 卡片间距 */
+            gap: 2vw;
+        }
+        .stat-item {
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            padding: 0.8vh 1.5vw;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        .stat-num { font-size: 2.5rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1; }
+        .stat-label { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
+
+
+        /* === 2. 核心：大师立柱展示区 (Vertical Pillars) === */
+        /* 使用 flex-direction: row 让大师左右排列，形成竖长的列 */
+        .master-stage {
+            flex: 1; /* 占据屏幕绝大部分空间 */
+            display: flex; 
+            flex-direction: row; /* 左右排列 */
+            padding: 0;
             overflow: hidden;
-        }
-
-        .master-card {
-            flex: 1; /* 自动拉伸高度，填满屏幕 */
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 8px;
-            /* 关键修改：内部改为竖向布局 (Vertical Frame) */
-            display: flex;
-            flex-direction: column; 
-            align-items: center;
-            justify-content: center;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0.3s;
         }
 
-        /* 状态顶条装饰 */
-        .card-top-bar { width: 100%; height: 6px; position: absolute; top: 0; left: 0; }
+        .master-pillar {
+            flex: 1; /* 自动均分宽度 */
+            height: 100%; /* 占满高度 */
+            border-right: 1px solid rgba(255,255,255,0.05); /* 分隔线 */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 4vh;
+            padding-bottom: 2vh;
+            transition: all 0.4s ease;
+            background: var(--glass-bg); /* 极淡背景 */
+        }
+        
+        /* 状态顶光 */
+        .pillar-light {
+            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            box-shadow: 0 0 30px 5px currentColor;
+        }
 
+        /* 头像 */
         .m-avatar {
-            width: 14vh; height: 14vh; /* 根据屏幕高度自适应 */
-            max-width: 150px; max-height: 150px;
+            width: 18vh; height: 18vh;
+            max-width: 160px; max-height: 160px;
             border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.1);
             object-fit: cover;
-            border: 4px solid #333;
-            margin-bottom: 1.5vh;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            margin-bottom: 4vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            z-index: 2;
         }
 
-        .m-info { text-align: center; margin-bottom: 2vh; }
-        .m-name { font-size: 3.5vh; font-weight: bold; color: #fff; text-shadow: 0 2px 5px #000; margin-bottom: 0.5vh; }
-        .m-client { font-size: 1.8vh; color: #bbb; font-style: italic; min-height: 2vh; }
+        /* 名字 (竖排) */
+        .m-name-box {
+            flex: 1; /* 占据中间空间 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .m-name {
+            font-family: var(--font-main);
+            font-size: 4rem; /* 大字 */
+            font-weight: 900;
+            color: #fff;
+            writing-mode: vertical-rl; /* 核心：文字竖排 */
+            text-orientation: upright;
+            letter-spacing: 1.5vh;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            opacity: 0.9;
+        }
 
-        .m-status {
-            font-size: 2.2vh;
-            padding: 0.8vh 4vw;
-            border-radius: 50px;
+        /* 底部状态区 */
+        .m-footer {
+            margin-top: auto;
+            text-align: center;
+            width: 100%;
+            padding: 0 1vw;
+            z-index: 2;
+        }
+        .status-seal {
+            display: inline-block;
+            padding: 1vh 2vw;
+            font-size: 1.5rem;
             font-family: var(--font-art);
-            letter-spacing: 2px;
+            border: 2px solid currentColor;
+            border-radius: 8px; /* 像印章 */
             background: rgba(0,0,0,0.6);
-            border: 1px solid transparent;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            white-space: nowrap;
+        }
+        .current-client {
+            margin-top: 1.5vh;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            min-height: 1.2em;
         }
 
-        /* 状态样式配置 */
-        .st-free .card-top-bar { background: var(--s-free); box-shadow: 0 0 15px var(--s-free); }
-        .st-free .m-avatar { border-color: var(--s-free); }
-        .st-free .m-status { color: #66bb6a; border-color: #2e7d32; }
-
-        .st-busy .card-top-bar { background: var(--s-busy); box-shadow: 0 0 15px var(--s-busy); }
-        .st-busy .m-avatar { border-color: var(--s-busy); }
-        .st-busy .m-status { color: #ef5350; border-color: #b71c1c; }
-
-        .st-prep .card-top-bar { background: var(--s-prep); box-shadow: 0 0 15px var(--s-prep); }
-        .st-prep .m-avatar { border-color: var(--s-prep); }
-        .st-prep .m-status { color: #ab47bc; border-color: #7b1fa2; }
-
-        /* 错误弹窗 */
-        #error-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            display: none; justify-content: center; align-items: center; flex-direction: column;
-            z-index: 999; color: var(--s-busy);
-        }
-
-    </style>
-</head>
-<body>
-
-    <div id="error-overlay">
-        <h2 style="font-size: 3vh; margin-bottom: 2vh;">连接异常</h2>
-        <p id="error-msg" style="font-size: 2vh; color: #fff;">初始化中...</p>
-    </div>
-
-    <header class="header">
-        <div class="brand-name">灯辰文化</div>
-        <div class="clock-box">
-            <div class="clock-time" id="c-time">00:00</div>
-            <div class="clock-date" id="c-date">载入中...</div>
-        </div>
-    </header>
-
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-num" id="count-today">0</div>
-            <div class="stat-label">今日预约</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-num" id="count-tmr">0</div>
-            <div class="stat-label">明日预约</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-num" id="count-total">0</div>
-            <div class="stat-label">本月累计</div>
-        </div>
-    </div>
-
-    <div class="marquee-bar">
-        <div class="marquee-icon">预约通告</div>
-        <div class="marquee-wrap">
-            <div class="marquee-content" id="marquee-list">
-                </div>
-        </div>
-    </div>
-
-    <div class="master-container" id="master-container">
-        <div style="margin:auto; color:#666; font-size:2vh;">数据读取中...</div>
-    </div>
-
-    <script>
-        // === 您的配置 (已写入) ===
-        const VIKA_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
-        const VIKA_ID = 'dstmgbUypiy0LbUzwF'; 
-        // =======================
-
-        const refreshInterval = 30000;
-
-        init();
-        runClock();
-
-        function runClock() {
-            setInterval(() => {
-                const now = new Date();
-                const t = now.toLocaleTimeString('en-GB', { hour12: false });
-                // 农历干支简单映射 (仅显示年)
-                const years = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
-                const zoadiac = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"]; // 对应子丑寅卯...
-                const offset = now.getFullYear() - 1984; 
-                const gz = years[(offset%10+10)%10] + ((offset%12+12)%12 === 5 ? '巳' : '支') + '年'; // 简写
-                
-                // 仅显示公历日期 + 星期
-                const d = now.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' });
-                
-                document.getElementById('c-time').innerText = t;
-                document.getElementById('c-date').innerText = `${d}`; 
-            }, 1000);
-        }
-
-        async function init() {
-            await loadData();
-            setInterval(loadData, refreshInterval);
-        }
-
-        async function loadData() {
-            try {
-                // fieldKey=name 确保返回列名而非ID
-                const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_ID}/records?fieldKey=name`;
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${VIKA_TOKEN}` } });
-                
-                if (!res.ok) throw new Error('网络连接错误');
-                const json = await res.json();
-                if (json.code !== 200) throw new Error(json.message);
-
-                document.getElementById('error-overlay').style.display = 'none';
-                render(json.data.records);
-
-            } catch (err) {
-                console.error(err);
-                document.getElementById('error-msg').innerText = err.message;
-                document.getElementById('error-overlay').style.display = 'flex';
-            }
-        }
-
-        function render(records) {
-            const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-
-            const masters = {};
-            const marqueeData = [];
-            
-            let cntToday = 0;
-            let cntTmr = 0;
-            let cntTotal = records.length; // 总数直接取记录数
-
-            records.forEach(r => {
-                const f = r.fields;
-                if (!f['大师'] || !f['日期'] || !f['时间']) return;
-
-                // 兼容日期处理
-                let dStr = f['日期'];
-                if(typeof dStr === 'number') {
-                    const dObj = new Date(dStr);
-                    dStr = `${dObj.getFullYear()}-${dObj.getMonth()+1}-${dObj.getDate()}`;
-                } else {
-                    dStr = String(dStr).replace(/\//g, '-');
-                }
-
-                const start = new Date(`${dStr}T${f['时间']}:00`);
-                if(isNaN(start)) return;
-                
-                const duration = f['时长'] || 60;
-                const end = new Date(start.getTime() + duration*60000);
-                const inter = f['状态干预'];
-
-                const item = {
-                    client: f['客户'] || '善信',
-                    start: start,
-                    end: end,
-                    inter: inter,
-                    master: f['大师']
-                };
-
-                const isToday = isSameDay(start, now);
-                const isTmr = isSameDay(start, tomorrow);
-
-                if(isToday) cntToday++;
-                if(isTmr) cntTmr++;
-
-                // 收集滚动数据 (今天未来的 + 明天的)
-                if ((isToday && start > now) || isTmr) {
-                    if (inter !== '取消') {
-                        marqueeData.push({ ...item, isTmr: isTmr });
-                    }
-                }
-
-                if (!masters[f['大师']]) {
-                    masters[f['大师']] = {
-                        name: f['大师'],
-                        photo: (f['头像'] && f['头像'][0]) ? f['头像'][0].url : null,
-                        items: []
-                    };
-                }
-                masters[f['大师']].items.push(item);
-            });
-
-            // 1. 更新数字
-            document.getElementById('count-today').innerText = cntToday;
-            document.getElementById('count-tmr').innerText = cntTmr;
-            document.getElementById('count-total').innerText = cntTotal;
-
-            // 2. 更新滚动条
-            const mq = document.getElementById('marquee-list');
-            mq.innerHTML = '';
-            if (marqueeData.length === 0) {
-                mq.innerHTML = '<div class="mq-item" style="padding-left:2vw;">今日后续及明日暂无预约</div>';
-            } else {
-                // 排序
-                marqueeData.sort((a,b) => a.start - b.start);
-                
-                const createItems = () => {
-                    marqueeData.forEach(d => {
-                        const tag = d.isTmr ? '<span class="mq-tag tag-tom">明日</span>' : '<span class="mq-tag tag-today">今日</span>';
-                        const time = d.start.toTimeString().substring(0, 5);
-                        const html = `<div class="mq-item">${tag} ${time} ${d.master} 预约 ${d.client}</div>`;
-                        mq.innerHTML += html;
-                    });
-                };
-                createItems();
-                createItems(); // 复制一份实现无缝
-            }
-
-            // 3. 渲染大师卡片 (竖向框)
-            const con = document.getElementById('master-container');
-            con.innerHTML = '';
-            
-            const mKeys = Object.keys(masters);
-            if(mKeys.length === 0) {
-                con.innerHTML = '<div style="margin:auto; font-size:2vh; color:#999;">暂无大师数据</div>';
-                return;
-            }
-
-            mKeys.forEach(k => {
-                const m = masters[k];
-                let stClass = 'st-free';
-                let stText = '空闲 · 纳客';
-                let clientText = '当前无咨客';
-                
-                for(let t of m.items) {
-                    if(t.inter === '取消') continue;
-
-                    const busy = now >= t.start && now < t.end;
-                    const prep = now >= new Date(t.start.getTime() - 10*60000) && now < t.start;
-
-                    if((busy||prep) && t.inter === '强制忙碌') {
-                        stClass = 'st-busy'; stText = '特约咨询'; clientText = `正服务：${t.client}`; break;
-                    }
-                    if((busy||prep) && t.inter === '强制空闲') continue;
-
-                    if(busy) {
-                        stClass = 'st-busy'; stText = '咨询中 · 勿扰'; clientText = `正服务：${t.client}`; break;
-                    } else if(prep && stClass !== 'st-busy') {
-                        stClass = 'st-prep'; stText = '恭候 · 待启'; clientText = `候见：${t.client}`;
-                    }
-                }
-
-                const img = m.photo || 'https://via.placeholder.com/200/333/d4af37?text=Master';
-                
-                const div = document.createElement('div');
-                div.className = `master-card ${stClass}`;
-                div.innerHTML = `
-                    <div class="card-top-bar"></div>
-                    <img src="${img}" class="m-avatar">
-                    <div class="m-info">
-                        <div class="m-name">${m.name}</div>
-                        <div class="m-client">${clientText}</div>
-                    </div>
-                    <div class="m-status">${stText}</div>
-                `;
-                con.appendChild(div);
-            });
-        }
-
-        function isSameDay(d1, d2) {
-            return d1.getFullYear() === d2.getFullYear() &&
-                   d1.getMonth() === d2.getMonth() &&
-                   d1.getDate() === d2.getDate();
-        }
-    </script>
-</body>
-</html>
+        /* 状态配色 (应用到光效和印章) */
+        .st-free { color: var(--s-free); }
+        .st-free .pillar-light { background: var(--s-free); }
+        
+        .st-busy { color: var(--s-busy); }
+        .st-

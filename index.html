@@ -12,7 +12,7 @@
 
     <style>
         :root {
-            /* 极简高透 + 中式配色 */
+            /* 配色变量 */
             --bg-overlay: rgba(0, 0, 0, 0.75); 
             --sidebar-bg: rgba(0, 0, 0, 0.5);
             --pillar-bg: rgba(255, 255, 255, 0.02);
@@ -28,8 +28,8 @@
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
 
-            /* 云纹图案 (用于边框四角) */
-            --cloud-pattern: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2,2 L15,2 Q25,2 25,12 L25,25' fill='none' stroke='%23eebb66' stroke-width='2'/%3E%3Cpath d='M5,5 L12,5 Q18,5 18,11 L18,18' fill='none' stroke='%23eebb66' stroke-width='1' opacity='0.6'/%3E%3C/svg%3E");
+            /* 云纹图案 (用于立柱四角) */
+            --cloud-pattern: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2,2 L20,2 Q35,2 35,17 L35,35' fill='none' stroke='%23eebb66' stroke-width='2'/%3E%3Cpath d='M6,6 L18,6 Q28,6 28,16 L28,28' fill='none' stroke='%23eebb66' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,9 +51,9 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === 1. Header === */
+        /* === 1. Header (12vh) === */
         .header {
-            flex: 0 0 11vh;
+            flex: 0 0 12vh;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -64,23 +64,38 @@
 
         .brand-box .brand-name {
             font-family: var(--font-art);
-            font-size: 2.6rem;
+            font-size: 2.8rem;
             color: var(--text-gold);
             letter-spacing: 0.2rem;
             text-shadow: 0 0 15px rgba(238, 187, 102, 0.4);
         }
-        .time-box { font-size: 0.9rem; color: #ccc; margin-top: 5px; }
+        .time-box { font-size: 1rem; color: #ccc; margin-top: 5px; }
         
+        /* 统计面板：4个指标 */
         .stats-panel { display: flex; gap: 1vw; }
         .stat-item {
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             background: rgba(255,255,255,0.05);
-            padding: 2px 10px;
+            width: 5.5vw;
+            padding: 0.8vh 0;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 4px;
         }
-        .stat-num { font-size: 1.6rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1; }
-        .stat-label { font-size: 0.7rem; color: #999; }
+        .stat-num { 
+            font-size: 1.8rem; 
+            color: var(--text-gold); 
+            font-family: var(--font-art); 
+            line-height: 1.1; 
+            font-weight: bold;
+        }
+        .stat-label { 
+            font-size: 0.75rem; 
+            color: #aaa; 
+            margin-top: 4px;
+        }
 
 
         /* === 2. Main Body === */
@@ -90,459 +105,8 @@
             overflow: hidden; 
         }
 
-        /* --- 左侧：行程列表 (紧凑版) --- */
+        /* --- 左侧：行程列表 (Sidebar) --- */
         .sidebar {
-            flex: 0 0 18%; /* 宽度占比缩小 */
+            flex: 0 0 20%; 
             background: var(--sidebar-bg);
-            border-right: 1px solid rgba(238, 187, 102, 0.2);
-            display: flex;
-            flex-direction: column;
-            padding: 1.5vh 0;
-            position: relative;
-        }
-
-        .sidebar-title {
-            text-align: center;
-            color: var(--text-gold);
-            font-size: 1.2rem;
-            font-family: var(--font-art);
-            margin-bottom: 1vh;
-            padding-bottom: 0.5vh;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
-            letter-spacing: 2px;
-        }
-
-        .schedule-list {
-            flex: 1;
-            overflow: hidden; /* 隐藏滚动条 */
-            padding: 0 0.8vw;
-            display: flex;
-            flex-direction: column;
-            gap: 0; /* 移除间隙，靠padding控制 */
-        }
-
-        .schedule-item {
-            display: flex;
-            align-items: center;
-            padding: 0.8vh 0.5vw; /* 紧凑 Padding */
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-size: 0.85rem;
-            transition: background 0.3s;
-        }
-        
-        .sc-time {
-            width: 2.8rem;
-            font-weight: bold;
-            color: var(--text-gold);
-            font-family: 'Arial', sans-serif;
-            text-align: left;
-            font-size: 0.9em;
-            line-height: 1.2;
-        }
-        
-        .sc-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .sc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1px; }
-        .sc-master { font-weight: bold; color: #fff; font-size: 0.95rem; white-space: nowrap; }
-        .sc-status { font-size: 0.7rem; padding: 0 3px; border-radius: 2px; white-space: nowrap; }
-        .sc-client { color: #888; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* 状态样式 */
-        .st-done { color: #555; } 
-        .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
-        .st-wait { color: #aaa; background: rgba(255,255,255,0.1); }
-
-        /* 历史记录：非常淡 */
-        .item-past { opacity: 0.3; }
-        /* 今日记录：高亮 */
-        .item-current { background: rgba(238, 187, 102, 0.08); border-left: 2px solid var(--text-gold); }
-
-
-        /* --- 右侧：大师立柱 (云纹 + 竖排) --- */
-        .master-stage {
-            flex: 1; 
-            display: flex; 
-            flex-direction: row; 
-            padding: 2vh 2vw; 
-            gap: 2vw; 
-        }
-
-        .master-pillar {
-            flex: 1; 
-            height: 100%;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 4vh;
-            padding-bottom: 2vh;
-            background: var(--pillar-bg);
-            border: 1px solid rgba(238, 187, 102, 0.3);
-            box-shadow: 0 0 20px rgba(0,0,0,0.5) inset;
-        }
-
-        /* 云纹角标 */
-        .master-pillar::before, .master-pillar::after {
-            content: ''; position: absolute; width: 40px; height: 40px;
-            background-image: var(--cloud-pattern);
-            background-size: contain; background-repeat: no-repeat;
-            opacity: 0.9;
-        }
-        .master-pillar::before { top: -2px; left: -2px; transform: rotate(0deg); }
-        .master-pillar::after { bottom: -2px; right: -2px; transform: rotate(180deg); }
-        
-        .pillar-top-bar {
-            position: absolute; top: 10px; width: 60%; height: 3px;
-            background: currentColor; box-shadow: 0 0 10px currentColor;
-            border-radius: 2px;
-        }
-
-        .m-avatar {
-            width: 15vh; height: 15vh;
-            max-width: 140px; max-height: 140px;
-            border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.1);
-            object-fit: cover;
-            margin-bottom: 3vh;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-            z-index: 2;
-        }
-
-        .m-name-box {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            margin: 1vh 0;
-            background: rgba(0,0,0,0.1);
-        }
-        .m-name {
-            font-family: var(--font-main);
-            font-size: 3.2rem; 
-            font-weight: 900;
-            color: #fff;
-            writing-mode: vertical-rl; 
-            text-orientation: upright;
-            letter-spacing: 1.2vh;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-        }
-
-        .m-footer {
-            margin-top: auto;
-            text-align: center;
-            width: 100%;
-            z-index: 2;
-        }
-        .status-seal {
-            display: inline-block;
-            padding: 0.6vh 1.5vw;
-            font-size: 1.3rem;
-            font-family: var(--font-art);
-            border: 2px solid currentColor;
-            border-radius: 6px;
-            background: rgba(0,0,0,0.8);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-        .current-client {
-            margin-top: 1vh;
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.5);
-            min-height: 1.2em;
-        }
-
-        /* 状态色 */
-        .st-free { color: var(--s-free); }
-        .st-busy { color: var(--s-busy); }
-        .st-prep { color: var(--s-prep); }
-
-        /* === 3. Footer Marquee === */
-        .marquee-bar {
-            flex: 0 0 5vh;
-            background: rgba(0,0,0,0.8);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            padding-left: 1vw;
-            font-size: 1rem;
-        }
-        .mq-label { color: var(--text-gold); font-weight: bold; margin-right: 2vw; padding-left: 1vw; }
-        .mq-viewport { flex: 1; overflow: hidden; height: 100%; position: relative; }
-        .mq-content { position: absolute; display: flex; align-items: center; height: 100%; white-space: nowrap; animation: scroll 25s linear infinite; }
-        .mq-item { margin-right: 4vw; color: #ddd; }
-        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-
-        #err-layer {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            display: none; justify-content: center; align-items: center; z-index: 999;
-            color: var(--s-busy); font-size: 2rem;
-        }
-    </style>
-</head>
-<body>
-
-    <div id="err-layer">系统连接中断，正在重试...</div>
-
-    <header class="header">
-        <div class="brand-box">
-            <div class="brand-name">灯辰文化</div>
-            <div class="time-box" id="clock-display">载入中...</div>
-        </div>
-        <div class="stats-panel">
-            <div class="stat-item">
-                <div class="stat-num" id="stat-today">0</div>
-                <div class="stat-label">今日</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-num" id="stat-tmr">0</div>
-                <div class="stat-label">明日</div>
-            </div>
-        </div>
-    </header>
-
-    <div class="main-body">
-        
-        <aside class="sidebar">
-            <div class="sidebar-title">本月行程</div>
-            <div class="schedule-list" id="month-list">
-                </div>
-        </aside>
-
-        <main class="master-stage" id="master-stage">
-            <div style="margin:auto; font-size:1.5rem; color:#888;">正在读取排班...</div>
-        </main>
-
-    </div>
-
-    <div class="marquee-bar">
-        <div class="mq-label">最新通告</div>
-        <div class="mq-viewport">
-            <div class="mq-content" id="mq-list"></div>
-        </div>
-    </div>
-
-    <script>
-        const VIKA_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
-        const VIKA_ID = 'dstmgbUypiy0LbUzwF'; 
-        const REFRESH_MS = 30000;
-
-        init();
-        
-        setInterval(() => {
-            const now = new Date();
-            const gan = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
-            const zhi = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-            const idx = (now.getFullYear() - 1984) % 60; 
-            const gz = gan[(idx%10+10)%10] + zhi[(idx%12+12)%12];
-            const tStr = now.toLocaleTimeString('en-GB', { hour12: false });
-            const dStr = now.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' });
-            document.getElementById('clock-display').innerHTML = `${gz}年 · ${dStr} &nbsp; <span style="color:#eebb66;">${tStr}</span>`;
-        }, 1000);
-
-        async function init() {
-            await load();
-            setInterval(load, REFRESH_MS);
-        }
-
-        async function load() {
-            try {
-                const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_ID}/records?fieldKey=name`;
-                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${VIKA_TOKEN}` } });
-                const json = await res.json();
-                if(!res.ok || json.code !== 200) throw new Error('API Error');
-                document.getElementById('err-layer').style.display = 'none';
-                render(json.data.records);
-            } catch(e) {
-                console.error(e);
-                document.getElementById('err-layer').style.display = 'flex';
-            }
-        }
-
-        function render(records) {
-            const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-
-            const masters = {};
-            const allItems = []; 
-            const marqueeData = [];
-            
-            let cToday = 0;
-            let cTmr = 0;
-
-            records.forEach(r => {
-                const f = r.fields;
-                if(!f['大师'] || !f['日期'] || !f['时间']) return;
-
-                let dStr = typeof f['日期'] === 'number' ? new Date(f['日期']).toISOString().split('T')[0] : String(f['日期']).replace(/\//g, '-');
-                const start = new Date(`${dStr}T${f['时间']}:00`);
-                if(isNaN(start)) return;
-                
-                const end = new Date(start.getTime() + (f['时长']||60)*60000);
-                const inter = f['状态干预'];
-
-                const item = {
-                    client: f['客户'] || '善信',
-                    start: start, end: end, inter: inter,
-                    master: f['大师']
-                };
-
-                const isToday = isSameDay(start, now);
-                const isTmr = isSameDay(start, tomorrow);
-                const isThisMonth = (start.getMonth() === now.getMonth()) && (start.getFullYear() === now.getFullYear());
-
-                if(isToday) cToday++;
-                if(isTmr) cTmr++;
-
-                // 收集本月数据 (用于筛选)
-                if (isThisMonth && inter !== '取消') {
-                    // 标记状态：已结束(isPast)，进行中(isIng)，未开始(isFuture)
-                    let isPast = end < now;
-                    let isIng = start <= now && end > now;
-                    // 如果是强制忙碌/强制空闲，逻辑相同
-                    
-                    allItems.push({...item, isPast: isPast, isIng: isIng, isToday: isToday});
-                }
-
-                // 滚动栏数据 (今日未来 + 明日)
-                if (inter !== '取消') {
-                    if (isToday && end > now) marqueeData.push({...item, tag:'今日'});
-                    if (isTmr) marqueeData.push({...item, tag:'明日'});
-                }
-
-                if(!masters[f['大师']]) {
-                    masters[f['大师']] = {
-                        name: f['大师'],
-                        pic: (f['头像']&&f['头像'][0]) ? f['头像'][0].url : null,
-                        items: []
-                    };
-                }
-                masters[f['大师']].items.push(item);
-            });
-
-            document.getElementById('stat-today').innerText = cToday;
-            document.getElementById('stat-tmr').innerText = cTmr;
-
-            // === 2. 侧边栏逻辑 (只显示最近1条历史 + 所有未来) ===
-            const sideList = document.getElementById('month-list');
-            sideList.innerHTML = '';
-            
-            allItems.sort((a,b) => a.start - b.start);
-            
-            const pastItems = allItems.filter(i => i.isPast);
-            const activeItems = allItems.filter(i => !i.isPast); // 包括进行中和未来
-            
-            // 策略：只取最近结束的 1 条 (仅作参照)，然后显示所有未完成的
-            const recentPast = pastItems.slice(-1); 
-            const displayList = [...recentPast, ...activeItems];
-
-            if(displayList.length === 0) {
-                sideList.innerHTML = '<div style="text-align:center; color:#666; padding-top:2rem;">无更多行程</div>';
-            } else {
-                displayList.forEach(d => {
-                    const dateTxt = `${d.start.getMonth()+1}/${d.start.getDate()}`;
-                    const timeTxt = d.start.toTimeString().substring(0,5);
-                    
-                    let cls = 'schedule-item';
-                    if(d.isPast) cls += ' item-past';
-                    else if(d.isToday) cls += ' item-current';
-
-                    // 状态字
-                    let stTxt = '待开始';
-                    let stCls = 'st-wait';
-                    if(d.isPast) { stTxt = '已结束'; stCls = 'st-done'; }
-                    else if(d.isIng) { stTxt = '进行中'; stCls = 'st-ing'; }
-
-                    const div = document.createElement('div');
-                    div.className = cls;
-                    div.innerHTML = `
-                        <div class="sc-time">${dateTxt}<br><span style="font-weight:normal;">${timeTxt}</span></div>
-                        <div class="sc-content">
-                            <div class="sc-top">
-                                <span class="sc-master">${d.master}</span>
-                                <span class="sc-status ${stCls}">${stTxt}</span>
-                            </div>
-                            <div class="sc-client">预约：${d.client}</div>
-                        </div>
-                    `;
-                    sideList.appendChild(div);
-                });
-            }
-
-            // === 3. Marquee ===
-            const mqBox = document.getElementById('mq-list');
-            mqBox.innerHTML = '';
-            if(marqueeData.length > 0) {
-                marqueeData.sort((a,b) => a.start - b.start);
-                const buildHtml = () => {
-                    let html = '';
-                    marqueeData.forEach(d => {
-                        const time = d.start.toTimeString().substring(0,5);
-                        html += `<div class="mq-item">[${d.tag}] <b>${time}</b> ${d.master} - ${d.client}</div>`;
-                    });
-                    return html;
-                };
-                mqBox.innerHTML = buildHtml() + buildHtml();
-            } else {
-                mqBox.innerHTML = '<div class="mq-item" style="padding-left:1vw">近期暂无更多预约</div>';
-            }
-
-            // === 4. Pillars ===
-            const stage = document.getElementById('master-stage');
-            stage.innerHTML = '';
-            const keys = Object.keys(masters);
-            if(keys.length === 0) {
-                stage.innerHTML = '<div style="margin:auto; color:#888;">暂无大师数据</div>';
-                return;
-            }
-
-            keys.forEach(k => {
-                const m = masters[k];
-                let statusClass = 'st-free';
-                let statusText = '空闲 · 纳客';
-                let clientText = '暂无待办';
-                
-                for(let t of m.items) {
-                    if(t.inter === '取消') continue;
-                    
-                    const busy = now >= t.start && now < t.end;
-                    const prep = now >= new Date(t.start.getTime() - 10*60000) && now < t.start;
-
-                    if((busy||prep) && t.inter === '强制忙碌') {
-                        statusClass = 'st-busy'; statusText = '特约咨询'; clientText = `正服务：${t.client}`; break;
-                    }
-                    if((busy||prep) && t.inter === '强制空闲') continue;
-
-                    if(busy) {
-                        statusClass = 'st-busy'; statusText = '咨询中 · 勿扰'; clientText = `正服务：${t.client}`; break;
-                    } else if(prep && statusClass !== 'st-busy') {
-                        statusClass = 'st-prep'; statusText = '恭候 · 待启'; clientText = `候见：${t.client}`;
-                    }
-                }
-
-                const img = m.pic || 'https://via.placeholder.com/200/333/d4af37?text=Master';
-                
-                const div = document.createElement('div');
-                div.className = `master-pillar ${statusClass}`;
-                div.innerHTML = `
-                    <div class="pillar-top-bar"></div>
-                    <img src="${img}" class="m-avatar">
-                    <div class="m-name-box">
-                        <div class="m-name">${m.name}</div>
-                    </div>
-                    <div class="m-footer">
-                        <div class="status-seal">${statusText}</div>
-                        <div class="current-client">${clientText}</div>
-                    </div>
-                `;
-                stage.appendChild(div);
-            });
-        }
-
-        function isSameDay(d1, d2) {
-            return d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth();
-        }
-    </script>
-</body>
-</html>
+            border

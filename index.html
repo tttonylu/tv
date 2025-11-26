@@ -12,14 +12,16 @@
 
     <style>
         :root {
-            --bg-color: #0d0d0d;
-            --card-bg: #1a1a1a;
-            --text-main: #e0e0e0;
-            --gold-accent: #d4af37; /* Chinese Gold */
-            --gold-dim: #8a7020;
-            --red-status: #c0392b;  /* Busy */
-            --green-status: #27ae60; /* Available */
-            --yellow-status: #f39c12; /* Preparing */
+            --bg-overlay: rgba(0, 0, 0, 0.75); /* 背景遮罩深色度 */
+            --sidebar-bg: rgba(13, 13, 13, 0.9);
+            --card-bg: rgba(26, 26, 26, 0.85);
+            --text-main: #f0f0f0;
+            --text-dim: #aaaaaa;
+            --gold-accent: #d4af37; /* 香槟金/中国金 */
+            --gold-dim: #9e832f;
+            --red-status: #b71c1c;  /* 忙碌 - 深红 */
+            --green-status: #1b5e20; /* 空闲 - 深绿 */
+            --yellow-status: #e65100; /* 准备 - 深橘黄 */
             --font-serif: 'Noto Serif SC', serif;
         }
 
@@ -30,22 +32,32 @@
         }
 
         body {
-            background-color: var(--bg-color);
             color: var(--text-main);
             font-family: var(--font-serif);
             height: 100vh;
             overflow: hidden;
             display: flex;
-            background-image: 
-                radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
+            /* 设置背景图片 */
+            background: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
         }
 
-        /* --- ERROR OVERLAY --- */
+        /* 背景遮罩层，确保文字清晰 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-overlay);
+            z-index: -1;
+        }
+
+        /* --- 错误提示层 --- */
         #error-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95);
-            display: none; /* Hidden by default */
+            display: none; /* 默认隐藏 */
             justify-content: center;
             align-items: center;
             flex-direction: column;
@@ -53,474 +65,201 @@
             color: var(--red-status);
             text-align: center;
         }
-        #error-overlay h2 { font-size: 2rem; margin-bottom: 1rem; border-bottom: 1px solid var(--red-status); }
-        #error-overlay p { font-size: 1.2rem; color: #fff; max-width: 600px; }
+        #error-overlay h2 { font-size: 2.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--red-status); padding-bottom: 0.5rem;}
+        #error-overlay p { font-size: 1.5rem; color: #fff; max-width: 700px; }
 
-        /* --- LAYOUT --- */
+        /* --- 布局框架 --- */
         .sidebar {
             width: 25%;
             height: 100%;
-            border-right: 2px solid var(--gold-dim);
+            border-right: 3px solid var(--gold-dim);
             display: flex;
             flex-direction: column;
-            background: rgba(20, 20, 20, 0.8);
-            padding: 2rem;
+            background: var(--sidebar-bg);
+            padding: 2.5rem;
             position: relative;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            z-index: 10;
         }
 
         .main-content {
             width: 75%;
             height: 100%;
-            padding: 2rem;
+            padding: 3rem; /* 增加内边距 */
             display: flex;
             flex-direction: column;
+            overflow-y: auto; /* 允许内容过多时滚动 */
         }
 
-        /* --- SIDEBAR COMPONENTS --- */
+        /* --- 侧边栏组件 --- */
         .brand-title {
-            font-size: 2.5rem;
+            font-size: 3rem;
+            font-weight: bold;
             color: var(--gold-accent);
             text-align: center;
-            margin-bottom: 2rem;
-            letter-spacing: 0.2rem;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-            border-bottom: 1px solid var(--gold-dim);
-            padding-bottom: 1rem;
+            margin-bottom: 3rem;
+            letter-spacing: 0.3rem;
+            text-shadow: 0 2px 15px rgba(212, 175, 55, 0.4);
+            border-bottom: 2px solid var(--gold-dim);
+            padding-bottom: 1.5rem;
         }
 
         .stats-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
         }
 
         .stat-box {
-            background: var(--card-bg);
+            background: rgba(255,255,255,0.05);
             border: 1px solid var(--gold-dim);
-            padding: 1rem;
+            padding: 1.5rem 1rem;
             text-align: center;
         }
 
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 3rem;
             color: var(--gold-accent);
             display: block;
+            font-weight: bold;
+            line-height: 1.2;
         }
 
         .stat-label {
-            font-size: 0.9rem;
-            color: #888;
-            text-transform: uppercase;
+            font-size: 1rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
         }
 
         .schedule-title {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             color: var(--gold-accent);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
+            border-bottom: 1px dashed var(--gold-dim);
+            padding-bottom: 0.5rem;
         }
         .schedule-title::before {
-            content: '';
-            width: 5px;
-            height: 20px;
-            background: var(--gold-accent);
+            content: '◈'; /* 使用符号代替纯色块，更具设计感 */
             margin-right: 10px;
-            display: inline-block;
+            color: var(--gold-accent);
+            font-size: 1.2rem;
         }
 
-        /* Marquee / Scrolling List */
+        /* 滚动列表 (Marquee) */
         .marquee-container {
             flex-grow: 1;
             overflow: hidden;
             position: relative;
-            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            /* 上下遮罩渐变，使滚动更自然 */
+            mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
         }
 
         .marquee-content {
             position: absolute;
             width: 100%;
-            /* Animation applied in JS based on content height */
         }
 
         .appointment-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+            background: rgba(212, 175, 55, 0.05); /* 微弱的金底色 */
+            padding: 1.2rem;
             margin-bottom: 1rem;
-            border-left: 3px solid var(--gold-dim);
+            border-left: 4px solid var(--gold-dim);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
         }
 
-        .appt-time { font-size: 1.2rem; color: var(--gold-accent); font-weight: bold; }
-        .appt-master { font-size: 1rem; margin: 5px 0; }
-        .appt-client { font-size: 0.9rem; color: #888; }
+        .appt-time { font-size: 1.4rem; color: var(--gold-accent); font-weight: bold; }
+        .appt-master { font-size: 1.1rem; margin: 8px 0; color: var(--text-main); }
+        .appt-client { font-size: 1rem; color: var(--text-dim); }
 
-        /* --- MAIN GRID --- */
+        /* --- 主区域网格 (核心修改) --- */
         .master-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            height: 100%;
+            /* 调整为更大的最小宽度，使卡片更宽大，排列更整齐 */
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2.5rem; /* 增大间距 */
             align-content: start;
+            padding-bottom: 2rem;
         }
 
         .master-card {
             background: var(--card-bg);
-            border: 1px solid var(--gold-dim);
+            border: 2px solid var(--gold-dim);
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            /* 增加卡片高度，显得更大方 */
+            min-height: 480px; 
         }
-
-        /* Status Stripe */
-        .status-stripe {
-            height: 8px;
-            width: 100%;
+        
+        /* 鼠标悬停效果 */
+        .master-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+            border-color: var(--gold-accent);
         }
 
         .card-body {
-            padding: 1.5rem;
+            padding: 2.5rem 2rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* 内容向上对齐 */
             text-align: center;
         }
 
         .master-avatar {
-            width: 150px;
-            height: 150px;
+            width: 180px; /* 加大头像 */
+            height: 180px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid var(--gold-dim);
-            margin-bottom: 1rem;
+            border: 4px solid var(--gold-dim);
+            padding: 4px; /* 双重边框效果 */
+            background-clip: content-box;
+            margin-bottom: 2rem;
             background-color: #000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .master-name {
-            font-size: 2rem;
-            color: var(--text-main);
-            margin-bottom: 0.5rem;
-        }
-
-        .master-status-text {
-            font-size: 1.2rem;
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
+            font-size: 2.4rem;
             font-weight: bold;
-            margin-top: auto;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .current-task {
-            font-size: 1rem;
-            color: #aaa;
-            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
             min-height: 1.5em;
+            font-style: italic;
         }
 
-        /* Status Specific Styles */
-        .status-busy .status-stripe { background-color: var(--red-status); box-shadow: 0 0 10px var(--red-status); }
-        .status-busy .master-status-text { color: var(--red-status); border: 1px solid var(--red-status); }
+        /* 状态栏移到底部，更稳重 */
+        .status-bar-bottom {
+            padding: 1.2rem;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 状态特定样式 */
+        .status-busy .master-avatar { border-color: var(--red-status); }
+        .status-busy .status-bar-bottom { background-color: var(--red-status); box-shadow: 0 -5px 20px rgba(183, 28, 28, 0.5); }
         
-        .status-prep .status-stripe { background-color: var(--yellow-status); box-shadow: 0 0 10px var(--yellow-status); }
-        .status-prep .master-status-text { color: var(--yellow-status); border: 1px solid var(--yellow-status); }
+        .status-prep .master-avatar { border-color: var(--yellow-status); }
+        .status-prep .status-bar-bottom { background-color: var(--yellow-status); box-shadow: 0 -5px 20px rgba(230, 81, 0, 0.5); color: #fff; }
 
-        .status-free .status-stripe { background-color: var(--green-status); box-shadow: 0 0 10px var(--green-status); }
-        .status-free .master-status-text { color: var(--green-status); border: 1px solid var(--green-status); }
-
-        /* Animation */
-        @keyframes scrollUp {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-50%); }
-        }
-
-    </style>
-</head>
-<body>
-
-    <div id="error-overlay">
-        <h2>系统连接异常 (System Error)</h2>
-        <p id="error-message">Initializing...</p>
-    </div>
-
-    <div class="sidebar">
-        <div class="brand-title">灯辰文化</div>
-        
-        <div class="stats-container">
-            <div class="stat-box">
-                <span class="stat-number" id="count-today">0</span>
-                <span class="stat-label">今日预约</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-number" id="count-waiting">0</span>
-                <span class="stat-label">候客中</span>
-            </div>
-        </div>
-
-        <div class="schedule-title">即将开始 (Upcoming)</div>
-        <div class="marquee-container" id="marquee-container">
-            <div class="marquee-content" id="marquee-list">
-                </div>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <div class="master-grid" id="master-grid">
-            </div>
-    </div>
-
-    <script>
-        // ================= CONFIGURATION =================
-        // TODO: REPLACE THESE WITH YOUR ACTUAL VIKA CREDENTIALS
-        const VIKA_API_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
-        const VIKA_DATASHEET_ID = 'dstmgbUypiy0LbUzwF'; 
-        // =================================================
-
-        const REFRESH_INTERVAL = 30000; // 30 seconds
-
-        // DOM Elements
-        const errorOverlay = document.getElementById('error-overlay');
-        const errorMsg = document.getElementById('error-message');
-        const masterGrid = document.getElementById('master-grid');
-        const marqueeList = document.getElementById('marquee-list');
-        const countTodayEl = document.getElementById('count-today');
-        const countWaitingEl = document.getElementById('count-waiting');
-
-        // Main Execution
-        init();
-
-        async function init() {
-            if (VIKA_API_TOKEN.includes('YOUR_')) {
-                showError('Configuration Error: Please edit the HTML file and set your VIKA_API_TOKEN and VIKA_DATASHEET_ID.');
-                return;
-            }
-            
-            await fetchDataAndRender();
-            setInterval(fetchDataAndRender, REFRESH_INTERVAL);
-        }
-
-        async function fetchDataAndRender() {
-            try {
-                const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_DATASHEET_ID}/records?viewId=&fieldKey=name`;
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `Bearer ${VIKA_API_TOKEN}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
-                }
-
-                const json = await response.json();
-
-                if (json.code !== 200) {
-                    throw new Error(`Vika Error: ${json.message}`);
-                }
-
-                // Hide error if successful
-                errorOverlay.style.display = 'none';
-
-                processData(json.data.records);
-
-            } catch (err) {
-                console.error(err);
-                showError(err.message);
-            }
-        }
-
-        function processData(records) {
-            const now = new Date();
-            const mastersMap = {}; // Key: Master Name, Value: Object
-            const futureAppointments = [];
-            let todayCount = 0;
-
-            // 1. Organize Data
-            records.forEach(record => {
-                const fields = record.fields;
-
-                // Validation: Check if essential columns exist
-                if (!fields['大师']) return; // Skip if no master name
-
-                const masterName = fields['大师'];
-                
-                // Parse Date & Time
-                // Assuming "YYYY-MM-DD" and "HH:mm"
-                if (!fields['日期'] || !fields['时间']) return;
-
-                const startDateTimeStr = `${fields['日期']}T${fields['时间']}:00`;
-                const startTime = new Date(startDateTimeStr);
-                const duration = fields['时长'] || 60; // Default 60 mins
-                const endTime = new Date(startTime.getTime() + duration * 60000);
-                
-                // Override status
-                const intervention = fields['状态干预'];
-
-                const appointment = {
-                    client: fields['客户'] || '匿名客户',
-                    startTime: startTime,
-                    endTime: endTime,
-                    intervention: intervention,
-                    master: masterName
-                };
-
-                // Filter for Today for Stats
-                const isToday = startTime.toDateString() === now.toDateString();
-                if (isToday) todayCount++;
-
-                // Collect Future Appointments for Sidebar
-                if (startTime > now && isToday) {
-                    futureAppointments.push(appointment);
-                }
-
-                // Group by Master
-                if (!mastersMap[masterName]) {
-                    mastersMap[masterName] = {
-                        name: masterName,
-                        photo: fields['头像'] ? fields['头像'][0].url : null, // Handle Vika attachment structure
-                        appointments: []
-                    };
-                }
-                mastersMap[masterName].appointments.push(appointment);
-            });
-
-            // 2. Render Sidebar
-            renderSidebar(futureAppointments, todayCount);
-
-            // 3. Render Grid
-            renderMasterGrid(mastersMap);
-        }
-
-        function renderSidebar(appointments, todayTotal) {
-            // Sort by time
-            appointments.sort((a, b) => a.startTime - b.startTime);
-
-            // Update Stats
-            countTodayEl.textContent = todayTotal;
-            countWaitingEl.textContent = appointments.length;
-
-            // Update List
-            marqueeList.innerHTML = '';
-            
-            if (appointments.length === 0) {
-                marqueeList.innerHTML = '<div style="padding:1rem; color:#666; text-align:center;">暂无更多预约</div>';
-                return;
-            }
-
-            const createItem = (appt) => {
-                const div = document.createElement('div');
-                div.className = 'appointment-item';
-                const timeStr = appt.startTime.toTimeString().substring(0, 5);
-                div.innerHTML = `
-                    <div class="appt-time">${timeStr}</div>
-                    <div class="appt-master">预约: ${appt.master}</div>
-                    <div class="appt-client">${appt.client}</div>
-                `;
-                return div;
-            };
-
-            // Double the list for seamless marquee loop
-            appointments.forEach(appt => marqueeList.appendChild(createItem(appt)));
-            appointments.forEach(appt => marqueeList.appendChild(createItem(appt)));
-
-            // Adjust Animation
-            const contentHeight = marqueeList.scrollHeight / 2;
-            const duration = contentHeight / 20; // Speed control
-            marqueeList.style.animation = `scrollUp ${duration}s linear infinite`;
-        }
-
-        function renderMasterGrid(mastersMap) {
-            masterGrid.innerHTML = '';
-            
-            const now = new Date();
-
-            Object.values(mastersMap).forEach(master => {
-                // Determine Status
-                let status = 'free'; // free, busy, prep
-                let statusLabel = '空闲中 (Available)';
-                let currentClient = '';
-                
-                // Logic: Check all appointments for this master
-                for (let appt of master.appointments) {
-                    
-                    // 1. Check Intervention First
-                    if (appt.intervention === '强制忙碌' && isSameDay(now, appt.startTime)) {
-                         // Loose logic: If marked busy today, we assume busy now? 
-                         // Or strictly during the slot? Assuming strict slot + override priority
-                         // Refined: If intervention is set, we prioritize it IF we are in the time window OR if it implies a full block.
-                         // Let's stick to the prompt: "If override is set, prioritize that status."
-                         // We will apply override if we are currently within the time window.
-                    }
-
-                    // Check Time Windows
-                    const isBusy = now >= appt.startTime && now < appt.endTime;
-                    const isPrep = now >= new Date(appt.startTime.getTime() - 15*60000) && now < appt.startTime;
-
-                    if (appt.intervention === '取消') continue;
-
-                    if (appt.intervention === '强制忙碌' && (isBusy || isPrep)) {
-                        status = 'busy';
-                        statusLabel = '● 咨询中 (Busy)';
-                        currentClient = appt.client;
-                        break; // Found active status
-                    }
-                    
-                    if (appt.intervention === '强制空闲' && (isBusy || isPrep)) {
-                        continue; // Force free means we ignore this slot
-                    }
-
-                    if (isBusy) {
-                        status = 'busy';
-                        statusLabel = '● 咨询中 (Busy)';
-                        currentClient = appt.client;
-                        break; 
-                    } else if (isPrep && status !== 'busy') {
-                        status = 'prep';
-                        statusLabel = '● 准备中 (Preparing)';
-                        currentClient = appt.client;
-                        // Don't break yet, in case there is a 'busy' slot overlapping
-                    }
-                }
-
-                // Build Card HTML
-                const card = document.createElement('div');
-                card.className = `master-card status-${status}`;
-                
-                // Default Avatar if missing
-                const avatarUrl = master.photo || 'https://via.placeholder.com/150/000000/FFFFFF/?text=Master';
-
-                card.innerHTML = `
-                    <div class="status-stripe"></div>
-                    <div class="card-body">
-                        <img src="${avatarUrl}" class="master-avatar" alt="${master.name}">
-                        <div class="master-name">${master.name}</div>
-                        <div class="current-task">${status === 'free' ? '等待预约' : '当前客户: ' + currentClient}</div>
-                        <div class="master-status-text">${statusLabel}</div>
-                    </div>
-                `;
-                masterGrid.appendChild(card);
-            });
-            
-            // Handle Empty State
-            if (Object.keys(mastersMap).length === 0) {
-                 masterGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding-top: 100px; color: #666;">暂无大师数据 (No Data)</div>';
-            }
-        }
-
-        function isSameDay(d1, d2) {
-            return d1.getFullYear() === d2.getFullYear() &&
-                d1.getMonth() === d2.getMonth() &&
-                d1.getDate() === d2.getDate();
-        }
-
-        function showError(msg) {
-            errorMsg.textContent = msg;
-            errorOverlay.style.display = 'flex';
-        }
-    </script>
-</body>
-</html>
+        .status-free .master-avatar { border-color: var(--green-status); }
+        .status-free .status-bar-bottom { background-color: var(--green

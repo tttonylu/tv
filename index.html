@@ -4,215 +4,523 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>灯辰文化 · 智能诊断版</title>
+    <title>灯辰文化 - 咨询师状态看板</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        /* =========================================
-           🎨 视觉配置
-           ========================================= */
         :root {
-            --bg-image: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png');
-            --glass-bg: rgba(0, 0, 0, 0.85); 
-            --glass-border: rgba(212, 175, 55, 0.6);
-            --font-title: "KaiTi", "STKaiti", serif; 
-            --font-body: "Songti SC", "SimSun", serif; 
-            --color-gold: #ffd700; 
-            --color-red: #ff4d4d; 
-            --color-green: #4caf50; 
-            --color-yellow: #ffaa00; 
-            --text-main: #ffffff;
+            --bg-color: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --text-main: #e0e0e0;
+            --gold-accent: #d4af37; /* Chinese Gold */
+            --gold-dim: #8a7020;
+            --red-status: #c0392b;  /* Busy */
+            --green-status: #27ae60; /* Available */
+            --yellow-status: #f39c12; /* Preparing */
+            --font-serif: 'Noto Serif SC', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0; background: var(--bg-image); background-size: cover; background-position: center; 
-            color: var(--text-main); font-family: var(--font-body); height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-serif);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            background-image: 
+                radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000000 100%);
         }
 
-        header {
-            height: 12vh; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 3px double var(--color-gold); background: rgba(0,0,0,0.6); 
-            padding: 0 40px;
+        /* --- ERROR OVERLAY --- */
+        #error-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            color: var(--red-status);
+            text-align: center;
         }
-        .brand {
-            font-family: var(--font-title); font-size: 5vh; color: var(--color-gold); 
-            letter-spacing: 5px; font-weight: bold; text-shadow: 0 2px 5px #000; 
-        }
-        #clock { 
-            font-family: 'Times New Roman'; font-size: 5vh; font-weight: bold; color: #ddd; 
+        #error-overlay h2 { font-size: 2rem; margin-bottom: 1rem; border-bottom: 1px solid var(--red-status); }
+        #error-overlay p { font-size: 1.2rem; color: #fff; max-width: 600px; }
+
+        /* --- LAYOUT --- */
+        .sidebar {
+            width: 25%;
+            height: 100%;
+            border-right: 2px solid var(--gold-dim);
+            display: flex;
+            flex-direction: column;
+            background: rgba(20, 20, 20, 0.8);
+            padding: 2rem;
+            position: relative;
         }
 
-        main { flex: 1; display: flex; padding: 2vh; gap: 2vh; }
-
-        .glass-panel {
-            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        .main-content {
+            width: 75%;
+            height: 100%;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
         }
 
-        .sidebar { flex: 25; display: flex; flex-direction: column; gap: 2vh; }
-        .stat-card { padding: 2vh; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.2); }
-        .stat-label { font-size: 2.5vh; color: #ccc; margin-bottom: 1vh; font-family: var(--font-title);}
-        .stat-num { font-family: 'Times New Roman'; font-size: 7vh; color: var(--color-gold); font-weight: bold; line-height: 1;}
+        /* --- SIDEBAR COMPONENTS --- */
+        .brand-title {
+            font-size: 2.5rem;
+            color: var(--gold-accent);
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 0.2rem;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            border-bottom: 1px solid var(--gold-dim);
+            padding-bottom: 1rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: var(--card-bg);
+            border: 1px solid var(--gold-dim);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            color: var(--gold-accent);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .schedule-title {
+            font-size: 1.2rem;
+            color: var(--gold-accent);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        .schedule-title::before {
+            content: '';
+            width: 5px;
+            height: 20px;
+            background: var(--gold-accent);
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        /* Marquee / Scrolling List */
+        .marquee-container {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+
+        .marquee-content {
+            position: absolute;
+            width: 100%;
+            /* Animation applied in JS based on content height */
+        }
+
+        .appointment-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--gold-dim);
+        }
+
+        .appt-time { font-size: 1.2rem; color: var(--gold-accent); font-weight: bold; }
+        .appt-master { font-size: 1rem; margin: 5px 0; }
+        .appt-client { font-size: 0.9rem; color: #888; }
+
+        /* --- MAIN GRID --- */
+        .master-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            height: 100%;
+            align-content: start;
+        }
+
+        .master-card {
+            background: var(--card-bg);
+            border: 1px solid var(--gold-dim);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        /* Status Stripe */
+        .status-stripe {
+            height: 8px;
+            width: 100%;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .master-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--gold-dim);
+            margin-bottom: 1rem;
+            background-color: #000;
+        }
+
+        .master-name {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .master-status-text {
+            font-size: 1.2rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: auto;
+        }
+
+        .current-task {
+            font-size: 1rem;
+            color: #aaa;
+            margin-top: 1rem;
+            min-height: 1.5em;
+        }
+
+        /* Status Specific Styles */
+        .status-busy .status-stripe { background-color: var(--red-status); box-shadow: 0 0 10px var(--red-status); }
+        .status-busy .master-status-text { color: var(--red-status); border: 1px solid var(--red-status); }
         
-        .marquee-box { flex: 1; padding: 2vh; overflow: hidden; position: relative; }
-        .marquee-content { position: absolute; width: 100%; }
-        .scroll-active { animation: scrollUp 40s linear infinite; }
-        
-        .future-item { padding: 1.5vh 0; border-bottom: 1px dashed #555; font-size: 2.2vh; display: flex; justify-content: space-between; }
-        @keyframes scrollUp { 0% { top: 100%; } 100% { top: -300%; } }
+        .status-prep .status-stripe { background-color: var(--yellow-status); box-shadow: 0 0 10px var(--yellow-status); }
+        .status-prep .master-status-text { color: var(--yellow-status); border: 1px solid var(--yellow-status); }
 
-        .master-grid { flex: 75; display: grid; grid-template-columns: repeat(auto-fit, minmax(22%, 1fr)); gap: 2vh; align-content: start;}
-        .master-card { display: flex; flex-direction: column; align-items: center; padding: 2vh; transition: transform 0.3s; }
-        
-        .avatar-frame {
-            width: 16vh; height: 16vh; border-radius: 50%; border: 3px solid var(--color-gold);
-            padding: 3px; background: #000; margin-bottom: 2vh; box-shadow: 0 5px 20px #000; overflow: hidden;
-            display: flex; justify-content: center; align-items: center; position: relative;
-        }
-        .avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        
-        .master-name { font-family: var(--font-title); font-size: 3.5vh; color: var(--color-gold); margin-bottom: 2vh; letter-spacing: 3px; }
-        .status-badge { margin-top: auto; padding: 1vh 0; width: 100%; text-align: center; font-size: 2.5vh; border-radius: 4px; font-family: var(--font-title); font-weight: bold; }
-        .client-info-box { width: 100%; min-height: 8vh; display: flex; flex-direction: column; justify-content: center; align-items: center; margin-bottom: 1vh; background: rgba(255,255,255,0.05); border-radius: 4px; }
-        .c-name { font-size: 3vh; color: #fff; font-weight: bold; margin-bottom: 0.5vh; }
-        .c-time { color: #aaa; font-family: 'Times New Roman'; font-size: 2.2vh; }
+        .status-free .status-stripe { background-color: var(--green-status); box-shadow: 0 0 10px var(--green-status); }
+        .status-free .master-status-text { color: var(--green-status); border: 1px solid var(--green-status); }
 
-        .busy { border-color: var(--color-red); } .busy .avatar-frame { border-color: var(--color-red); } .busy .status-badge { background: var(--color-red); color: #fff; }
-        .free { border-color: var(--color-green); } .free .avatar-frame { filter: grayscale(100%); opacity: 0.8; } .free .status-badge { border: 1px solid var(--color-green); color: var(--color-green); }
+        /* Animation */
+        @keyframes scrollUp {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
 
-        /* 🔴 诊断报告弹窗 */
-        #diagnosis-box {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: #fff; font-size: 2vh;
-        }
-        #diagnosis-content {
-            background: #222; border: 2px solid red; padding: 30px; border-radius: 10px; max-width: 80%; text-align: left;
-        }
-        .ok { color: #4caf50; }
-        .err { color: #ff4d4d; font-weight: bold; font-size: 2.5vh; margin: 10px 0; }
-        .tip { color: #aaa; margin-top: 5px; font-size: 1.8vh; }
     </style>
 </head>
 <body>
 
-<div id="diagnosis-box">
-    <div style="color: var(--color-gold); font-size: 4vh; margin-bottom: 20px;">🔍 正在进行数据体检...</div>
-    <div id="loading-text">连接维格表云端...</div>
-</div>
+    <div id="error-overlay">
+        <h2>系统连接异常 (System Error)</h2>
+        <p id="error-message">Initializing...</p>
+    </div>
 
-<header>
-    <div class="brand">灯辰文化命理服务中心</div>
-    <div id="clock">00:00:00</div>
-</header>
-
-<main>
-    <aside class="sidebar glass-panel">
-        <div class="stat-card"><div class="stat-label">今日预约</div><div class="stat-num" id="count-total">0</div></div>
-        <div class="stat-card"><div class="stat-label">等待接引</div><div class="stat-num" id="count-wait" style="color:#fff">0</div></div>
-        <div class="marquee-box">
-            <div style="text-align:center; color:var(--color-gold); border-bottom:2px solid var(--color-red); padding-bottom:10px; margin-bottom:10px; font-family:var(--font-title); font-size: 2.5vh;">📅 预约实况</div>
-            <div class="marquee-content" id="future-list"></div>
-        </div>
-    </aside>
-    <div class="master-grid" id="master-grid"></div>
-</main>
-
-<script>
-    // ==========================================
-    // 🔴 配置区 (已为您填好)
-    // ==========================================
-    const VIKA_CONFIG = {
-        TOKEN: "uskRMINs8MRQZD07iTNuNnl", 
-        DATASHEET_ID: "dstmgbUypiy0LbUzwF" 
-    };
-
-    // ==========================================
-    // 🧠 核心逻辑
-    // ==========================================
-    
-    function showDiagnosis(html) {
-        const box = document.getElementById('diagnosis-box');
-        box.innerHTML = `<div id="diagnosis-content">${html}</div><button onclick="location.reload()" style="margin-top:20px; padding:10px 30px; font-size:2vh; cursor:pointer;">刷新重试</button>`;
-    }
-
-    async function fetchData() {
-        const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_CONFIG.DATASHEET_ID}/records?fieldKey=name&t=${new Date().getTime()}`;
+    <div class="sidebar">
+        <div class="brand-title">灯辰文化</div>
         
-        try {
-            const response = await fetch(url, { headers: { "Authorization": `Bearer ${VIKA_CONFIG.TOKEN}` } });
+        <div class="stats-container">
+            <div class="stat-box">
+                <span class="stat-number" id="count-today">0</span>
+                <span class="stat-label">今日预约</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-number" id="count-waiting">0</span>
+                <span class="stat-label">候客中</span>
+            </div>
+        </div>
+
+        <div class="schedule-title">即将开始 (Upcoming)</div>
+        <div class="marquee-container" id="marquee-container">
+            <div class="marquee-content" id="marquee-list">
+                </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="master-grid" id="master-grid">
+            </div>
+    </div>
+
+    <script>
+        // ================= CONFIGURATION =================
+        // TODO: REPLACE THESE WITH YOUR ACTUAL VIKA CREDENTIALS
+        const VIKA_API_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
+        const VIKA_DATASHEET_ID = 'dstmgbUypiy0LbUzwF'; 
+        // =================================================
+
+        const REFRESH_INTERVAL = 30000; // 30 seconds
+
+        // DOM Elements
+        const errorOverlay = document.getElementById('error-overlay');
+        const errorMsg = document.getElementById('error-message');
+        const masterGrid = document.getElementById('master-grid');
+        const marqueeList = document.getElementById('marquee-list');
+        const countTodayEl = document.getElementById('count-today');
+        const countWaitingEl = document.getElementById('count-waiting');
+
+        // Main Execution
+        init();
+
+        async function init() {
+            if (VIKA_API_TOKEN.includes('YOUR_')) {
+                showError('Configuration Error: Please edit the HTML file and set your VIKA_API_TOKEN and VIKA_DATASHEET_ID.');
+                return;
+            }
             
-            if (!response.ok) {
-                if(response.status === 401) showDiagnosis(`<div class="err">❌ 身份验证失败 (401)</div><div class="tip">原因：Token 失效或错误。<br>解决：请去维格表重新生成 Token 并替换代码。</div>`);
-                else if(response.status === 404) showDiagnosis(`<div class="err">❌ 找不到表格 (404)</div><div class="tip">原因：表格 ID (dst...) 填错了。<br>解决：请检查浏览器地址栏的 dst 开头的字符串。</div>`);
-                else showDiagnosis(`<div class="err">❌ 连接失败: ${response.status}</div>`);
+            await fetchDataAndRender();
+            setInterval(fetchDataAndRender, REFRESH_INTERVAL);
+        }
+
+        async function fetchDataAndRender() {
+            try {
+                const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_DATASHEET_ID}/records?viewId=&fieldKey=name`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${VIKA_API_TOKEN}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+
+                const json = await response.json();
+
+                if (json.code !== 200) {
+                    throw new Error(`Vika Error: ${json.message}`);
+                }
+
+                // Hide error if successful
+                errorOverlay.style.display = 'none';
+
+                processData(json.data.records);
+
+            } catch (err) {
+                console.error(err);
+                showError(err.message);
+            }
+        }
+
+        function processData(records) {
+            const now = new Date();
+            const mastersMap = {}; // Key: Master Name, Value: Object
+            const futureAppointments = [];
+            let todayCount = 0;
+
+            // 1. Organize Data
+            records.forEach(record => {
+                const fields = record.fields;
+
+                // Validation: Check if essential columns exist
+                if (!fields['大师']) return; // Skip if no master name
+
+                const masterName = fields['大师'];
+                
+                // Parse Date & Time
+                // Assuming "YYYY-MM-DD" and "HH:mm"
+                if (!fields['日期'] || !fields['时间']) return;
+
+                const startDateTimeStr = `${fields['日期']}T${fields['时间']}:00`;
+                const startTime = new Date(startDateTimeStr);
+                const duration = fields['时长'] || 60; // Default 60 mins
+                const endTime = new Date(startTime.getTime() + duration * 60000);
+                
+                // Override status
+                const intervention = fields['状态干预'];
+
+                const appointment = {
+                    client: fields['客户'] || '匿名客户',
+                    startTime: startTime,
+                    endTime: endTime,
+                    intervention: intervention,
+                    master: masterName
+                };
+
+                // Filter for Today for Stats
+                const isToday = startTime.toDateString() === now.toDateString();
+                if (isToday) todayCount++;
+
+                // Collect Future Appointments for Sidebar
+                if (startTime > now && isToday) {
+                    futureAppointments.push(appointment);
+                }
+
+                // Group by Master
+                if (!mastersMap[masterName]) {
+                    mastersMap[masterName] = {
+                        name: masterName,
+                        photo: fields['头像'] ? fields['头像'][0].url : null, // Handle Vika attachment structure
+                        appointments: []
+                    };
+                }
+                mastersMap[masterName].appointments.push(appointment);
+            });
+
+            // 2. Render Sidebar
+            renderSidebar(futureAppointments, todayCount);
+
+            // 3. Render Grid
+            renderMasterGrid(mastersMap);
+        }
+
+        function renderSidebar(appointments, todayTotal) {
+            // Sort by time
+            appointments.sort((a, b) => a.startTime - b.startTime);
+
+            // Update Stats
+            countTodayEl.textContent = todayTotal;
+            countWaitingEl.textContent = appointments.length;
+
+            // Update List
+            marqueeList.innerHTML = '';
+            
+            if (appointments.length === 0) {
+                marqueeList.innerHTML = '<div style="padding:1rem; color:#666; text-align:center;">暂无更多预约</div>';
                 return;
             }
 
-            const json = await response.json();
-            
-            if (json.code === 200) {
-                const records = json.data.records;
-                
-                // 🔍 深度诊断：检查数据是否为空
-                if (records.length === 0) {
-                    showDiagnosis(`<div class="err">⚠️ 连接成功，但维格表是空的！</div><div class="tip">解决：请去维格表里添加至少一行数据（大师、时间等）。</div>`);
-                    return;
-                }
+            const createItem = (appt) => {
+                const div = document.createElement('div');
+                div.className = 'appointment-item';
+                const timeStr = appt.startTime.toTimeString().substring(0, 5);
+                div.innerHTML = `
+                    <div class="appt-time">${timeStr}</div>
+                    <div class="appt-master">预约: ${appt.master}</div>
+                    <div class="appt-client">${appt.client}</div>
+                `;
+                return div;
+            };
 
-                // 🔍 深度诊断：检查列名
-                const firstRow = records[0].fields;
-                const keys = Object.keys(firstRow);
-                
-                // 检查关键列是否存在
-                if (!keys.includes("大师")) {
-                    showDiagnosis(`
-                        <div class="err">❌ 严重错误：没找到【大师】列！</div>
-                        <div class="tip">
-                            <strong>代码只能读取叫“大师”的列，但您表格里的列名是：</strong><br>
-                            [ ${keys.join(" , ")} ]
-                            <br><br>
-                            <strong>解决方法：</strong><br>
-                            请回到维格表，双击那个填名字的列头，把它改名为 <strong>大师</strong> (两个字，不要空格)。
-                        </div>
-                    `);
-                    return;
-                }
+            // Double the list for seamless marquee loop
+            appointments.forEach(appt => marqueeList.appendChild(createItem(appt)));
+            appointments.forEach(appt => marqueeList.appendChild(createItem(appt)));
 
-                // 一切正常，隐藏诊断，显示界面
-                document.getElementById('diagnosis-box').style.display = 'none';
-                processData(records);
-
-            } else {
-                showDiagnosis(`<div class="err">❌ API 报错: ${json.message}</div>`);
-            }
-        } catch (err) {
-            showDiagnosis(`<div class="err">❌ 网络无法连接</div><div class="tip">请检查电脑/电视是否连网。<br>错误信息: ${err.message}</div>`);
+            // Adjust Animation
+            const contentHeight = marqueeList.scrollHeight / 2;
+            const duration = contentHeight / 20; // Speed control
+            marqueeList.style.animation = `scrollUp ${duration}s linear infinite`;
         }
-    }
 
-    function processData(records) {
-        const mastersMap = {};
-        const appointments = [];
-
-        records.forEach(r => {
-            const f = r.fields;
-            const name = f['大师'];
-            if (!name) return;
-
-            // A. 提取头像
-            let avatarUrl = "";
-            const rawAvatar = f['头像'];
-            if (rawAvatar) {
-                if (Array.isArray(rawAvatar) && rawAvatar.length > 0) avatarUrl = rawAvatar[0].url;
-                else if (typeof rawAvatar === 'string') avatarUrl = rawAvatar;
-            }
+        function renderMasterGrid(mastersMap) {
+            masterGrid.innerHTML = '';
             
-            if (!mastersMap[name] || (avatarUrl && !mastersMap[name].img)) {
-                mastersMap[name] = { name: name, img: avatarUrl || "" };
-            }
+            const now = new Date();
 
-            // B. 提取预约
-            if (f['日期'] && f['时间']) {
-                appointments.push({
-                    master: name,
+            Object.values(mastersMap).forEach(master => {
+                // Determine Status
+                let status = 'free'; // free, busy, prep
+                let statusLabel = '空闲中 (Available)';
+                let currentClient = '';
+                
+                // Logic: Check all appointments for this master
+                for (let appt of master.appointments) {
+                    
+                    // 1. Check Intervention First
+                    if (appt.intervention === '强制忙碌' && isSameDay(now, appt.startTime)) {
+                         // Loose logic: If marked busy today, we assume busy now? 
+                         // Or strictly during the slot? Assuming strict slot + override priority
+                         // Refined: If intervention is set, we prioritize it IF we are in the time window OR if it implies a full block.
+                         // Let's stick to the prompt: "If override is set, prioritize that status."
+                         // We will apply override if we are currently within the time window.
+                    }
+
+                    // Check Time Windows
+                    const isBusy = now >= appt.startTime && now < appt.endTime;
+                    const isPrep = now >= new Date(appt.startTime.getTime() - 15*60000) && now < appt.startTime;
+
+                    if (appt.intervention === '取消') continue;
+
+                    if (appt.intervention === '强制忙碌' && (isBusy || isPrep)) {
+                        status = 'busy';
+                        statusLabel = '● 咨询中 (Busy)';
+                        currentClient = appt.client;
+                        break; // Found active status
+                    }
+                    
+                    if (appt.intervention === '强制空闲' && (isBusy || isPrep)) {
+                        continue; // Force free means we ignore this slot
+                    }
+
+                    if (isBusy) {
+                        status = 'busy';
+                        statusLabel = '● 咨询中 (Busy)';
+                        currentClient = appt.client;
+                        break; 
+                    } else if (isPrep && status !== 'busy') {
+                        status = 'prep';
+                        statusLabel = '● 准备中 (Preparing)';
+                        currentClient = appt.client;
+                        // Don't break yet, in case there is a 'busy' slot overlapping
+                    }
+                }
+
+                // Build Card HTML
+                const card = document.createElement('div');
+                card.className = `master-card status-${status}`;
+                
+                // Default Avatar if missing
+                const avatarUrl = master.photo || 'https://via.placeholder.com/150/000000/FFFFFF/?text=Master';
+
+                card.innerHTML = `
+                    <div class="status-stripe"></div>
+                    <div class="card-body">
+                        <img src="${avatarUrl}" class="master-avatar" alt="${master.name}">
+                        <div class="master-name">${master.name}</div>
+                        <div class="current-task">${status === 'free' ? '等待预约' : '当前客户: ' + currentClient}</div>
+                        <div class="master-status-text">${statusLabel}</div>
+                    </div>
+                `;
+                masterGrid.appendChild(card);
+            });
+            
+            // Handle Empty State
+            if (Object.keys(mastersMap).length === 0) {
+                 masterGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding-top: 100px; color: #666;">暂无大师数据 (No Data)</div>';
+            }
+        }
+
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                d1.getMonth() === d2.getMonth() &&
+                d1.getDate() === d2.getDate();
+        }
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorOverlay.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

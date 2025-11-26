@@ -182,4 +182,266 @@
         .st-free .pillar-light { background: var(--s-free); }
         
         .st-busy { color: var(--s-busy); }
-        .st-
+        .st-busy .pillar-light { background: var(--s-busy); }
+        
+        .st-prep { color: var(--s-prep); }
+        .st-prep .pillar-light { background: var(--s-prep); }
+
+
+        /* === 3. 底部滚动通告 === */
+        .marquee-bar {
+            flex: 0 0 6vh;
+            background: rgba(0,0,0,0.6);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            padding-left: 2vw;
+            font-size: 1.1rem;
+        }
+        .mq-label { color: var(--text-gold); font-weight: bold; margin-right: 2vw; white-space: nowrap; }
+        .mq-viewport { flex: 1; overflow: hidden; height: 100%; position: relative; }
+        .mq-content { position: absolute; display: flex; align-items: center; height: 100%; white-space: nowrap; animation: scroll 25s linear infinite; }
+        .mq-item { margin-right: 5vw; color: #ddd; display: flex; align-items: center; }
+        .mq-tag { font-size: 0.8em; padding: 2px 6px; border-radius: 2px; margin-right: 8px; }
+        
+        .tag-today { background: var(--text-gold); color: #000; }
+        .tag-tmr { background: #0288d1; color: #fff; }
+
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* 错误层 */
+        #err-layer {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            display: none; justify-content: center; align-items: center; z-index: 999;
+            color: var(--s-busy); font-size: 2rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="err-layer">系统连接中断，正在重试...</div>
+
+    <header class="header">
+        <div class="brand-box">
+            <div class="brand-name">灯辰文化</div>
+            <div class="time-box" id="clock-display">载入中...</div>
+        </div>
+        <div class="stats-panel">
+            <div class="stat-item">
+                <div class="stat-num" id="stat-today">0</div>
+                <div class="stat-label">今日预约</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num" id="stat-tmr">0</div>
+                <div class="stat-label">明日预约</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num" id="stat-total">0</div>
+                <div class="stat-label">本月累计</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="master-stage" id="master-stage">
+        <div style="margin:auto; font-size:2rem; color:#888;">正在读取排班数据...</div>
+    </div>
+
+    <div class="marquee-bar">
+        <div class="mq-label">预约信息</div>
+        <div class="mq-viewport">
+            <div class="mq-content" id="mq-list">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // === API 配置 ===
+        const VIKA_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
+        const VIKA_ID = 'dstmgbUypiy0LbUzwF'; 
+        // ===============
+
+        const REFRESH_MS = 30000;
+
+        init();
+        
+        // 时钟逻辑
+        setInterval(() => {
+            const now = new Date();
+            // 农历干支算法 (简易版)
+            const gan = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+            const zhi = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+            const idx = (now.getFullYear() - 1984) % 60; 
+            const gz = gan[(idx%10+10)%10] + zhi[(idx%12+12)%12];
+            
+            const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
+            const dateStr = now.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' });
+            
+            document.getElementById('clock-display').innerHTML = 
+                `${gz}年 · ${dateStr} &nbsp;&nbsp;<span style="color:#eebb66; font-weight:bold; font-size:1.4rem;">${timeStr}</span>`;
+        }, 1000);
+
+        async function init() {
+            await load();
+            setInterval(load, REFRESH_MS);
+        }
+
+        async function load() {
+            try {
+                const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_ID}/records?fieldKey=name`;
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${VIKA_TOKEN}` } });
+                const json = await res.json();
+                
+                if(!res.ok || json.code !== 200) throw new Error('API Error');
+                
+                document.getElementById('err-layer').style.display = 'none';
+                render(json.data.records);
+            } catch(e) {
+                console.error(e);
+                document.getElementById('err-layer').style.display = 'flex';
+            }
+        }
+
+        function render(records) {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const masters = {};
+            const mqData = [];
+            
+            let cToday = 0;
+            let cTmr = 0;
+            let cTotal = records.length;
+
+            records.forEach(r => {
+                const f = r.fields;
+                if(!f['大师'] || !f['日期'] || !f['时间']) return;
+
+                // 日期兼容
+                let dStr = f['日期'];
+                if(typeof dStr === 'number') {
+                    const dObj = new Date(dStr);
+                    dStr = `${dObj.getFullYear()}-${dObj.getMonth()+1}-${dObj.getDate()}`;
+                } else {
+                    dStr = String(dStr).replace(/\//g, '-');
+                }
+                
+                const start = new Date(`${dStr}T${f['时间']}:00`);
+                if(isNaN(start)) return;
+                
+                const end = new Date(start.getTime() + (f['时长']||60)*60000);
+                const inter = f['状态干预'];
+
+                const item = {
+                    client: f['客户'] || '善信',
+                    start: start, end: end, inter: inter,
+                    master: f['大师']
+                };
+
+                const isToday = isSameDay(start, now);
+                const isTmr = isSameDay(start, tomorrow);
+
+                if(isToday) cToday++;
+                if(isTmr) cTmr++;
+
+                // 收集信息：今日未结束的 + 明日的
+                if (inter !== '取消') {
+                    if (isToday && end > now) mqData.push({...item, tag:'今日'});
+                    if (isTmr) mqData.push({...item, tag:'明日'});
+                }
+
+                if(!masters[f['大师']]) {
+                    masters[f['大师']] = {
+                        name: f['大师'],
+                        pic: (f['头像']&&f['头像'][0]) ? f['头像'][0].url : null,
+                        items: []
+                    };
+                }
+                masters[f['大师']].items.push(item);
+            });
+
+            // 更新数字
+            document.getElementById('stat-today').innerText = cToday;
+            document.getElementById('stat-tmr').innerText = cTmr;
+            document.getElementById('stat-total').innerText = cTotal;
+
+            // 更新滚动列表
+            const mqBox = document.getElementById('mq-list');
+            mqBox.innerHTML = '';
+            if(mqData.length === 0) {
+                mqBox.innerHTML = '<div class="mq-item" style="padding-left:2vw;">近两日无更多预约</div>';
+            } else {
+                mqData.sort((a,b) => a.start - b.start);
+                const buildHtml = () => {
+                    let html = '';
+                    mqData.forEach(d => {
+                        const tagClass = d.tag === '今日' ? 'tag-today' : 'tag-tmr';
+                        const time = d.start.toTimeString().substring(0,5);
+                        html += `<div class="mq-item"><span class="mq-tag ${tagClass}">${d.tag}</span> <b>${time}</b> &nbsp;${d.master} 预约 ${d.client}</div>`;
+                    });
+                    return html;
+                };
+                mqBox.innerHTML = buildHtml() + buildHtml(); // 复制一份无缝滚动
+            }
+
+            // 渲染大师立柱
+            const stage = document.getElementById('master-stage');
+            stage.innerHTML = '';
+            
+            const keys = Object.keys(masters);
+            if(keys.length === 0) {
+                stage.innerHTML = '<div style="margin:auto; font-size:2rem; color:#888;">暂无大师数据</div>';
+                return;
+            }
+
+            keys.forEach(k => {
+                const m = masters[k];
+                // 默认状态
+                let statusClass = 'st-free';
+                let statusText = '空闲 · 纳客';
+                let clientText = '暂无待办';
+                
+                for(let t of m.items) {
+                    if(t.inter === '取消') continue;
+                    
+                    const busy = now >= t.start && now < t.end;
+                    const prep = now >= new Date(t.start.getTime() - 10*60000) && now < t.start;
+
+                    if((busy||prep) && t.inter === '强制忙碌') {
+                        statusClass = 'st-busy'; statusText = '特约咨询'; clientText = `正服务：${t.client}`; break;
+                    }
+                    if((busy||prep) && t.inter === '强制空闲') continue;
+
+                    if(busy) {
+                        statusClass = 'st-busy'; statusText = '咨询中 · 勿扰'; clientText = `正服务：${t.client}`; break;
+                    } else if(prep && statusClass !== 'st-busy') {
+                        statusClass = 'st-prep'; statusText = '恭候 · 待启'; clientText = `候见：${t.client}`;
+                    }
+                }
+
+                const img = m.pic || 'https://via.placeholder.com/200/333/d4af37?text=Master';
+                
+                const div = document.createElement('div');
+                div.className = `master-pillar ${statusClass}`;
+                div.innerHTML = `
+                    <div class="pillar-light"></div>
+                    <img src="${img}" class="m-avatar">
+                    <div class="m-name-box">
+                        <div class="m-name">${m.name}</div>
+                    </div>
+                    <div class="m-footer">
+                        <div class="status-seal">${statusText}</div>
+                        <div class="current-client">${clientText}</div>
+                    </div>
+                `;
+                stage.appendChild(div);
+            });
+        }
+
+        function isSameDay(d1, d2) {
+            return d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth();
+        }
+    </script>
+</body>
+</html>

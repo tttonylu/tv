@@ -12,23 +12,21 @@
 
     <style>
         :root {
-            /* === 全局配色 === */
+            /* === 配色 === */
             --bg-overlay: rgba(0, 0, 0, 0.85); 
             --sidebar-bg: rgba(0, 0, 0, 0.6);
             --pillar-bg: rgba(255, 255, 255, 0.02);
-            
             --text-gold: #eebb66; 
             --text-white: #ffffff;
             
-            /* 状态色系 */
-            --s-busy: #d32f2f;   /* 忙碌 */
-            --s-free: #2e7d32;   /* 空闲 */
-            --s-prep: #7b1fa2;   /* 准备 */
-            --s-rest: #546e7a;   /* 休息 */
+            /* 状态色 */
+            --s-busy: #d32f2f;   /* 忙 */
+            --s-free: #2e7d32;   /* 闲 */
+            --s-prep: #7b1fa2;   /* 备 */
+            --s-rest: #546e7a;   /* 休 */
 
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
-
             --cloud-pattern: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2,2 L20,2 Q35,2 35,17 L35,35' fill='none' stroke='%23eebb66' stroke-width='2'/%3E%3Cpath d='M6,6 L18,6 Q28,6 28,16 L28,28' fill='none' stroke='%23eebb66' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
         }
 
@@ -51,7 +49,7 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === 1. Header === */
+        /* === Header === */
         .header {
             flex: 0 0 12vh;
             display: flex;
@@ -61,243 +59,122 @@
             border-bottom: 2px solid rgba(238, 187, 102, 0.2);
             background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
         }
-
         .brand-box .brand-name {
-            font-family: var(--font-art);
-            font-size: 2.8rem;
-            color: var(--text-gold);
-            letter-spacing: 0.2rem;
-            text-shadow: 0 0 15px rgba(238, 187, 102, 0.4);
+            font-family: var(--font-art); font-size: 2.8rem; color: var(--text-gold);
+            letter-spacing: 0.2rem; text-shadow: 0 0 15px rgba(238, 187, 102, 0.4);
         }
         .time-box { font-size: 1rem; color: #ccc; margin-top: 5px; }
         
         .stats-panel { display: flex; gap: 1vw; }
         .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.05);
-            width: 5.5vw;
-            padding: 0.8vh 0;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05); width: 5.5vw; padding: 0.8vh 0;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;
         }
-        .stat-num { 
-            font-size: 1.8rem; 
-            color: var(--text-gold); 
-            font-family: var(--font-art); 
-            line-height: 1.1; 
-            font-weight: bold;
-        }
+        .stat-num { font-size: 1.8rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1.1; font-weight: bold; }
         .stat-label { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
 
-        /* === 2. Main Body === */
-        .main-body {
-            flex: 1;
-            display: flex;
-            overflow: hidden; 
-        }
+        /* === Main === */
+        .main-body { flex: 1; display: flex; overflow: hidden; }
 
-        /* --- 左侧 Sidebar --- */
+        /* Sidebar */
         .sidebar {
-            flex: 0 0 20%; 
-            background: var(--sidebar-bg);
+            flex: 0 0 20%; background: var(--sidebar-bg);
             border-right: 1px solid rgba(238, 187, 102, 0.2);
-            display: flex;
-            flex-direction: column;
-            padding: 1.5vh 0;
-            position: relative;
+            display: flex; flex-direction: column; padding: 1.5vh 0;
         }
-
         .sidebar-title {
-            text-align: center;
-            color: var(--text-gold);
-            font-size: 1.3rem;
-            font-family: var(--font-art);
-            margin-bottom: 1vh;
-            padding-bottom: 0.5vh;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
-            letter-spacing: 2px;
+            text-align: center; color: var(--text-gold); font-size: 1.3rem;
+            font-family: var(--font-art); margin-bottom: 1vh; padding-bottom: 0.5vh;
+            border-bottom: 1px dashed rgba(255,255,255,0.1); letter-spacing: 2px;
         }
-
-        .schedule-list {
-            flex: 1;
-            overflow: hidden; 
-            padding: 0 1vw;
-            display: flex;
-            flex-direction: column;
-            gap: 0; 
-        }
-
+        .schedule-list { flex: 1; overflow: hidden; padding: 0 1vw; display: flex; flex-direction: column; gap: 0; }
         .schedule-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 1vh 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.9rem;
-            transition: background 0.3s;
+            display: flex; align-items: flex-start; padding: 1vh 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;
         }
-        
         .sc-time-col {
-            width: 3.5rem;
-            text-align: left;
-            padding-right: 0.5rem;
-            border-right: 1px solid rgba(255,255,255,0.1);
-            margin-right: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            width: 3.5rem; text-align: left; padding-right: 0.5rem;
+            border-right: 1px solid rgba(255,255,255,0.1); margin-right: 0.5rem;
+            display: flex; flex-direction: column; justify-content: center;
         }
         .sc-date-txt { font-family:'Arial'; font-weight:bold; color: var(--text-gold); font-size: 1em; line-height: 1; }
         .sc-time-txt { font-family:'Arial'; color: #bbb; font-size: 0.8em; margin-top: 3px; }
-
         .sc-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .sc-row-1 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
         .sc-master { font-weight: bold; font-size: 1rem; color: var(--text-gold); }
         .sc-status { font-size: 0.75rem; padding: 0 4px; border-radius: 2px; }
         .sc-row-2 { font-size: 0.85rem; color: #999; display: flex; justify-content: space-between;}
         
-        .st-done { color: #555; } 
-        .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
+        .st-done { color: #555; } .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
         .st-wait { color: #aaa; background: rgba(255,255,255,0.1); }
         .st-rest-item { color: #666; font-style: italic; border: 1px dashed #666; }
-        
         .item-past { opacity: 0.4; filter: grayscale(1); }
         .item-current { background: rgba(238, 187, 102, 0.1); border-left: 3px solid var(--text-gold); padding-left: 5px; }
 
-
-        /* --- 右侧 Pillars --- */
-        .master-stage {
-            flex: 1; 
-            display: flex; 
-            flex-direction: row; 
-            padding: 3vh 2vw; 
-            gap: 2vw; 
-        }
-
+        /* Master Pillars */
+        .master-stage { flex: 1; display: flex; flex-direction: row; padding: 3vh 2vw; gap: 2vw; }
         .master-pillar {
-            flex: 1; 
-            height: 100%;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 4vh;
-            padding-bottom: 2vh;
+            flex: 1; height: 100%; position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            padding-top: 4vh; padding-bottom: 2vh;
             background: var(--pillar-bg);
             border: 1px solid rgba(238, 187, 102, 0.4);
             box-shadow: 0 0 30px rgba(0,0,0,0.6) inset;
             transition: all 0.5s ease;
         }
-
         .master-pillar::before, .master-pillar::after {
             content: ''; position: absolute; width: 50px; height: 50px;
-            background-image: var(--cloud-pattern);
-            background-size: contain; background-repeat: no-repeat;
-            opacity: 1;
+            background-image: var(--cloud-pattern); background-size: contain;
+            background-repeat: no-repeat; opacity: 1;
         }
         .master-pillar::before { top: -2px; left: -2px; transform: rotate(0deg); }
         .master-pillar::after { bottom: -2px; right: -2px; transform: rotate(180deg); }
         
         .pillar-light {
             position: absolute; top: 15px; width: 60%; height: 4px;
-            background: currentColor; box-shadow: 0 0 20px 2px currentColor;
-            border-radius: 2px;
+            background: currentColor; box-shadow: 0 0 20px 2px currentColor; border-radius: 2px;
         }
-
         .m-avatar {
-            width: 15vh; height: 15vh;
-            max-width: 150px; max-height: 150px;
-            border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.2);
-            object-fit: cover;
-            margin-bottom: 3vh;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            z-index: 2;
-            transition: all 0.5s;
+            width: 15vh; height: 15vh; max-width: 150px; max-height: 150px;
+            border-radius: 50%; border: 3px solid rgba(255,255,255,0.2);
+            object-fit: cover; margin-bottom: 3vh; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            z-index: 2; transition: all 0.5s;
         }
-
         .m-name-box {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            margin: 1vh 0;
-            background: rgba(0,0,0,0.15);
+            flex: 1; display: flex; justify-content: center; align-items: center; width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin: 1vh 0; background: rgba(0,0,0,0.15);
         }
         .m-name {
-            font-family: var(--font-main);
-            font-size: 3.5rem; 
-            font-weight: 900;
-            color: #fff;
-            writing-mode: vertical-rl; 
-            text-orientation: upright;
-            letter-spacing: 1.2vh;
-            text-shadow: 0 4px 15px rgba(0,0,0,1);
-            transition: color 0.5s;
+            font-family: var(--font-main); font-size: 3.5rem; font-weight: 900; color: #fff;
+            writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 1.2vh;
+            text-shadow: 0 4px 15px rgba(0,0,0,1); transition: color 0.5s;
         }
-
-        .m-footer {
-            margin-top: auto;
-            text-align: center;
-            width: 100%;
-            z-index: 2;
-        }
+        .m-footer { margin-top: auto; text-align: center; width: 100%; z-index: 2; }
         .status-seal {
-            display: inline-block;
-            padding: 0.8vh 2vw;
-            font-size: 1.4rem;
-            font-family: var(--font-art);
-            border: 2px solid currentColor;
-            border-radius: 8px;
-            background: rgba(0,0,0,0.85);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            display: inline-block; padding: 0.8vh 2vw; font-size: 1.4rem;
+            font-family: var(--font-art); border: 2px solid currentColor;
+            border-radius: 8px; background: rgba(0,0,0,0.85); box-shadow: 0 5px 20px rgba(0,0,0,0.6);
             transition: all 0.5s;
         }
-        .current-client {
-            margin-top: 1.5vh;
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.6);
-            min-height: 1.2em;
-        }
+        .current-client { margin-top: 1.5vh; font-size: 0.95rem; color: rgba(255,255,255,0.6); min-height: 1.2em; }
 
-        /* 状态色 */
-        .st-free { color: var(--s-free); }
-        .st-busy { color: var(--s-busy); }
-        .st-prep { color: var(--s-prep); }
-        
-        /* 休息状态设计 */
-        .st-rest {
-            color: var(--s-rest);
-            border-color: rgba(100, 100, 100, 0.2);
-            background: rgba(0,0,0,0.4);
-        }
+        .st-free { color: var(--s-free); } .st-busy { color: var(--s-busy); } .st-prep { color: var(--s-prep); }
+
+        /* Rest Mode */
+        .st-rest { color: var(--s-rest); border-color: rgba(100, 100, 100, 0.2); background: rgba(0,0,0,0.4); }
         .st-rest::before, .st-rest::after { filter: grayscale(1) brightness(0.5); opacity: 0.2; }
-        .st-rest .m-avatar { 
-            filter: grayscale(100%) brightness(0.6); 
-            border-color: #444; box-shadow: none;
-        }
+        .st-rest .m-avatar { filter: grayscale(100%) brightness(0.6); border-color: #444; box-shadow: none; }
         .st-rest .m-name { color: #666; text-shadow: none; }
-        .st-rest .status-seal {
-            border: 2px dashed #666; background: transparent; color: #888; box-shadow: none;
-        }
+        .st-rest .status-seal { border: 2px dashed #666; background: transparent; color: #888; box-shadow: none; }
         .st-rest .pillar-light { display: none; }
         .st-rest .current-client { color: #555; font-style: italic; }
 
-
-        /* === Footer === */
+        /* Footer */
         .marquee-bar {
-            flex: 0 0 5vh;
-            background: rgba(0,0,0,0.85);
-            border-top: 1px solid rgba(255,255,255,0.15);
-            display: flex;
-            align-items: center;
-            padding-left: 1vw;
-            font-size: 1rem;
+            flex: 0 0 5vh; background: rgba(0,0,0,0.85); border-top: 1px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; padding-left: 1vw; font-size: 1rem;
         }
         .mq-label { color: var(--text-gold); font-weight: bold; margin-right: 2vw; padding-left: 1vw; white-space: nowrap; }
         .mq-viewport { flex: 1; overflow: hidden; height: 100%; position: relative; }
@@ -305,16 +182,26 @@
         .mq-item { margin-right: 4vw; color: #ddd; }
         @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
+        /* Error/Diag Layer */
         #err-layer {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            display: none; justify-content: center; align-items: center; z-index: 999;
-            color: var(--s-busy); font-size: 2rem;
+            display: flex; justify-content: center; align-items: center; z-index: 999;
+            color: var(--s-busy); font-size: 1.5rem; flex-direction: column;
+            text-align: center; padding: 20px;
+        }
+        #diag-log {
+            margin-top: 20px; font-size: 0.9rem; color: #aaa; text-align: left;
+            background: #111; padding: 10px; border: 1px solid #333; width: 80%;
+            height: 200px; overflow-y: auto; font-family: monospace;
         }
     </style>
 </head>
 <body>
 
-    <div id="err-layer">系统连接中断，正在重试...</div>
+    <div id="err-layer">
+        <div id="err-msg">系统连接中...</div>
+        <div id="diag-log">等待 API 响应...</div>
+    </div>
 
     <header class="header">
         <div class="brand-box">
@@ -343,7 +230,7 @@
 
     <div class="main-body">
         <aside class="sidebar">
-            <div class="sidebar-title">本月待办 (全馆)</div>
+            <div class="sidebar-title">本月行程 (全馆)</div>
             <div class="schedule-list" id="month-list"></div>
         </aside>
 
@@ -363,6 +250,15 @@
         const VIKA_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
         const VIKA_ID = 'dstmgbUypiy0LbUzwF'; 
         const REFRESH_MS = 30000;
+
+        function log(msg) {
+            const el = document.getElementById('diag-log');
+            if(el) {
+                el.innerHTML += `<div>> ${msg}</div>`;
+                el.scrollTop = el.scrollHeight;
+            }
+            console.log(msg);
+        }
 
         init();
         
@@ -384,28 +280,61 @@
 
         async function load() {
             try {
+                log('开始请求 API...');
                 const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_ID}/records?fieldKey=name`;
                 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${VIKA_TOKEN}` } });
                 const json = await res.json();
-                if(!res.ok || json.code !== 200) throw new Error('API Error');
+                
+                if(!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+                if(json.code !== 200) throw new Error(`API Error: ${json.message}`);
+                
+                log(`获取成功，记录数: ${json.data.records.length}`);
+                
+                if(json.data.records.length === 0) {
+                    throw new Error("表格为空，请检查维格表是否有数据");
+                }
+
+                // 检查字段
+                const first = json.data.records[0].fields;
+                if(!first['大师'] && !first['日期']) {
+                    log(`字段警告: 未找到 '大师' 或 '日期' 列。当前列名: ${Object.keys(first).join(', ')}`);
+                }
+
                 document.getElementById('err-layer').style.display = 'none';
                 render(json.data.records);
             } catch(e) {
-                console.error(e);
+                log(`错误: ${e.message}`);
+                document.getElementById('err-msg').innerText = "数据加载失败";
                 document.getElementById('err-layer').style.display = 'flex';
             }
         }
 
-        // 安全解析日期
-        function parseVikaDate(dateStr, timeStr) {
-            if (!dateStr) return null;
-            let tStr = timeStr || "00:00"; // 缺省时间补全，防止崩溃
-            let ds = String(dateStr).replace(/\//g, '-');
-            let dParts = ds.split('-'); 
-            let tParts = tStr.split(':'); 
-            if (dParts.length < 3) return null;
-            if (tParts.length < 2) tParts = [0, 0];
-            return new Date(parseInt(dParts[0]), parseInt(dParts[1]) - 1, parseInt(dParts[2]), parseInt(tParts[0]), parseInt(tParts[1]));
+        function parseVikaDate(dateVal, timeStr) {
+            if (!dateVal) return null;
+            let d = new Date();
+            
+            // 核心修复：兼容时间戳 (数字) 和 字符串 (YYYY-MM-DD)
+            if (typeof dateVal === 'number') {
+                d = new Date(dateVal);
+            } else {
+                let ds = String(dateVal).replace(/\//g, '-');
+                let parts = ds.split('-');
+                if(parts.length >= 3) {
+                    d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+                } else {
+                    return null; // 无法解析的日期
+                }
+            }
+
+            // 设置具体时间
+            let tStr = timeStr || "00:00";
+            let tParts = tStr.split(':');
+            if(tParts.length >= 2) {
+                d.setHours(parseInt(tParts[0]), parseInt(tParts[1]), 0, 0);
+            } else {
+                d.setHours(0,0,0,0);
+            }
+            return d;
         }
 
         function render(records) {
@@ -428,21 +357,18 @@
 
             records.forEach(r => {
                 const f = r.fields;
-                // 关键修正：如果日期为空则跳过，但如果时间为空，允许parseVikaDate去补全
-                if(!f['大师'] || !f['日期']) return; 
+                // 只要有日期，就尝试解析。如果没大师名字，暂时忽略
+                if(!f['大师'] || !f['日期']) return;
 
                 const start = parseVikaDate(f['日期'], f['时间']);
-                if(!start) return;
+                if(!start) return; // 日期解析失败则跳过
                 
-                // 处理状态文本，防止 undefined 报错
                 const inter = String(f['状态干预'] || "");
-                const isRest = ['休息', '请假', '外出', '停诊'].some(kw => inter.includes(kw));
-                const isCancel = inter.includes('取消');
+                const isRest = ['休息', '请假', '外出', '停诊'].some(k => inter.includes(k));
 
-                // 时长处理：如果是休息且未填时长，默认为全天(1440)，否则默认60
+                // 时长处理
                 let defaultDur = 60;
-                if(isRest && !f['时长']) defaultDur = 1440;
-                
+                if(isRest && !f['时长']) defaultDur = 1440; // 休息默认全天
                 const end = new Date(start.getTime() + (f['时长']||defaultDur)*60000);
 
                 const item = {
@@ -455,6 +381,8 @@
                 const isTmr = (start >= tomorrowStart && start <= tomorrowEnd);
                 const isThisMonth = (start.getMonth() === now.getMonth()) && (start.getFullYear() === now.getFullYear());
                 const isPast = end < now;
+
+                const isCancel = inter.includes('取消');
 
                 if (!isRest && !isCancel) {
                     if (isToday) cntTodayTotal++;
@@ -512,8 +440,7 @@
                     let stCls = 'st-wait';
                     
                     if (d.isRest) {
-                        stTxt = '休·沐'; 
-                        stCls = 'st-rest-item'; 
+                        stTxt = '休·沐'; stCls = 'st-rest-item'; 
                     } else {
                         if(d.isPast) { stTxt = '已结束'; stCls = 'st-done'; }
                         else if(d.isIng) { stTxt = '进行中'; stCls = 'st-ing'; }
@@ -581,12 +508,8 @@
                     
                     const isRest = ['休息', '请假', '外出', '停诊'].some(kw => t.inter.includes(kw));
 
-                    // 如果是休息，且（时间吻合 或者 根本没填时间导致默认为全天）
                     if(isRest && (busy || (t.inter && t.start.getHours()===0 && t.start.getMinutes()===0))) {
-                        statusClass = 'st-rest'; 
-                        statusText = '休沐 · 暂离'; 
-                        clientText = '归期未定'; 
-                        break; 
+                        statusClass = 'st-rest'; statusText = '休沐 · 暂离'; clientText = '归期未定'; break; 
                     }
 
                     if((busy||prep) && t.inter.includes('忙碌')) {

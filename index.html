@@ -12,23 +12,24 @@
 
     <style>
         :root {
-            /* 配色变量 */
-            --bg-overlay: rgba(0, 0, 0, 0.75); 
-            --sidebar-bg: rgba(0, 0, 0, 0.5);
+            /* === 全局配色 === */
+            --bg-overlay: rgba(0, 0, 0, 0.8); 
+            --sidebar-bg: rgba(0, 0, 0, 0.6);
             --pillar-bg: rgba(255, 255, 255, 0.02);
             
             --text-gold: #eebb66; 
             --text-white: #ffffff;
             
-            /* 状态色 */
-            --s-busy: #d32f2f;   /* 忙碌-红 */
-            --s-free: #2e7d32;   /* 空闲-绿 */
-            --s-prep: #7b1fa2;   /* 准备-紫 */
-            --s-rest: #607d8b;   /* 休息-青灰 */
+            /* 状态色系 */
+            --s-busy: #d32f2f;   /* 忙碌：丹红 */
+            --s-free: #2e7d32;   /* 空闲：竹青 */
+            --s-prep: #7b1fa2;   /* 准备：紫气 */
+            --s-rest: #546e7a;   /* 休息：墨灰 (低调) */
 
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
 
+            /* 云纹 SVG */
             --cloud-pattern: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2,2 L20,2 Q35,2 35,17 L35,35' fill='none' stroke='%23eebb66' stroke-width='2'/%3E%3Cpath d='M6,6 L18,6 Q28,6 28,16 L28,28' fill='none' stroke='%23eebb66' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
         }
 
@@ -51,7 +52,7 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === Header === */
+        /* === 1. 顶部 Header === */
         .header {
             flex: 0 0 12vh;
             display: flex;
@@ -59,7 +60,7 @@
             align-items: center;
             padding: 0 2vw;
             border-bottom: 2px solid rgba(238, 187, 102, 0.2);
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
         }
 
         .brand-box .brand-name {
@@ -93,14 +94,14 @@
         .stat-label { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
 
 
-        /* === Main Body === */
+        /* === 2. Main Layout === */
         .main-body {
             flex: 1;
             display: flex;
             overflow: hidden; 
         }
 
-        /* --- Sidebar --- */
+        /* --- 左侧：行程列表 --- */
         .sidebar {
             flex: 0 0 20%; 
             background: var(--sidebar-bg);
@@ -159,14 +160,18 @@
         .sc-status { font-size: 0.75rem; padding: 0 4px; border-radius: 2px; }
         .sc-row-2 { font-size: 0.85rem; color: #999; display: flex; justify-content: space-between;}
         
+        /* Sidebar Item States */
         .st-done { color: #555; } 
         .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
         .st-wait { color: #aaa; background: rgba(255,255,255,0.1); }
+        /* 侧边栏里的休息条目 */
+        .st-rest-item { color: #777; font-style: italic; }
+        
         .item-past { opacity: 0.4; filter: grayscale(1); }
         .item-current { background: rgba(238, 187, 102, 0.1); border-left: 3px solid var(--text-gold); padding-left: 5px; }
 
 
-        /* --- Pillars --- */
+        /* --- 右侧：大师立柱 (Pillars) --- */
         .master-stage {
             flex: 1; 
             display: flex; 
@@ -185,11 +190,13 @@
             padding-top: 4vh;
             padding-bottom: 2vh;
             background: var(--pillar-bg);
+            /* 默认金边 */
             border: 1px solid rgba(238, 187, 102, 0.4);
             box-shadow: 0 0 30px rgba(0,0,0,0.6) inset;
-            transition: all 0.3s;
+            transition: all 0.5s ease;
         }
 
+        /* 云纹角标 */
         .master-pillar::before, .master-pillar::after {
             content: ''; position: absolute; width: 50px; height: 50px;
             background-image: var(--cloud-pattern);
@@ -199,6 +206,7 @@
         .master-pillar::before { top: -2px; left: -2px; transform: rotate(0deg); }
         .master-pillar::after { bottom: -2px; right: -2px; transform: rotate(180deg); }
         
+        /* 顶部光效 */
         .pillar-light {
             position: absolute; top: 15px; width: 60%; height: 4px;
             background: currentColor; box-shadow: 0 0 20px 2px currentColor;
@@ -209,11 +217,12 @@
             width: 15vh; height: 15vh;
             max-width: 150px; max-height: 150px;
             border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.2);
             object-fit: cover;
             margin-bottom: 3vh;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             z-index: 2;
+            transition: all 0.5s;
         }
 
         .m-name-box {
@@ -236,6 +245,7 @@
             text-orientation: upright;
             letter-spacing: 1.2vh;
             text-shadow: 0 4px 15px rgba(0,0,0,1);
+            transition: color 0.5s;
         }
 
         .m-footer {
@@ -253,6 +263,7 @@
             border-radius: 8px;
             background: rgba(0,0,0,0.85);
             box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            transition: all 0.5s;
         }
         .current-client {
             margin-top: 1.5vh;
@@ -261,15 +272,43 @@
             min-height: 1.2em;
         }
 
-        /* 状态色定义 */
+        /* === 状态配色 === */
         .st-free { color: var(--s-free); }
         .st-busy { color: var(--s-busy); }
         .st-prep { color: var(--s-prep); }
+
+        /* === 【重点设计】休息状态 (REST MODE) === */
+        /* 整体去色，降低透明度，营造“隐退”感 */
+        .st-rest {
+            color: var(--s-rest);
+            border-color: rgba(100, 100, 100, 0.3); /* 边框变暗 */
+            background: rgba(0,0,0,0.3); /* 背景加深 */
+        }
+        /* 云纹变暗 */
+        .st-rest::before, .st-rest::after { filter: grayscale(1) brightness(0.5); opacity: 0.3; }
         
-        /* 休息状态：灰色调，低饱和度 */
-        .st-rest { color: var(--s-rest); filter: grayscale(0.8) opacity(0.8); }
-        .st-rest .m-avatar { border-color: var(--s-rest); }
-        .st-rest .status-seal { border-style: dashed; } /* 休息时边框变虚线 */
+        /* 头像黑白化，加重阴影 */
+        .st-rest .m-avatar { 
+            filter: grayscale(100%) brightness(0.7); 
+            border-color: #555;
+            box-shadow: none;
+        }
+        /* 名字变灰 */
+        .st-rest .m-name { color: #777; text-shadow: none; }
+        
+        /* 印章变虚线 */
+        .st-rest .status-seal {
+            border: 2px dashed #777;
+            background: transparent;
+            color: #aaa;
+            box-shadow: none;
+        }
+        /* 光效消失 */
+        .st-rest .pillar-light { display: none; }
+        
+        /* 客户栏 */
+        .st-rest .current-client { color: #555; font-style: italic; }
+
 
         /* === Footer === */
         .marquee-bar {
@@ -325,7 +364,7 @@
 
     <div class="main-body">
         <aside class="sidebar">
-            <div class="sidebar-title">本月待办 (全馆)</div>
+            <div class="sidebar-title">本月行程 (全馆)</div>
             <div class="schedule-list" id="month-list"></div>
         </aside>
 
@@ -335,7 +374,7 @@
     </div>
 
     <div class="marquee-bar">
-        <div class="mq-label">实时通告</div>
+        <div class="mq-label">最新通告</div>
         <div class="mq-viewport">
             <div class="mq-content" id="mq-list"></div>
         </div>
@@ -413,7 +452,7 @@
                 if(!start) return;
                 
                 const end = new Date(start.getTime() + (f['时长']||60)*60000);
-                const inter = f['状态干预'];
+                const inter = f['状态干预']; // 可能包含：休息、请假、外出
 
                 const item = {
                     client: f['客户'] || '善信',
@@ -426,7 +465,10 @@
                 const isThisMonth = (start.getMonth() === now.getMonth()) && (start.getFullYear() === now.getFullYear());
                 const isPast = end < now;
 
-                if (inter !== '取消') {
+                // 判断是否是“休息/请假”类型的记录
+                const isRest = ['休息', '请假', '外出', '停诊'].includes(inter);
+
+                if (!isRest && inter !== '取消') {
                     if (isToday) cntTodayTotal++;
                     if (isToday && isPast) cntTodayDone++;
                     if (isThisMonth) cntMonthTotal++;
@@ -435,11 +477,11 @@
 
                 if (isThisMonth && inter !== '取消') {
                     let isIng = start <= now && end > now;
-                    allItems.push({...item, isPast: isPast, isIng: isIng, isToday: isToday});
+                    allItems.push({...item, isPast: isPast, isIng: isIng, isToday: isToday, isRest: isRest});
                 }
 
-                if (inter !== '取消') {
-                    // 修正滚动条逻辑：今天未完成的(end>now) + 明天的
+                // 滚动栏：排除休息记录
+                if (!isRest && inter !== '取消') {
                     if (isToday && end > now) marqueeData.push({...item, tag:'今日'});
                     else if (isTmr) marqueeData.push({...item, tag:'明日'});
                 }
@@ -481,8 +523,15 @@
 
                     let stTxt = '待开始';
                     let stCls = 'st-wait';
-                    if(d.isPast) { stTxt = '已结束'; stCls = 'st-done'; }
-                    else if(d.isIng) { stTxt = '进行中'; stCls = 'st-ing'; }
+                    
+                    // 侧边栏对休息的特殊展示
+                    if (d.isRest) {
+                        stTxt = '休·假'; 
+                        stCls = 'st-rest-item'; 
+                    } else {
+                        if(d.isPast) { stTxt = '已结束'; stCls = 'st-done'; }
+                        else if(d.isIng) { stTxt = '进行中'; stCls = 'st-ing'; }
+                    }
 
                     const div = document.createElement('div');
                     div.className = cls;
@@ -497,7 +546,7 @@
                                 <span class="sc-status ${stCls}">${stTxt}</span>
                             </div>
                             <div class="sc-row-2">
-                                <span>预约：${d.client}</span>
+                                <span>${d.isRest ? '暂停接客' : '预约：'+d.client}</span>
                             </div>
                         </div>
                     `;
@@ -544,17 +593,24 @@
                     const busy = now >= t.start && now < t.end;
                     const prep = now >= new Date(t.start.getTime() - 10*60000) && now < t.start;
                     
-                    // 检查休息关键字 (新增逻辑)
-                    const isRest = (t.inter === '休息' || t.inter === '请假' || t.inter === '外出');
+                    // 检查休息关键字 (含模糊匹配)
+                    const isRest = ['休息', '请假', '外出', '停诊'].some(keyword => t.inter && t.inter.includes(keyword));
 
+                    // 优先级 1: 休息 (只要在时间段内，或者强制干预标记了)
                     if(isRest && (busy || prep)) {
-                        statusClass = 'st-rest'; statusText = '休息中 · 暂离'; clientText = '暂停服务'; break;
+                        statusClass = 'st-rest'; 
+                        statusText = '休沐 · 暂离'; 
+                        clientText = '归期未定'; 
+                        break; 
                     }
-                    if((busy||prep) && t.inter === '强制忙碌') {
+
+                    // 优先级 2: 强制忙碌
+                    if((busy||prep) && t.inter && t.inter.includes('忙碌')) {
                         statusClass = 'st-busy'; statusText = '特约咨询'; clientText = `正服务：${t.client}`; break;
                     }
-                    if((busy||prep) && t.inter === '强制空闲') continue;
+                    if((busy||prep) && t.inter && t.inter.includes('空闲')) continue;
 
+                    // 优先级 3: 正常时间
                     if(busy) {
                         statusClass = 'st-busy'; statusText = '咨询中 · 勿扰'; clientText = `正服务：${t.client}`; break;
                     } else if(prep && statusClass !== 'st-busy' && statusClass !== 'st-rest') {

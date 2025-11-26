@@ -12,10 +12,10 @@
 
     <style>
         :root {
-            /* 极简高透风格 */
-            --bg-overlay: rgba(0, 0, 0, 0.65); 
-            --glass-bg: rgba(255, 255, 255, 0.02);
-            --sidebar-bg: rgba(0, 0, 0, 0.4); /* 侧边栏稍深 */
+            /* 极简高透 + 中式配色 */
+            --bg-overlay: rgba(0, 0, 0, 0.7); 
+            --sidebar-bg: rgba(0, 0, 0, 0.5);
+            --pillar-bg: rgba(255, 255, 255, 0.02);
             
             --text-gold: #eebb66; 
             --text-white: #ffffff;
@@ -27,14 +27,12 @@
 
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
+
+            /* 云纹图案 (用于边框四角) */
+            --cloud-pattern: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2,2 L15,2 Q25,2 25,12 L25,25' fill='none' stroke='%23eebb66' stroke-width='2'/%3E%3Cpath d='M5,5 L12,5 Q18,5 18,11 L18,18' fill='none' stroke='%23eebb66' stroke-width='1' opacity='0.6'/%3E%3C/svg%3E");
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* 滚动条美化 */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        ::-webkit-scrollbar-thumb { background: var(--text-gold); border-radius: 3px; }
 
         body {
             background: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png') no-repeat center center fixed;
@@ -53,138 +51,163 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === 1. 顶部 Header === */
+        /* === 1. Header (12vh) === */
         .header {
             flex: 0 0 12vh;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 3vw;
-            border-bottom: 2px solid rgba(238, 187, 102, 0.3);
+            padding: 0 2vw;
+            border-bottom: 2px solid rgba(238, 187, 102, 0.2);
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            z-index: 10;
         }
 
-        .brand-box { display: flex; flex-direction: column; }
-        .brand-name {
+        .brand-box .brand-name {
             font-family: var(--font-art);
-            font-size: 3rem;
+            font-size: 2.8rem;
             color: var(--text-gold);
-            letter-spacing: 0.3rem;
-            text-shadow: 0 0 20px rgba(238, 187, 102, 0.4);
+            letter-spacing: 0.2rem;
+            text-shadow: 0 0 15px rgba(238, 187, 102, 0.4);
         }
-        .time-box {
-            font-size: 1.1rem;
-            color: #ddd;
-            margin-top: 0.5rem;
-        }
+        .time-box { font-size: 1rem; color: #ccc; margin-top: 5px; }
         
-        /* 统计面板 */
-        .stats-panel { display: flex; gap: 1.5vw; }
+        .stats-panel { display: flex; gap: 1vw; }
         .stat-item {
             text-align: center;
-            background: rgba(0,0,0,0.4);
-            padding: 0.5vh 1vw;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 12px;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 4px;
         }
-        .stat-num { font-size: 2rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1; }
-        .stat-label { font-size: 0.8rem; color: #aaa; margin-top: 3px; }
+        .stat-num { font-size: 1.8rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1; }
+        .stat-label { font-size: 0.75rem; color: #999; margin-top: 2px; }
 
 
-        /* === 2. 中间主体区 (左右分栏) === */
+        /* === 2. Main Body === */
         .main-body {
             flex: 1;
             display: flex;
-            overflow: hidden; /* 内部滚动 */
+            overflow: hidden; 
         }
 
-        /* --- 左侧：本月行程列表 (Sidebar) --- */
+        /* --- 左侧：行程列表 (变窄, 无滚动条) --- */
         .sidebar {
-            flex: 0 0 28%; /* 宽度占比 */
+            flex: 0 0 20%; /* 宽度调整为 20% */
             background: var(--sidebar-bg);
-            border-right: 2px solid rgba(238, 187, 102, 0.3);
+            border-right: 2px solid rgba(238, 187, 102, 0.2);
             display: flex;
             flex-direction: column;
             padding: 2vh 0;
+            position: relative;
         }
 
         .sidebar-title {
             text-align: center;
             color: var(--text-gold);
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-family: var(--font-art);
-            margin-bottom: 1.5vh;
+            margin-bottom: 1vh;
+            padding-bottom: 1vh;
             border-bottom: 1px dashed rgba(255,255,255,0.1);
-            padding-bottom: 1.5vh;
+            letter-spacing: 2px;
         }
 
         .schedule-list {
             flex: 1;
-            overflow-y: auto;
-            padding: 0 1.5vw;
+            overflow: hidden; /* 隐藏滚动条 */
+            padding: 0 1vw;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5vh;
         }
 
         .schedule-item {
             display: flex;
             align-items: center;
-            padding: 1.5vh 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.95rem;
+            padding: 1vh 0.5vw;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.9rem;
+            transition: background 0.3s;
         }
-        .sc-date {
-            width: 3.5rem;
-            text-align: center;
+        
+        .sc-time {
+            width: 3rem;
             font-weight: bold;
             color: var(--text-gold);
-            line-height: 1.2;
+            font-family: 'Arial', sans-serif;
+            text-align: left;
         }
-        .sc-date span { display: block; font-size: 0.8em; color: #888; font-weight: normal; }
         
-        .sc-content { flex: 1; padding-left: 1rem; }
-        .sc-master { font-weight: bold; color: #fff; font-size: 1.1rem; margin-bottom: 2px; }
-        .sc-info { color: #aaa; font-size: 0.9rem; }
-        
-        /* 标记今天/过去的样式 */
-        .item-past { opacity: 0.4; }
-        .item-today { background: rgba(238, 187, 102, 0.1); border-left: 3px solid var(--text-gold); padding-left: 10px; }
+        .sc-content { flex: 1; display: flex; flex-direction: column; }
+        .sc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+        .sc-master { font-weight: bold; color: #fff; font-size: 1rem; }
+        .sc-status { font-size: 0.75rem; padding: 1px 4px; border-radius: 2px; }
+        .sc-client { color: #888; font-size: 0.85rem; }
+
+        /* 状态标记 */
+        .st-done { color: #666; } 
+        .st-ing { color: var(--text-gold); }
+        .st-wait { color: #aaa; }
+
+        /* 历史记录半透明 */
+        .item-past { opacity: 0.5; filter: grayscale(0.8); }
+        .item-current { background: rgba(238, 187, 102, 0.1); border-left: 2px solid var(--text-gold); }
 
 
-        /* --- 右侧：大师立柱展示区 (Pillars) --- */
+        /* --- 右侧：大师立柱 (云纹边框) --- */
         .master-stage {
             flex: 1; 
             display: flex; 
-            flex-direction: row; /* 左右排列 */
-            position: relative;
+            flex-direction: row; 
+            padding: 2vh 2vw; /* 给边框留点呼吸空间 */
+            gap: 2vw; /* 立柱之间的间距 */
+            background: rgba(0,0,0,0.2);
         }
 
         .master-pillar {
-            flex: 1; /* 均分宽度 */
+            flex: 1; 
             height: 100%;
-            border-right: 1px solid rgba(255,255,255,0.05);
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 3vh;
+            padding-top: 4vh;
             padding-bottom: 2vh;
-            transition: all 0.4s ease;
-            background: var(--glass-bg);
+            background: var(--pillar-bg);
+            /* 基础边框 */
+            border: 1px solid rgba(238, 187, 102, 0.3);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5) inset;
         }
+
+        /* === 云纹角标设计 === */
+        .master-pillar::before, .master-pillar::after {
+            content: ''; position: absolute; width: 40px; height: 40px;
+            background-image: var(--cloud-pattern);
+            background-size: contain; background-repeat: no-repeat;
+            opacity: 0.8;
+        }
+        /* 左上 */
+        .master-pillar::before { top: -2px; left: -2px; transform: rotate(0deg); }
+        /* 右下 */
+        .master-pillar::after { bottom: -2px; right: -2px; transform: rotate(180deg); }
         
-        .pillar-light {
-            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            box-shadow: 0 0 25px 5px currentColor;
+        /* 增加另外两个角的伪元素需要额外标签，这里用 inset shadow 和 border 模拟整体感，只加两个角的云纹更有留白美感 */
+
+        /* 顶部状态光条 */
+        .pillar-top-bar {
+            position: absolute; top: 10px; width: 60%; height: 4px;
+            background: currentColor; box-shadow: 0 0 15px currentColor;
+            border-radius: 2px;
         }
 
         .m-avatar {
-            width: 16vh; height: 16vh; /* 头像稍微调小以适应布局 */
-            max-width: 140px; max-height: 140px;
+            width: 16vh; height: 16vh;
+            max-width: 150px; max-height: 150px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.1);
             object-fit: cover;
-            margin-bottom: 2vh;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            margin-bottom: 3vh;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
             z-index: 2;
         }
 
@@ -194,83 +217,71 @@
             justify-content: center;
             align-items: center;
             width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin: 1vh 0;
+            background: rgba(0,0,0,0.1);
         }
         .m-name {
             font-family: var(--font-main);
             font-size: 3.5rem; 
             font-weight: 900;
             color: #fff;
-            writing-mode: vertical-rl; /* 竖排文字 */
+            writing-mode: vertical-rl; 
             text-orientation: upright;
-            letter-spacing: 1vh;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
-            opacity: 0.95;
+            letter-spacing: 1.2vh;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         }
 
         .m-footer {
             margin-top: auto;
             text-align: center;
             width: 100%;
-            padding: 0 0.5vw;
             z-index: 2;
         }
         .status-seal {
             display: inline-block;
-            padding: 0.8vh 1.5vw;
-            font-size: 1.3rem;
+            padding: 0.8vh 2vw;
+            font-size: 1.4rem;
             font-family: var(--font-art);
             border: 2px solid currentColor;
-            border-radius: 6px;
-            background: rgba(0,0,0,0.6);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-            white-space: nowrap;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.8);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
         .current-client {
             margin-top: 1vh;
             font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,255,255,0.5);
             min-height: 1.2em;
         }
 
-        /* 状态颜色 */
+        /* 状态色 */
         .st-free { color: var(--s-free); }
-        .st-free .pillar-light { background: var(--s-free); }
-        
         .st-busy { color: var(--s-busy); }
-        .st-busy .pillar-light { background: var(--s-busy); }
-        
         .st-prep { color: var(--s-prep); }
-        .st-prep .pillar-light { background: var(--s-prep); }
 
-
-        /* === 3. 底部滚动通告 === */
+        /* === 3. Footer Marquee === */
         .marquee-bar {
             flex: 0 0 5vh;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             border-top: 1px solid rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
-            padding-left: 2vw;
+            padding-left: 1vw;
             font-size: 1rem;
         }
-        .mq-label { color: var(--text-gold); font-weight: bold; margin-right: 2vw; white-space: nowrap; }
+        .mq-label { color: var(--text-gold); font-weight: bold; margin-right: 2vw; padding-left: 1vw; }
         .mq-viewport { flex: 1; overflow: hidden; height: 100%; position: relative; }
         .mq-content { position: absolute; display: flex; align-items: center; height: 100%; white-space: nowrap; animation: scroll 25s linear infinite; }
-        .mq-item { margin-right: 5vw; color: #ddd; display: flex; align-items: center; }
-        .mq-tag { font-size: 0.8em; padding: 1px 5px; border-radius: 2px; margin-right: 8px; }
-        
-        .tag-curr { background: var(--text-gold); color: #000; }
-        .tag-next { background: #0288d1; color: #fff; }
-
+        .mq-item { margin-right: 4vw; color: #ddd; }
         @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* Error */
         #err-layer {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95);
             display: none; justify-content: center; align-items: center; z-index: 999;
             color: var(--s-busy); font-size: 2rem;
         }
-
     </style>
 </head>
 <body>
@@ -291,17 +302,13 @@
                 <div class="stat-num" id="stat-tmr">0</div>
                 <div class="stat-label">明日</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-num" id="stat-total">0</div>
-                <div class="stat-label">本月</div>
-            </div>
         </div>
     </header>
 
     <div class="main-body">
         
         <aside class="sidebar">
-            <div class="sidebar-title">本月行程一览</div>
+            <div class="sidebar-title">本月行程</div>
             <div class="schedule-list" id="month-list">
                 </div>
         </aside>
@@ -313,36 +320,28 @@
     </div>
 
     <div class="marquee-bar">
-        <div class="mq-label">实时通告</div>
+        <div class="mq-label">最新通告</div>
         <div class="mq-viewport">
-            <div class="mq-content" id="mq-list">
-                </div>
+            <div class="mq-content" id="mq-list"></div>
         </div>
     </div>
 
     <script>
-        // === API 配置 ===
         const VIKA_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
         const VIKA_ID = 'dstmgbUypiy0LbUzwF'; 
-        // ===============
-
         const REFRESH_MS = 30000;
 
         init();
         
-        // 时钟逻辑
         setInterval(() => {
             const now = new Date();
             const gan = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
             const zhi = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
             const idx = (now.getFullYear() - 1984) % 60; 
             const gz = gan[(idx%10+10)%10] + zhi[(idx%12+12)%12];
-            
-            const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
-            const dateStr = now.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' });
-            
-            document.getElementById('clock-display').innerHTML = 
-                `${gz}年 · ${dateStr} &nbsp; <span style="color:#eebb66;">${timeStr}</span>`;
+            const tStr = now.toLocaleTimeString('en-GB', { hour12: false });
+            const dStr = now.toLocaleDateString('zh-CN', { month:'long', day:'numeric', weekday:'long' });
+            document.getElementById('clock-display').innerHTML = `${gz}年 · ${dStr} &nbsp; <span style="color:#eebb66;">${tStr}</span>`;
         }, 1000);
 
         async function init() {
@@ -355,9 +354,7 @@
                 const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_ID}/records?fieldKey=name`;
                 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${VIKA_TOKEN}` } });
                 const json = await res.json();
-                
                 if(!res.ok || json.code !== 200) throw new Error('API Error');
-                
                 document.getElementById('err-layer').style.display = 'none';
                 render(json.data.records);
             } catch(e) {
@@ -372,8 +369,8 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
 
             const masters = {};
-            const monthRecords = []; // 本月所有记录
-            const marqueeData = [];  // 滚动记录
+            const allItems = []; // 用于侧边栏筛选
+            const marqueeData = [];
             
             let cToday = 0;
             let cTmr = 0;
@@ -382,15 +379,7 @@
                 const f = r.fields;
                 if(!f['大师'] || !f['日期'] || !f['时间']) return;
 
-                // 日期处理
-                let dStr = f['日期'];
-                if(typeof dStr === 'number') {
-                    const dObj = new Date(dStr);
-                    dStr = `${dObj.getFullYear()}-${dObj.getMonth()+1}-${dObj.getDate()}`;
-                } else {
-                    dStr = String(dStr).replace(/\//g, '-');
-                }
-                
+                let dStr = typeof f['日期'] === 'number' ? new Date(f['日期']).toISOString().split('T')[0] : String(f['日期']).replace(/\//g, '-');
                 const start = new Date(`${dStr}T${f['时间']}:00`);
                 if(isNaN(start)) return;
                 
@@ -407,22 +396,19 @@
                 const isTmr = isSameDay(start, tomorrow);
                 const isThisMonth = (start.getMonth() === now.getMonth()) && (start.getFullYear() === now.getFullYear());
 
-                // 统计
                 if(isToday) cToday++;
                 if(isTmr) cTmr++;
 
-                // 收集本月数据 (用于侧边栏)
+                // 收集本月数据 (用于后续筛选)
                 if (isThisMonth && inter !== '取消') {
-                    monthRecords.push({...item, isPast: end < now, isToday: isToday});
+                    allItems.push({...item, isPast: end < now, isToday: isToday});
                 }
 
-                // 收集滚动数据 (今日未来 + 明日)
                 if (inter !== '取消') {
                     if (isToday && end > now) marqueeData.push({...item, tag:'今日'});
                     if (isTmr) marqueeData.push({...item, tag:'明日'});
                 }
 
-                // 大师分组
                 if(!masters[f['大师']]) {
                     masters[f['大师']] = {
                         name: f['大师'],
@@ -433,68 +419,81 @@
                 masters[f['大师']].items.push(item);
             });
 
-            // 1. 更新顶部统计
             document.getElementById('stat-today').innerText = cToday;
             document.getElementById('stat-tmr').innerText = cTmr;
-            document.getElementById('stat-total').innerText = monthRecords.length;
 
-            // 2. 渲染左侧边栏 (本月行程)
+            // === 2. 侧边栏逻辑 (Fixed, Recent Past + Future) ===
             const sideList = document.getElementById('month-list');
             sideList.innerHTML = '';
-            // 按时间排序
-            monthRecords.sort((a,b) => a.start - b.start);
             
-            if(monthRecords.length === 0) {
-                sideList.innerHTML = '<div style="text-align:center; color:#666; padding-top:2rem;">本月无行程</div>';
+            // 分离过期和未来
+            allItems.sort((a,b) => a.start - b.start);
+            const pastItems = allItems.filter(i => i.isPast);
+            const futureItems = allItems.filter(i => !i.isPast);
+            
+            // 取最近结束的 2 个
+            const recentPast = pastItems.slice(-2); 
+            // 组合最终列表
+            const displayList = [...recentPast, ...futureItems];
+
+            if(displayList.length === 0) {
+                sideList.innerHTML = '<div style="text-align:center; color:#666; padding-top:2rem;">无更多行程</div>';
             } else {
-                monthRecords.forEach(d => {
-                    const dateTxt = `${d.start.getMonth()+1}-${d.start.getDate()}`;
+                displayList.forEach(d => {
+                    const dateTxt = `${d.start.getMonth()+1}/${d.start.getDate()}`;
                     const timeTxt = d.start.toTimeString().substring(0,5);
-                    const weekTxt = d.start.toLocaleDateString('zh-CN', {weekday:'short'});
                     
                     let cls = 'schedule-item';
                     if(d.isPast) cls += ' item-past';
-                    if(d.isToday) cls += ' item-today';
+                    else if(d.isToday) cls += ' item-current';
+
+                    // 状态字
+                    let stTxt = d.isPast ? '已结束' : '待开始';
+                    let stCls = d.isPast ? 'st-done' : 'st-wait';
+                    if(!d.isPast && d.start <= now && d.end > now) {
+                        stTxt = '进行中'; stCls = 'st-ing';
+                    }
 
                     const div = document.createElement('div');
                     div.className = cls;
                     div.innerHTML = `
-                        <div class="sc-date">${dateTxt}<span>${weekTxt}</span></div>
+                        <div class="sc-time">${dateTxt}<br><span style="font-size:0.8em;font-weight:normal;">${timeTxt}</span></div>
                         <div class="sc-content">
-                            <div class="sc-master">${d.master}</div>
-                            <div class="sc-info">${timeTxt} 预约 ${d.client}</div>
+                            <div class="sc-top">
+                                <span class="sc-master">${d.master}</span>
+                                <span class="sc-status ${stCls}">${stTxt}</span>
+                            </div>
+                            <div class="sc-client">预约：${d.client}</div>
                         </div>
                     `;
                     sideList.appendChild(div);
                 });
             }
 
-            // 3. 渲染底部滚动
+            // === 3. Marquee ===
             const mqBox = document.getElementById('mq-list');
             mqBox.innerHTML = '';
-            if(marqueeData.length === 0) {
-                mqBox.innerHTML = '<div class="mq-item" style="padding-left:2vw;">近两日暂无更多预约</div>';
-            } else {
+            if(marqueeData.length > 0) {
                 marqueeData.sort((a,b) => a.start - b.start);
                 const buildHtml = () => {
                     let html = '';
                     marqueeData.forEach(d => {
-                        const tagClass = d.tag === '今日' ? 'tag-curr' : 'tag-next';
                         const time = d.start.toTimeString().substring(0,5);
-                        html += `<div class="mq-item"><span class="mq-tag ${tagClass}">${d.tag}</span> <b>${time}</b> &nbsp;${d.master} 预约 ${d.client}</div>`;
+                        html += `<div class="mq-item">[${d.tag}] <b>${time}</b> ${d.master} - ${d.client}</div>`;
                     });
                     return html;
                 };
-                mqBox.innerHTML = buildHtml() + buildHtml(); 
+                mqBox.innerHTML = buildHtml() + buildHtml();
+            } else {
+                mqBox.innerHTML = '<div class="mq-item" style="padding-left:1vw">近期暂无更多预约</div>';
             }
 
-            // 4. 渲染大师立柱 (右侧)
+            // === 4. Pillars ===
             const stage = document.getElementById('master-stage');
             stage.innerHTML = '';
-            
             const keys = Object.keys(masters);
             if(keys.length === 0) {
-                stage.innerHTML = '<div style="margin:auto; font-size:2rem; color:#888;">暂无大师数据</div>';
+                stage.innerHTML = '<div style="margin:auto; color:#888;">暂无大师数据</div>';
                 return;
             }
 
@@ -527,7 +526,7 @@
                 const div = document.createElement('div');
                 div.className = `master-pillar ${statusClass}`;
                 div.innerHTML = `
-                    <div class="pillar-light"></div>
+                    <div class="pillar-top-bar"></div>
                     <img src="${img}" class="m-avatar">
                     <div class="m-name-box">
                         <div class="m-name">${m.name}</div>

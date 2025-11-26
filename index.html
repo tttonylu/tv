@@ -12,7 +12,7 @@
 
     <style>
         :root {
-            /* === 配色 === */
+            /* === 全局配色 === */
             --bg-overlay: rgba(0, 0, 0, 0.85); 
             --sidebar-bg: rgba(0, 0, 0, 0.6);
             --pillar-bg: rgba(255, 255, 255, 0.02);
@@ -68,49 +68,65 @@
         .stats-panel { display: flex; gap: 1vw; }
         .stat-item {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.05); width: 5.5vw; padding: 0.8vh 0;
+            background: rgba(255,255,255,0.05); width: 6vw; padding: 1vh 0;
             border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;
         }
         .stat-num { font-size: 1.8rem; color: var(--text-gold); font-family: var(--font-art); line-height: 1.1; font-weight: bold; }
-        .stat-label { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
+        .stat-label { font-size: 0.8rem; color: #aaa; margin-top: 5px; }
 
         /* === Main === */
         .main-body { flex: 1; display: flex; overflow: hidden; }
 
-        /* Sidebar */
+        /* --- 左侧 Sidebar (优化版) --- */
         .sidebar {
-            flex: 0 0 20%; background: var(--sidebar-bg);
+            flex: 0 0 25%; /* 宽度增加到 25% */
+            background: var(--sidebar-bg);
             border-right: 1px solid rgba(238, 187, 102, 0.2);
-            display: flex; flex-direction: column; padding: 1.5vh 0;
+            display: flex; flex-direction: column; padding: 2vh 0;
         }
         .sidebar-title {
-            text-align: center; color: var(--text-gold); font-size: 1.3rem;
-            font-family: var(--font-art); margin-bottom: 1vh; padding-bottom: 0.5vh;
+            text-align: center; color: var(--text-gold); font-size: 1.4rem;
+            font-family: var(--font-art); margin-bottom: 1.5vh; padding-bottom: 0.5vh;
             border-bottom: 1px dashed rgba(255,255,255,0.1); letter-spacing: 2px;
         }
-        .schedule-list { flex: 1; overflow: hidden; padding: 0 1vw; display: flex; flex-direction: column; gap: 0; }
-        .schedule-item {
-            display: flex; align-items: flex-start; padding: 1vh 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;
-        }
-        .sc-time-col {
-            width: 3.5rem; text-align: left; padding-right: 0.5rem;
-            border-right: 1px solid rgba(255,255,255,0.1); margin-right: 0.5rem;
-            display: flex; flex-direction: column; justify-content: center;
-        }
-        .sc-date-txt { font-family:'Arial'; font-weight:bold; color: var(--text-gold); font-size: 1em; line-height: 1; }
-        .sc-time-txt { font-family:'Arial'; color: #bbb; font-size: 0.8em; margin-top: 3px; }
-        .sc-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .sc-row-1 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
-        .sc-master { font-weight: bold; font-size: 1rem; color: var(--text-gold); }
-        .sc-status { font-size: 0.75rem; padding: 0 4px; border-radius: 2px; }
-        .sc-row-2 { font-size: 0.85rem; color: #999; display: flex; justify-content: space-between;}
+        .schedule-list { flex: 1; overflow: hidden; padding: 0 1.2vw; display: flex; flex-direction: column; gap: 0; }
         
-        .st-done { color: #555; } .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
-        .st-wait { color: #aaa; background: rgba(255,255,255,0.1); }
-        .st-rest-item { color: #666; font-style: italic; border: 1px dashed #666; }
-        .item-past { opacity: 0.4; filter: grayscale(1); }
-        .item-current { background: rgba(238, 187, 102, 0.1); border-left: 3px solid var(--text-gold); padding-left: 5px; }
+        .schedule-item {
+            display: flex; align-items: center; /* 垂直居中 */
+            padding: 1.2vh 0; /* 增加垂直间距 */
+            border-bottom: 1px solid rgba(255,255,255,0.08); 
+            font-size: 1rem; /* 增大字号 */
+        }
+        
+        .sc-time-col {
+            width: 4.5rem; /* 增加宽度 */
+            text-align: left; padding-right: 0.8rem;
+            border-right: 1px solid rgba(255,255,255,0.15); margin-right: 0.8rem;
+            display: flex; flex-direction: column; justify-content: center;
+            flex-shrink: 0; /* 防止压缩 */
+        }
+        .sc-date-txt { 
+            font-family:'Arial'; font-weight:bold; color: var(--text-gold); 
+            font-size: 1.1rem; line-height: 1.2; margin-bottom: 2px;
+        }
+        .sc-time-txt { font-family:'Arial'; color: #ccc; font-size: 0.9rem; }
+
+        .sc-content { 
+            flex: 1; display: flex; flex-direction: column; justify-content: center; 
+            gap: 4px; /* 行间距 */
+        }
+        .sc-row-1 { display: flex; justify-content: space-between; align-items: center; }
+        .sc-master { font-weight: bold; font-size: 1.1rem; color: var(--text-gold); }
+        .sc-status { font-size: 0.8rem; padding: 2px 6px; border-radius: 3px; margin-left: 10px; }
+        .sc-row-2 { font-size: 0.9rem; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* 状态样式 */
+        .st-done { color: #666; } .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
+        .st-wait { color: #bbb; background: rgba(255,255,255,0.1); }
+        .st-rest-item { color: #888; font-style: italic; border: 1px dashed #666; }
+        
+        .item-past { opacity: 0.5; filter: grayscale(1); }
+        .item-current { background: rgba(238, 187, 102, 0.08); border-left: 4px solid var(--text-gold); padding-left: 8px; }
 
         /* Master Pillars */
         .master-stage { flex: 1; display: flex; flex-direction: row; padding: 3vh 2vw; gap: 2vw; }
@@ -294,12 +310,6 @@
                     throw new Error("表格为空，请检查维格表是否有数据");
                 }
 
-                // 检查字段
-                const first = json.data.records[0].fields;
-                if(!first['大师'] && !first['日期']) {
-                    log(`字段警告: 未找到 '大师' 或 '日期' 列。当前列名: ${Object.keys(first).join(', ')}`);
-                }
-
                 document.getElementById('err-layer').style.display = 'none';
                 render(json.data.records);
             } catch(e) {
@@ -313,7 +323,6 @@
             if (!dateVal) return null;
             let d = new Date();
             
-            // 核心修复：兼容时间戳 (数字) 和 字符串 (YYYY-MM-DD)
             if (typeof dateVal === 'number') {
                 d = new Date(dateVal);
             } else {
@@ -322,11 +331,10 @@
                 if(parts.length >= 3) {
                     d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
                 } else {
-                    return null; // 无法解析的日期
+                    return null; 
                 }
             }
 
-            // 设置具体时间
             let tStr = timeStr || "00:00";
             let tParts = tStr.split(':');
             if(tParts.length >= 2) {
@@ -357,18 +365,16 @@
 
             records.forEach(r => {
                 const f = r.fields;
-                // 只要有日期，就尝试解析。如果没大师名字，暂时忽略
                 if(!f['大师'] || !f['日期']) return;
 
                 const start = parseVikaDate(f['日期'], f['时间']);
-                if(!start) return; // 日期解析失败则跳过
+                if(!start) return; 
                 
                 const inter = String(f['状态干预'] || "");
                 const isRest = ['休息', '请假', '外出', '停诊'].some(k => inter.includes(k));
 
-                // 时长处理
                 let defaultDur = 60;
-                if(isRest && !f['时长']) defaultDur = 1440; // 休息默认全天
+                if(isRest && !f['时长']) defaultDur = 1440; 
                 const end = new Date(start.getTime() + (f['时长']||defaultDur)*60000);
 
                 const item = {

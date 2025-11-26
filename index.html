@@ -2,610 +2,386 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>灯辰文化 - 咨询看板 (竖屏版)</title>
+    <title>灯辰文化 - 咨询看板</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            /* === 配色方案：新中式重彩 === */
-            --bg-overlay: rgba(0, 0, 0, 0.75); /* 加深背景遮罩 */
-            --container-bg: rgba(25, 20, 20, 0.85); /* 主容器半透明背景 */
-            --card-bg: rgba(40, 35, 35, 0.8); /* 卡片背景 */
-            
-            --text-gold-bright: #ffd700; /* 亮金 (强调) */
-            --text-gold-mute: #cfaf70;   /* 哑金 (次要) */
-            --text-white: #f2f2f2;
-            --text-dim: #aaaaaa;
-            
-            --border-gold: #b89348;
-            --cinnabar-red: #c0392b; /* 朱砂红 */
-            
+            --bg-overlay: rgba(0, 0, 0, 0.6);
+            --text-gold: #eebb66; 
+            --text-white: #f5f5f5;
+            --text-dim: #999;
+            --card-bg: rgba(20, 20, 20, 0.75); /* 卡片底色 */
+            --border-color: rgba(238, 187, 102, 0.3);
+
             /* 状态色 */
-            --status-busy: #d32f2f;  /* 忙碌-丹红 */
-            --status-free: #388e3c;  /* 空闲-竹青 */
-            --status-prep: #7b1fa2;  /* 恭候-紫气 */
+            --s-busy: #b71c1c; 
+            --s-free: #2e7d32;
+            --s-prep: #7b1fa2;
 
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
-
-            /* --- 云纹 SVG 图案 (Base64 编码) --- */
-            /* 用于边框角落的装饰 */
-            --cloud-corner-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23b89348' d='M95,5c0,0-5.6,0-10.4,1.2c-2.7,0.7-5.2,1.7-7.7,2.9c-8.1,4.1-15.1,11-19.2,19.1c-1.2,2.5-2.2,5-2.9,7.7C53.8,40.6,53.8,46.2,53.8,46.2s-5.6,0-10.4-1.2c-2.7-0.7-5.2-1.7-7.7-2.9C27.6,38,20.6,31.1,16.5,23c-1.2-2.5-2.2-5-2.9-7.7C12.4,10.6,12.4,5,12.4,5H5v90h90V5H95z M90,90H10V10h0.9c0.1,1,0.3,2,0.6,3.1c0.8,3,2,5.9,3.4,8.6c4.5,8.9,12.2,16.6,21.1,21.1c2.7,1.4,5.6,2.6,8.6,3.4c3.7,1,7.7,1.4,12,1.4c-0.1,1-0.3,2-0.6,3.1c-0.8,3-2,5.9-3.4,8.6c-4.5,8.9-12.2,16.6-21.1,21.1c-2.7,1.4-5.6,2.6-8.6,3.4C19.2,84.7,15.1,85,11.1,85H10V10h90v80h-1.1c-4,0-8-0.3-11.7-1.2c-3-0.8-5.9-2-8.6-3.4c-8.9-4.5-16.6-12.2-21.1-21.1c-1.4-2.7-2.6-5.6-3.4-8.6c-1-3.7-1.4-7.7-1.4-12c0.1,1,0.3,2,0.6,3.1c0.8,3,2,5.9,3.4,8.6c4.5,8.9,12.2,16.6,21.1,21.1c2.7,1.4,5.6,2.6,8.6,3.4c1.1,0.3,2.1,0.5,3.1,0.6H90V90z'/%3E%3C/svg%3E");
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            /* 背景图：依然使用之前的水墨山水 */
+            /* 背景图 */
             background: url('https://s21.ax1x.com/2025/11/25/pZAQ501.png') no-repeat center center fixed;
             background-size: cover;
-            color: var(--text-white);
             font-family: var(--font-main);
             height: 100vh;
-            overflow: hidden; /* 禁止整体滚动 */
+            width: 100vw;
+            overflow: hidden; /* 强制不滚动，一屏显示 */
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2vh 2vw; /* 外边距 */
+            flex-direction: column;
+            color: var(--text-white);
         }
 
-        /* 背景遮罩，增加文字可读性 */
         body::before {
             content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === 主容器 (带有云纹边框) === */
-        .main-container {
-            width: 100%;
-            height: 100%;
-            max-width: 1080px; /* 限制最大宽度，防止在超宽屏上变形 */
-            background: var(--container-bg);
-            display: flex;
-            flex-direction: column; /* 核心：竖向排列 */
-            position: relative;
-            /* 云纹边框实现 */
-            border: 10px solid transparent;
-            border-image: var(--cloud-corner-url) 30 stretch;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-        }
-
-        /* === 1. 顶部 Header 区域 (Logo + 双时钟) === */
-        .header-section {
-            flex: 0 0 18vh; /* 固定高度占比 */
+        /* === 1. 顶部 Header (压缩高度，留空间给内容) === */
+        .header {
+            flex: 0 0 12vh; /* 占比 12% */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 3rem;
-            border-bottom: 2px solid var(--border-gold);
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+            padding: 0 3vw;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .brand-box .brand-name {
+        .brand-name {
             font-family: var(--font-art);
-            font-size: 4rem; /* 更大的标题 */
-            color: var(--text-gold-bright);
-            letter-spacing: 0.5rem;
-            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
-        }
-        .brand-box .brand-sub {
-            font-size: 1.2rem;
-            color: var(--text-gold-mute);
-            letter-spacing: 0.8rem;
-            margin-top: 0.5rem;
-            text-align: center;
+            font-size: 3rem;
+            color: var(--text-gold);
+            letter-spacing: 0.2rem;
+            text-shadow: 0 0 10px rgba(238, 187, 102, 0.4);
         }
 
-        .clocks-box {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        .clock-box { text-align: right; }
+        .clock-time { font-size: 2.5rem; font-weight: 700; line-height: 1; }
+        .clock-lunar { font-size: 1.1rem; color: var(--text-gold); margin-top: 5px; font-family: var(--font-art); }
 
-        /* 西历时钟 */
-        .western-clock {
-            border-left: 3px solid var(--cinnabar-red);
-            padding-left: 1.5rem;
-        }
-        .w-time {
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: var(--text-white);
-            line-height: 1;
-            font-variant-numeric: tabular-nums; /* 数字等宽 */
-        }
-        .w-date { font-size: 1.1rem; color: var(--text-dim); margin-top: 5px; }
-
-        /* 农历时钟 */
-        .chinese-clock {
-            border-left: 3px solid var(--border-gold);
-            padding-left: 1.5rem;
-            padding-top: 0.5rem;
-        }
-        .c-ganzhi {
-            font-size: 1.6rem;
-            color: var(--text-gold-bright);
-            font-family: var(--font-art);
-        }
-        .c-date { font-size: 1.2rem; color: var(--text-gold-mute); }
-
-
-        /* === 2. 中部信息条 (统计 + 滚动) === */
-        .info-bar-section {
-            flex: 0 0 10vh;
-            display: flex;
-            background: rgba(184, 147, 72, 0.15);
-            border-bottom: 1px solid var(--border-gold);
-            backdrop-filter: blur(10px);
-        }
-
-        .stats-group {
-            flex: 0 0 35%; /* 占比 */
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-right: 2px solid var(--border-gold);
-        }
-        .stat-item { text-align: center; }
-        .stat-val { font-size: 2.2rem; color: var(--text-gold-bright); font-weight: bold; }
-        .stat-label { font-size: 1rem; color: var(--text-gold-mute); }
-
-        .marquee-group {
-            flex: 1; /* 占据剩余空间 */
+        /* === 2. 信息条 (极简) === */
+        .info-bar {
+            flex: 0 0 6vh; /* 占比 6% */
             display: flex;
             align-items: center;
-            overflow: hidden;
-            position: relative;
-            padding-left: 2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 3vw;
+            font-size: 1.1rem;
         }
-        .marquee-title {
-            background: var(--border-gold);
-            color: #000;
-            padding: 0.4rem 1rem;
-            font-weight: bold;
-            margin-right: 1rem;
-            border-radius: 4px;
-            white-space: nowrap;
-        }
-        .marquee-viewport {
-            flex: 1; overflow: hidden; position: relative; height: 100%;
-            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-        }
-        .marquee-track {
-            display: flex; height: 100%; align-items: center; position: absolute; white-space: nowrap;
-            /* 动画由 JS 动态添加 */
-        }
-        .mq-item { font-size: 1.3rem; margin-right: 4rem; color: var(--text-white); }
-        .mq-time { color: var(--text-gold-bright); margin-right: 0.8rem; font-weight: bold; }
 
+        .stats-wrap { display: flex; gap: 2rem; margin-right: 3rem; }
+        .stat-span b { color: var(--text-gold); font-size: 1.3rem; margin-right: 5px; }
 
-        /* === 3. 底部大师列表区域 (核心内容) === */
-        .masters-section {
-            flex: 1; /* 占据剩余所有高度 */
-            overflow-y: auto; /* 允许内部滚动 */
-            padding: 2rem 3rem;
-            /* 隐藏滚动条但保持功能 */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none;  /* IE/Edge */
-        }
-        .masters-section::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+        /* 滚动文字 */
+        .marquee-wrap { flex: 1; overflow: hidden; white-space: nowrap; position: relative; height: 100%; display: flex; align-items: center;}
+        .marquee-content { position: absolute; display: flex; animation: marquee 20s linear infinite; }
+        .mq-item { margin-right: 4vw; color: #ddd; }
+        .mq-item span { color: var(--text-gold); margin-right: 10px; font-weight: bold; }
 
-        .master-grid {
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* === 3. 大师列表 (核心：弹性拉伸) === */
+        .master-container {
+            flex: 1; /* 占据剩余所有空间 (约82%) */
             display: flex;
-            flex-direction: column; /* 竖向堆叠 */
-            gap: 2rem;
+            flex-direction: column; /* 竖向排列 */
+            padding: 2vh 3vw; /* 边距 */
+            gap: 2vh; /* 卡片间距 */
         }
 
-        /* 大师卡片样式 */
         .master-card {
-            display: flex;
+            flex: 1; /* 关键：所有卡片平分高度，自动拉伸 */
             background: var(--card-bg);
-            min-height: 160px; /* 卡片高度 */
-            border-radius: 8px;
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding: 0 3vw;
             position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            /* 卡片也加上微妙的云纹边框 */
-            border: 3px solid transparent;
-            border-image: var(--cloud-corner-url) 10 stretch;
+            border-left: 6px solid #555; /* 默认灰色条 */
+            transition: all 0.5s;
+            /* 增加一点质感装饰 */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        /* 状态条颜色 */
+        .status-free { border-left-color: var(--s-free); background: linear-gradient(90deg, rgba(46,125,50,0.15), transparent); }
+        .status-busy { border-left-color: var(--s-busy); background: linear-gradient(90deg, rgba(183,28,28,0.15), transparent); }
+        .status-prep { border-left-color: var(--s-prep); background: linear-gradient(90deg, rgba(123,31,162,0.15), transparent); }
+
+        /* 内容布局 */
+        .mc-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        .avatar {
+            height: 14vh; /* 相对高度，随屏幕变化 */
+            width: 14vh;
+            max-height: 160px; max-width: 160px; /* 限制最大值 */
+            min-height: 80px; min-width: 80px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.1);
+            object-fit: cover;
         }
         
-        /* 状态指示条 (左侧) */
-        .card-status-bar { width: 15px; height: 100%; }
+        .mc-info { display: flex; flex-direction: column; justify-content: center; }
+        .mc-name { font-size: 4vh; font-weight: bold; color: #fff; margin-bottom: 0.5vh; }
+        .mc-task { font-size: 2vh; color: #bbb; }
 
-        .card-content {
-            flex: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 2.5rem;
-        }
-
-        .master-profile { display: flex; align-items: center; gap: 2rem; }
-        .master-avatar {
-            width: 110px; height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--border-gold);
-            padding: 3px; background: var(--container-bg);
-        }
-        .master-details .m-name {
-            font-size: 2.4rem;
-            font-weight: bold;
-            color: var(--text-white);
-            margin-bottom: 0.8rem;
-        }
-        .master-details .m-task {
-            font-size: 1.2rem;
-            color: var(--text-gold-mute);
-            font-style: italic;
-        }
-
-        .status-badge-box {
-            text-align: right;
-        }
-        .status-badge {
+        .mc-right { text-align: right; }
+        .status-pill {
             display: inline-block;
-            padding: 0.6rem 2rem;
-            font-size: 1.8rem;
+            padding: 1vh 3vw;
+            font-size: 2.5vh;
             font-family: var(--font-art);
-            border-radius: 50px; /* 圆角 */
-            background: rgba(0,0,0,0.4);
-            border: 2px solid currentColor;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            letter-spacing: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
         }
 
-        /* === 状态配色 === */
-        /* 忙碌 */
-        .s-busy .card-status-bar { background: var(--status-busy); box-shadow: 3px 0 20px var(--status-busy); }
-        .s-busy .status-badge { color: var(--status-busy); text-shadow: 0 0 10px var(--status-busy); }
-        /* 空闲 */
-        .s-free .card-status-bar { background: var(--status-free); box-shadow: 3px 0 20px var(--status-free); }
-        .s-free .status-badge { color: var(--status-free); text-shadow: 0 0 10px var(--status-free); }
-        /* 恭候 */
-        .s-prep .card-status-bar { background: var(--status-prep); box-shadow: 3px 0 20px var(--status-prep); }
-        .s-prep .status-badge { color: var(--status-prep); text-shadow: 0 0 10px var(--status-prep); }
+        /* 状态文字色 */
+        .status-free .status-pill { color: #66bb6a; border-color: #2e7d32; box-shadow: 0 0 10px rgba(46,125,50,0.3); }
+        .status-busy .status-pill { color: #ef5350; border-color: #c62828; box-shadow: 0 0 10px rgba(183,28,28,0.3); }
+        .status-prep .status-pill { color: #ab47bc; border-color: #6a1b9a; box-shadow: 0 0 10px rgba(123,31,162,0.3); }
 
-
-        /* === 错误提示层 === */
-        #error-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.95); z-index: 9999;
-            display: none; /* 默认隐藏 */
-            flex-direction: column; justify-content: center; align-items: center;
-            color: var(--status-busy);
+        /* 错误弹窗 */
+        #error-box {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            display: none; align-items: center; justify-content: center; flex-direction: column; z-index: 999;
         }
-        #error-overlay h2 { font-size: 3rem; margin-bottom: 2rem; border-bottom: 3px solid; }
-        #error-overlay p { font-size: 1.5rem; color: var(--text-white); }
-
-        /* 滚动动画关键帧 */
-        @keyframes marqueeMove {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } /* 移动一半，配合内容复制实现无缝 */
-        }
+        #error-box h2 { color: var(--s-busy); margin-bottom: 20px; font-size: 2rem; }
 
     </style>
 </head>
 <body>
 
-    <div id="error-overlay">
-        <h2>连接中断 (Error)</h2>
-        <p id="error-message">正在尝试连接系统...</p>
+    <div id="error-box">
+        <h2>系统连接中断</h2>
+        <p id="error-msg">正在重连...</p>
     </div>
 
-    <div class="main-container">
-        
-        <header class="header-section">
-            <div class="brand-box">
-                <div class="brand-name">灯辰文化</div>
-                <div class="brand-sub">国学 · 命理 · 咨询</div>
-            </div>
-            <div class="clocks-box">
-                <div class="western-clock">
-                    <div class="w-time" id="w-time">00:00:00</div>
-                    <div class="w-date" id="w-date">载入中...</div>
-                </div>
-                <div class="chinese-clock">
-                    <div class="c-ganzhi" id="c-ganzhi">载入中...</div>
-                    <div class="c-date" id="c-date">农历日期计算中</div>
-                </div>
-            </div>
-        </header>
+    <header class="header">
+        <div class="brand-name">灯辰文化</div>
+        <div class="clock-box">
+            <div class="clock-time" id="clock-time">00:00</div>
+            <div class="clock-lunar" id="clock-lunar">乙巳年 · 载入中</div>
+        </div>
+    </header>
 
-        <section class="info-bar-section">
-            <div class="stats-group">
-                <div class="stat-item">
-                    <div class="stat-val" id="count-today">-</div>
-                    <div class="stat-label">今日预约</div>
+    <div class="info-bar">
+        <div class="stats-wrap">
+            <span class="stat-span">今日预约: <b id="stat-today">0</b></span>
+            <span class="stat-span">当前候客: <b id="stat-wait">0</b></span>
+        </div>
+        <div class="marquee-wrap">
+            <div class="marquee-content" id="marquee-list">
                 </div>
-                <div class="stat-item">
-                    <div class="stat-val" id="count-waiting">-</div>
-                    <div class="stat-label">当前待办</div>
-                </div>
-            </div>
-            <div class="marquee-group">
-                <div class="marquee-title">近期通告</div>
-                <div class="marquee-viewport">
-                    <div class="marquee-track" id="marquee-track">
-                        </div>
-                </div>
-            </div>
-        </section>
+        </div>
+    </div>
 
-        <main class="masters-section">
-            <div class="master-grid" id="master-grid">
-                <div style="text-align:center; padding:5rem; color:var(--text-dim); font-size:1.5rem;">
-                    正在获取大师数据...
-                </div>
-            </div>
-        </main>
-
+    <div class="master-container" id="master-container">
+        <div style="margin:auto; color:#666; font-size:1.5rem;">正在读取大师排班...</div>
     </div>
 
     <script>
-        // ================= 配置区域 (必须修改) =================
-        const VIKA_API_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
-        const VIKA_DATASHEET_ID = 'dstmgbUypiy0LbUzwF'; 
-        // =====================================================
+        // === 配置 ===
+        const VIKA_TOKEN = 'uskRMINs8MRQZD07iTNuNnl'; 
+        const VIKA_ID = 'dstmgbUypiy0LbUzwF'; 
+        // ===========
 
-        const REFRESH_INTERVAL = 30000; // 30秒刷新
+        const refreshTime = 30000;
+        
+        // 简易农历年份映射 (仅作装饰，不作为精确历法)
+        const lunarYears = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
+        const sky = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+        const earth = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
 
-        // DOM 元素
-        const errorOverlay = document.getElementById('error-overlay');
-        const errorMsg = document.getElementById('error-message');
-        const masterGridEl = document.getElementById('master-grid');
-        const marqueeTrack = document.getElementById('marquee-track');
-        const countTodayEl = document.getElementById('count-today');
-        const countWaitingEl = document.getElementById('count-waiting');
-        // 时钟元素
-        const wTimeEl = document.getElementById('w-time');
-        const wDateEl = document.getElementById('w-date');
-        const cGanZhiEl = document.getElementById('c-ganzhi');
-        const cDateEl = document.getElementById('c-date');
-
-        // 初始化
         init();
-        startClocks();
+        runClock();
 
-        // --- 时钟功能 ---
-        function startClocks() {
-            updateClocks(); // 立即执行一次
-            setInterval(updateClocks, 1000);
+        function runClock() {
+            setInterval(() => {
+                const now = new Date();
+                // 西历
+                document.getElementById('clock-time').innerText = now.toLocaleTimeString('en-GB', {hour12:false});
+                
+                // 农历氛围 (简单推算年干支)
+                const y = now.getFullYear();
+                const idx = (y - 4) % 60; // 1984是甲子年
+                const g = sky[idx % 10];
+                const z = earth[idx % 12];
+                const sx = lunarYears[idx % 12];
+                
+                // 月日显示公历转中文
+                const m = now.getMonth() + 1;
+                const d = now.getDate();
+                document.getElementById('clock-lunar').innerText = `${g}${z}年 [${sx}] · ${m}月${d}日`;
+            }, 1000);
         }
 
-        function updateClocks() {
-            const now = new Date();
-            
-            // 1. 更新西历
-            wTimeEl.textContent = now.toLocaleTimeString('en-GB', { hour12: false });
-            wDateEl.textContent = now.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' });
-
-            // 2. 更新农历干支 (简易算法实现)
-            // 注意：这里使用简易算法计算年干支和生肖，复杂的农历月日计算需要庞大的库，
-            // 为保持单文件，这里仅做近似展示，重点展示年份和生肖氛围。
-            const gan = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-            const zhi = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-            const zodiac = ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"];
-            
-            const year = now.getFullYear();
-            // 计算年干支 (以立春为界过于复杂，这里简单按农历新年近似)
-            // 偏移量调整：1984年是甲子年
-            const offset = year - 1984;
-            const ganIndex = (offset % 10 + 10) % 10;
-            const zhiIndex = (offset % 12 + 12) % 12;
-            
-            const ganZhiYear = gan[ganIndex] + zhi[zhiIndex] + "年";
-            const zodiacAnimal = "[" + zodiac[zhiIndex] + "]";
-
-            // 简单显示农历月份 (不准确，仅作视觉展示)
-            const lunarMonth = ["正月","二月","三月","四月","五月","六月","七月","八月","九月","十月","冬月","腊月"];
-            // 粗略估算：公历月-1 大致对应农历月
-            let roughMonthIdx = now.getMonth() - 1;
-            if (roughMonthIdx < 0) roughMonthIdx = 11;
-
-            cGanZhiEl.textContent = `${ganZhiYear} ${zodiacAnimal}`;
-            // cDateEl.textContent = `${lunarMonth[roughMonthIdx]} (大吉)`; // 简化显示
-            // 为了更严谨，我们暂且只显示年份干支，避免错误的农历日月误导
-            cDateEl.textContent = "吉时良辰 · 万事胜意"; 
-        }
-
-
-        // --- 数据核心逻辑 ---
         async function init() {
-            if (VIKA_API_TOKEN.includes('YOUR_')) {
-                showError('配置错误：请在 HTML 代码中填写您的 Vika API Token 和 Datasheet ID');
-                return;
+            if (VIKA_TOKEN.includes('YOUR_')) {
+                showErr('请配置 Token'); return;
             }
-            await fetchDataAndRender();
-            setInterval(fetchDataAndRender, REFRESH_INTERVAL);
+            await loadData();
+            setInterval(loadData, refreshTime);
         }
 
-        async function fetchDataAndRender() {
+        async function loadData() {
             try {
-                // 仅拉取必要字段，优化性能
-                const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_DATASHEET_ID}/records?fieldKey=name`;
-                const response = await fetch(url, { headers: { 'Authorization': `Bearer ${VIKA_API_TOKEN}` } });
+                const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_ID}/records?fieldKey=name`;
+                const res = await fetch(url, {headers: {'Authorization': `Bearer ${VIKA_TOKEN}`}});
+                if(!res.ok) throw new Error('网络错误');
+                const json = await res.json();
+                if(json.code !== 200) throw new Error(json.message);
                 
-                if (!response.ok) throw new Error(`网络请求失败 (${response.status})`);
-                const json = await response.json();
-                if (json.code !== 200) throw new Error(json.message);
-
-                errorOverlay.style.display = 'none';
-                processData(json.data.records);
-
-            } catch (err) {
-                console.error(err);
-                showError(err.message);
+                document.getElementById('error-box').style.display = 'none';
+                render(json.data.records);
+            } catch(e) {
+                console.error(e);
+                showErr(e.message);
             }
         }
 
-        function processData(records) {
+        function render(records) {
             const now = new Date();
-            const mastersMap = {}; 
-            const futureList = []; 
-            let todayCount = 0; 
+            const masters = {};
+            const future = [];
+            let todayCnt = 0;
 
-            records.forEach(record => {
-                const f = record.fields;
-                if (!f['大师'] || !f['日期'] || !f['时间']) return;
+            records.forEach(r => {
+                const f = r.fields;
+                if(!f['大师'] || !f['日期'] || !f['时间']) return;
 
-                // 日期解析兼容
-                let dateStr = typeof f['日期'] === 'number' 
-                    ? new Date(f['日期']).toISOString().split('T')[0] 
-                    : String(f['日期']).replace(/\//g, '-');
+                // 兼容日期格式
+                let dStr = f['日期'];
+                if(typeof dStr === 'number') {
+                    const d = new Date(dStr);
+                    dStr = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+                } else {
+                    dStr = dStr.replace(/\//g, '-');
+                }
                 
-                const startTime = new Date(`${dateStr}T${f['时间']}:00`);
-                if (isNaN(startTime.getTime())) return;
+                const start = new Date(`${dStr}T${f['时间']}:00`);
+                if(isNaN(start)) return;
+                
+                const end = new Date(start.getTime() + (f['时长']||60)*60000);
+                const inter = f['状态干预'];
 
-                const duration = f['时长'] || 60;
-                const endTime = new Date(startTime.getTime() + duration * 60000);
-                const intervention = f['状态干预'];
-
-                const appt = {
-                    client: f['客户'] || '匿名善信',
-                    start: startTime,
-                    end: endTime,
-                    inter: intervention,
-                    master: f['大师']
+                const item = {
+                    c: f['客户'] || '善信',
+                    s: start, e: end, i: inter,
+                    m: f['大师']
                 };
 
-                // 统计与过滤
-                const isToday = (startTime.toDateString() === now.toDateString());
-                if (isToday) todayCount++;
-                // 未来预约：今天且未开始且未取消
-                if (isToday && startTime > now && intervention !== '取消') {
-                    futureList.push(appt);
-                }
+                const isToday = (start.toDateString() === now.toDateString());
+                if(isToday) todayCnt++;
+                if(isToday && start > now && inter !== '取消') future.push(item);
 
-                // 分组
-                if (!mastersMap[f['大师']]) {
-                    mastersMap[f['大师']] = {
-                        name: f['大师'],
-                        photo: (f['头像'] && f['头像'][0]) ? f['头像'][0].url : null,
-                        appts: []
+                if(!masters[item.m]) {
+                    masters[item.m] = {
+                        name: item.m,
+                        pic: (f['头像']&&f['头像'][0]) ? f['头像'][0].url : null,
+                        tasks: []
                     };
                 }
-                mastersMap[f['大师']].appts.push(appt);
+                masters[item.m].tasks.push(item);
             });
 
-            renderStatsAndMarquee(futureList, todayCount);
-            renderMasterGrid(mastersMap);
-        }
-
-        function renderStatsAndMarquee(list, total) {
-            // 更新统计
-            countTodayEl.textContent = total;
-            countWaitingEl.textContent = list.length;
-
-            // 更新滚动条
-            marqueeTrack.innerHTML = '';
-            marqueeTrack.style.animation = 'none'; // 重置动画
-
-            if (list.length === 0) {
-                marqueeTrack.innerHTML = '<div class="mq-item" style="opacity:0.6">今日后续暂无预约安排</div>';
-                return;
-            }
-
-            // 排序
-            list.sort((a, b) => a.start - b.start);
-
-            // 创建列表项并复制一份用于无缝滚动
-            const createItems = () => {
-                list.forEach(item => {
-                    const timeStr = item.start.toTimeString().substring(0, 5);
-                    const div = document.createElement('div');
-                    div.className = 'mq-item';
-                    div.innerHTML = `<span class="mq-time">${timeStr}</span> ${item.master} 恭候 ${item.client}`;
-                    marqueeTrack.appendChild(div);
-                });
-            };
-            createItems(); // 原件
-            createItems(); // 复制件(用于填补滚动空隙)
-
-            // 计算并应用动画
-            // 强制浏览器重绘以获取准确宽度
-            marqueeTrack.offsetWidth; 
-            const trackWidth = marqueeTrack.scrollWidth;
-            // 速度设定：每秒移动 80px
-            const duration = trackWidth / 80; 
+            // 1. 渲染统计 & 跑马灯
+            document.getElementById('stat-today').innerText = todayCnt;
+            document.getElementById('stat-wait').innerText = future.length;
             
-            // 应用 CSS 动画：向左移动整个轨道宽度的 50% (因为内容复制了一份)
-            marqueeTrack.style.animation = `marqueeMove ${duration}s linear infinite`;
-        }
+            const mq = document.getElementById('marquee-list');
+            mq.innerHTML = '';
+            if(future.length === 0) {
+                mq.innerHTML = '<div class="mq-item">今日暂无更多预约</div>';
+            } else {
+                future.sort((a,b)=>a.s - b.s);
+                future.forEach(x => {
+                    const t = x.s.toTimeString().substr(0,5);
+                    mq.innerHTML += `<div class="mq-item"><span>${t}</span>${x.m} 预约 ${x.c}</div>`;
+                });
+                // 复制一份做无缝滚动
+                mq.innerHTML += mq.innerHTML;
+            }
 
-        function renderMasterGrid(map) {
-            masterGridEl.innerHTML = '';
-            const now = new Date();
-            const keys = Object.keys(map);
-
-            if (keys.length === 0) {
-                masterGridEl.innerHTML = '<div style="text-align:center; padding:5rem; color:var(--text-dim); font-size:1.5rem;">暂无大师数据</div>';
+            // 2. 渲染大师卡片 (Flex 自动高度)
+            const con = document.getElementById('master-container');
+            con.innerHTML = '';
+            
+            const mKeys = Object.keys(masters);
+            if(mKeys.length === 0) {
+                con.innerHTML = '<div style="margin:auto; font-size:2rem; color:#888;">暂无大师排班</div>';
                 return;
             }
 
-            keys.forEach(key => {
-                const m = map[key];
-                let statusCls = 's-free';
-                let statusTxt = '空闲 · 纳客';
-                let taskTxt = '当前无咨客安排';
+            mKeys.forEach(k => {
+                const m = masters[k];
+                let st = 'status-free';
+                let txt = '空闲 · 纳客';
+                let sub = '当前无咨客';
                 
-                // 状态判定逻辑
-                for (let appt of m.appts) {
-                    if (appt.inter === '取消') continue;
+                // 逻辑判断
+                for(let t of m.tasks) {
+                    if(t.i === '取消') continue;
+                    
+                    const busy = now >= t.s && now < t.e;
+                    const prep = now >= new Date(t.s.getTime() - 10*60000) && now < t.s; // 10分钟提醒
 
-                    const isBusy = now >= appt.start && now < appt.end;
-                    // 提前10分钟为恭候期
-                    const isPrep = now >= new Date(appt.start.getTime() - 10*60000) && now < appt.start;
-
-                    // 1. 强制干预优先
-                    if ((isBusy || isPrep) && appt.inter === '强制忙碌') {
-                         statusCls = 's-busy'; statusTxt = '咨询中 (特约)'; taskTxt = `正服务：${appt.client}`;
-                         break;
+                    // 强制干预
+                    if((busy||prep) && t.i === '强制忙碌') {
+                        st = 'status-busy'; txt = '咨询中 (特约)'; sub = `正服务：${t.c}`; break;
                     }
-                    if ((isBusy || isPrep) && appt.inter === '强制空闲') continue;
+                    if((busy||prep) && t.i === '强制空闲') continue;
 
-                    // 2. 时间自然判定
-                    if (isBusy) {
-                        statusCls = 's-busy'; statusTxt = '咨询中 · 勿扰'; taskTxt = `正服务：${appt.client}`;
-                        break;
-                    } else if (isPrep && statusCls !== 's-busy') {
-                        statusCls = 's-prep'; statusTxt = '恭候 · 待启'; taskTxt = `候见：${appt.client}`;
+                    // 自然时间
+                    if(busy) {
+                        st = 'status-busy'; txt = '咨询中 · 勿扰'; sub = `正服务：${t.c}`; break;
+                    } else if(prep && st !== 'status-busy') {
+                        st = 'status-prep'; txt = '恭候 · 待启'; sub = `候见：${t.c}`;
                     }
                 }
 
-                // 构建卡片 DOM
-                const card = document.createElement('div');
-                card.className = `master-card ${statusCls}`;
-                const photoUrl = m.photo || 'https://via.placeholder.com/150/282323/b89348?text=Master';
-
-                card.innerHTML = `
-                    <div class="card-status-bar"></div>
-                    <div class="card-content">
-                        <div class="master-profile">
-                            <img src="${photoUrl}" class="master-avatar" alt="${m.name}">
-                            <div class="master-details">
-                                <div class="m-name">${m.name}</div>
-                                <div class="m-task">${taskTxt}</div>
-                            </div>
-                        </div>
-                        <div class="status-badge-box">
-                            <span class="status-badge">${statusTxt}</span>
+                const img = m.pic || 'https://via.placeholder.com/150/333/d4af37?text=Master';
+                
+                // HTML 结构
+                const div = document.createElement('div');
+                div.className = `master-card ${st}`;
+                div.innerHTML = `
+                    <div class="mc-left">
+                        <img src="${img}" class="avatar">
+                        <div class="mc-info">
+                            <div class="mc-name">${m.name}</div>
+                            <div class="mc-task">${sub}</div>
                         </div>
                     </div>
+                    <div class="mc-right">
+                        <div class="status-pill">${txt}</div>
+                    </div>
                 `;
-                masterGridEl.appendChild(card);
+                con.appendChild(div);
             });
         }
 
-        function showError(msg) {
-            errorMsg.textContent = msg;
-            errorOverlay.style.display = 'flex';
+        function showErr(msg) {
+            document.getElementById('error-msg').innerText = msg;
+            document.getElementById('error-box').style.display = 'flex';
         }
     </script>
 </body>

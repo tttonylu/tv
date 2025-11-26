@@ -262,4 +262,336 @@
         .status-prep .status-bar-bottom { background-color: var(--yellow-status); box-shadow: 0 -5px 20px rgba(230, 81, 0, 0.5); color: #fff; }
 
         .status-free .master-avatar { border-color: var(--green-status); }
-        .status-free .status-bar-bottom { background-color: var(--green
+        .status-free .status-bar-bottom { background-color: var(--green-status); box-shadow: 0 -5px 20px rgba(27, 94, 32, 0.5); }
+
+        /* 动画定义 */
+        @keyframes scrollUp {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+
+        /* 针对超大屏幕的微调 */
+        @media (min-width: 2560px) {
+             .main-content { padding: 4rem; }
+             .master-grid { gap: 4rem; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); }
+             .master-card { min-height: 550px; }
+             .master-name { font-size: 2.8rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="error-overlay">
+        <h2>系统连接异常 (System Error)</h2>
+        <p id="error-message">正在初始化数据...</p>
+    </div>
+
+    <div class="sidebar">
+        <div class="brand-title">灯辰文化</div>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <span class="stat-number" id="count-today">0</span>
+                <span class="stat-label">今日预约总数</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-number" id="count-waiting">0</span>
+                <span class="stat-label">当前候客人数</span>
+            </div>
+        </div>
+
+        <div class="schedule-title">即将开始 (Upcoming)</div>
+        <div class="marquee-container" id="marquee-container">
+            <div class="marquee-content" id="marquee-list">
+                </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="master-grid" id="master-grid">
+            </div>
+    </div>
+
+    <script>
+        // ================= 配置区域 =================
+        // 【重要】请在此处替换您的维格表 API Token 和 Datasheet ID
+        const VIKA_API_TOKEN = 'YOUR_VIKA_API_TOKEN_HERE'; 
+        const VIKA_DATASHEET_ID = 'YOUR_DATASHEET_ID_HERE'; 
+        // ============================================
+
+        const REFRESH_INTERVAL = 30000; // 30 秒刷新一次
+
+        // DOM 元素获取
+        const errorOverlay = document.getElementById('error-overlay');
+        const errorMsg = document.getElementById('error-message');
+        const masterGrid = document.getElementById('master-grid');
+        const marqueeList = document.getElementById('marquee-list');
+        const countTodayEl = document.getElementById('count-today');
+        const countWaitingEl = document.getElementById('count-waiting');
+
+        // 程序入口
+        init();
+
+        async function init() {
+            // 简单的配置检查
+            if (VIKA_API_TOKEN.includes('YOUR_') || VIKA_DATASHEET_ID.includes('YOUR_')) {
+                showError('配置错误：请在 HTML 代码中设置您的 VIKA_API_TOKEN 和 VIKA_DATASHEET_ID。');
+                return;
+            }
+            
+            await fetchDataAndRender();
+            // 设置定时自动刷新
+            setInterval(fetchDataAndRender, REFRESH_INTERVAL);
+        }
+
+        // 核心函数：获取数据并渲染
+        async function fetchDataAndRender() {
+            try {
+                // 构建 API 请求 URL
+                const url = `https://api.vika.cn/fusion/v1/datasheets/${VIKA_DATASHEET_ID}/records?viewId=&fieldKey=name`;
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${VIKA_API_TOKEN}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API 请求失败: ${response.status} ${response.statusText}`);
+                }
+
+                const json = await response.json();
+
+                if (json.code !== 200) {
+                    throw new Error(`维格表返回错误: ${json.message}`);
+                }
+
+                // 数据获取成功，隐藏错误层
+                errorOverlay.style.display = 'none';
+
+                // 处理并渲染数据
+                processData(json.data.records);
+
+            } catch (err) {
+                console.error('数据抓取失败:', err);
+                showError(err.message);
+            }
+        }
+
+        // 数据处理逻辑
+        function processData(records) {
+            const now = new Date();
+            const mastersMap = {}; // 用于按大师分组的映射表
+            const futureAppointments = []; // 用于侧边栏的未来预约
+            let todayCount = 0; // 今日总预约数计数
+
+            // 1. 数据清洗与组织
+            records.forEach(record => {
+                const fields = record.fields;
+
+                // 数据校验：必须要有大师名字
+                if (!fields['大师']) return;
+
+                const masterName = fields['大师'];
+                
+                // 解析日期和时间
+                // 假设格式为 "YYYY-MM-DD" 和 "HH:mm"
+                if (!fields['日期'] || !fields['时间']) return;
+
+                const startDateTimeStr = `${fields['日期'].replace(/\//g, '-')}T${fields['时间']}:00`;
+                const startTime = new Date(startDateTimeStr);
+                
+                // 处理无效日期格式
+                if (isNaN(startTime.getTime())) {
+                     console.warn('Skip invalid date record:', fields['大师'], startDateTimeStr);
+                     return;
+                }
+
+                const duration = fields['时长'] || 60; // 默认时长 60 分钟
+                const endTime = new Date(startTime.getTime() + duration * 60000);
+                
+                const intervention = fields['状态干预']; // 获取干预状态
+
+                const appointment = {
+                    client: fields['客户'] || '匿名客户',
+                    startTime: startTime,
+                    endTime: endTime,
+                    intervention: intervention,
+                    master: masterName
+                };
+
+                // 统计今日数据
+                const isToday = isSameDay(now, startTime);
+                if (isToday) todayCount++;
+
+                // 收集未来预约用于侧边栏展示 (只显示今天的未来预约，避免列表过长)
+                if (startTime > now && isToday) {
+                    futureAppointments.push(appointment);
+                }
+
+                // 按大师分组
+                if (!mastersMap[masterName]) {
+                    // 处理头像附件结构
+                    let photoUrl = null;
+                    if (fields['头像'] && Array.isArray(fields['头像']) && fields['头像'].length > 0) {
+                        photoUrl = fields['头像'][0].url;
+                    }
+
+                    mastersMap[masterName] = {
+                        name: masterName,
+                        photo: photoUrl,
+                        appointments: []
+                    };
+                }
+                mastersMap[masterName].appointments.push(appointment);
+            });
+
+            // 2. 渲染侧边栏
+            renderSidebar(futureAppointments, todayCount);
+
+            // 3. 渲染主网格
+            renderMasterGrid(mastersMap);
+        }
+
+        // 渲染侧边栏逻辑
+        function renderSidebar(appointments, todayTotal) {
+            // 按时间排序
+            appointments.sort((a, b) => a.startTime - b.startTime);
+
+            // 更新统计数字
+            countTodayEl.textContent = todayTotal;
+            countWaitingEl.textContent = appointments.length;
+
+            // 更新滚动列表
+            marqueeList.innerHTML = '';
+            // 移除旧的动画，以便重新计算
+            marqueeList.style.animation = 'none';
+            marqueeList.offsetHeight; /* 触发重绘 */
+
+            if (appointments.length === 0) {
+                marqueeList.innerHTML = '<div style="padding:2rem; color:var(--text-dim); text-align:center; font-style:italic;">今日暂无更多待办</div>';
+                return;
+            }
+
+            // 创建列表项的辅助函数
+            const createItem = (appt) => {
+                const div = document.createElement('div');
+                div.className = 'appointment-item';
+                // 格式化时间 HH:mm
+                const timeStr = appt.startTime.toTimeString().substring(0, 5);
+                div.innerHTML = `
+                    <div class="appt-time">${timeStr}</div>
+                    <div class="appt-master">咨询师: ${appt.master}</div>
+                    <div class="appt-client">客户: ${appt.client}</div>
+                `;
+                return div;
+            };
+
+            // 复制一份列表以实现无缝滚动循环
+            appointments.forEach(appt => marqueeList.appendChild(createItem(appt)));
+            // 如果列表项很少，不需要滚动
+            if (marqueeList.scrollHeight > marqueeList.parentElement.clientHeight) {
+                 appointments.forEach(appt => marqueeList.appendChild(createItem(appt)));
+                 
+                 // 根据内容高度动态调整滚动速度
+                 const contentHeight = marqueeList.scrollHeight / 2;
+                 const duration = contentHeight / 25; // 调整此数值改变滚动速度
+                 marqueeList.style.animation = `scrollUp ${duration}s linear infinite`;
+            }
+        }
+
+        // 渲染大师卡片网格逻辑
+        function renderMasterGrid(mastersMap) {
+            masterGrid.innerHTML = '';
+            
+            const now = new Date();
+            const masterKeys = Object.keys(mastersMap);
+
+             // 处理空状态
+            if (masterKeys.length === 0) {
+                 masterGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding-top: 150px; color: var(--text-dim); font-size: 1.5rem;">暂无大师数据 (No Data Available)</div>';
+                 return;
+            }
+
+            masterKeys.forEach(key => {
+                const master = mastersMap[key];
+                // 默认状态
+                let status = 'free'; // free, busy, prep
+                let statusLabel = '● 空闲中 (Available)';
+                let currentClient = '等待预约...';
+                
+                // 状态判断核心逻辑
+                // 遍历该大师的所有预约记录
+                for (let appt of master.appointments) {
+                    
+                    // 0. 如果是“取消”状态，直接跳过这条记录
+                    if (appt.intervention === '取消') continue;
+
+                    // 1. 计算时间窗口
+                    const isBusyTime = now >= appt.startTime && now < appt.endTime;
+                    // 准备时间定义为开始前15分钟
+                    const isPrepTime = now >= new Date(appt.startTime.getTime() - 15*60000) && now < appt.startTime;
+
+                    // 2. 状态干预优先级判断 (强制忙碌/空闲 仅在当前时间段内有效，以符合直觉)
+                    if (isBusyTime || isPrepTime) {
+                        if (appt.intervention === '强制忙碌') {
+                             status = 'busy';
+                             statusLabel = '● 咨询中 (Busy / 干预)';
+                             currentClient = appt.client;
+                             break; // 找到最高优先级状态，跳出循环
+                        } else if (appt.intervention === '强制空闲') {
+                            // 强制空闲，意味着这条预约在当前时间点不生效，继续检查下一条
+                            continue; 
+                        }
+                    }
+
+                    // 3. 正常时间逻辑判断 (如果没有干预)
+                    if (isBusyTime) {
+                        status = 'busy';
+                        statusLabel = '● 咨询中 (Busy)';
+                        currentClient = appt.client;
+                        break; // 找到忙碌状态，跳出
+                    } else if (isPrepTime && status !== 'busy') {
+                        // 如果是准备时间，且尚未被标记为忙碌
+                        status = 'prep';
+                        statusLabel = '● 准备中 (Preparing)';
+                        currentClient = appt.client + ' (即将开始)';
+                        // 不跳出，因为可能存在时间重叠的“忙碌”记录，需要继续检查
+                    }
+                }
+
+                // 构建卡片 HTML
+                const card = document.createElement('div');
+                card.className = `master-card status-${status}`;
+                
+                // 默认头像占位符
+                const avatarUrl = master.photo || 'https://via.placeholder.com/180/1a1a1a/d4af37/?text=Master';
+
+                card.innerHTML = `
+                    <div class="card-body">
+                        <img src="${avatarUrl}" class="master-avatar" alt="${master.name}">
+                        <div class="master-name">${master.name}</div>
+                        <div class="current-task">${status === 'free' ? '当前无咨询安排' : '客户: ' + currentClient}</div>
+                    </div>
+                    <div class="status-bar-bottom">${statusLabel}</div>
+                `;
+                masterGrid.appendChild(card);
+            });
+        }
+
+        // 辅助函数：判断是否是同一天
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() &&
+                d1.getMonth() === d2.getMonth() &&
+                d1.getDate() === d2.getDate();
+        }
+
+        // 显示错误信息
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorOverlay.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

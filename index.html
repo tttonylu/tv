@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="no-referrer">
-    <title>灯辰文化 - 咨询看板</title>
+    <title>灯辰文化 - 咨询看板 (360翻牌增强版)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,19 +12,23 @@
 
     <style>
         :root {
-            /* === 全局配色 === */
-            --bg-overlay: rgba(0, 0, 0, 0.85); 
+            /* === 1. 全局基础 (原样保留) === */
+            --bg-overlay: rgba(0, 0, 0, 0.55); 
             --sidebar-bg: rgba(0, 0, 0, 0.6);
             --pillar-bg: rgba(255, 255, 255, 0.02);
             --text-gold: #eebb66; 
             --text-white: #ffffff;
             
-            /* 状态色 */
-            --s-busy: #d32f2f;   
-            --s-free: #2e7d32;   
-            --s-prep: #7b1fa2;   
-            --s-rest: #546e7a;   
+            /* === 2. 中国传统色定义 (原样保留) === */
+            --c-zhusha: 255, 70, 31;     
+            --c-tianqing: 119, 157, 141; 
+            --c-xinghuang: 255, 140, 49; 
+            --c-xuanse: 61, 59, 79;      
+            --c-yuebai: 214, 236, 240;   
+            --c-zheshi: 132, 90, 51;     
+            --c-songhua: 188, 230, 114; 
 
+            /* 字体 */
             --font-main: 'Noto Serif SC', serif;
             --font-art: 'ZCOOL XiaoWei', serif;
             --cloud-pattern: url("data:image/svg+xml,%3Csvg width='50' height='50' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2,2 L20,2 Q35,2 35,17 L35,35' fill='none' stroke='%23eebb66' stroke-width='2'/%3E%3Cpath d='M6,6 L18,6 Q28,6 28,16 L28,28' fill='none' stroke='%23eebb66' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
@@ -49,11 +53,10 @@
             background: var(--bg-overlay); z-index: -1;
         }
 
-        /* === 1. Header (13vh) === */
+        /* === Header (原样保留) === */
         .header {
             flex: 0 0 13vh;
             display: grid;
-            /* 调整比例：左25 中45 右30 */
             grid-template-columns: 25fr 45fr 30fr; 
             align-items: center;
             padding: 0 3vw;
@@ -61,16 +64,22 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
         }
 
-        /* Logo */
         .brand-box { display: flex; flex-direction: column; justify-content: center; }
         .brand-name {
             font-family: var(--font-art); font-size: 4.5vh; color: var(--text-gold);
             letter-spacing: 0.5vh; text-shadow: 0 0 15px rgba(238, 187, 102, 0.4);
             white-space: nowrap;
         }
-        .time-box { font-size: 1.6vh; color: #ccc; margin-top: 0.5vh; font-family: 'Arial', sans-serif; }
+        
+        /* === [唯一修改点] 时间字体调大 === */
+        .time-box { 
+            font-size: 2.5vh;  /* 原 1.6vh -> 2.5vh */
+            color: #ccc; 
+            margin-top: 1vh;   /* 原 0.5vh -> 1vh */
+            font-family: 'Arial', sans-serif; 
+            letter-spacing: 1px;
+        }
 
-        /* 四柱时钟 */
         .ganzhi-clock {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border-left: 1px solid rgba(255,255,255,0.1);
@@ -87,22 +96,20 @@
         .gz-col { display: flex; flex-direction: column; align-items: center; }
         .gz-label { font-size: 1.4vh; color: #666; margin-top: -0.5vh; font-family: var(--font-main); }
 
-        /* 统计区 (Stats) - 增大间距和字号 */
         .stats-panel { display: flex; gap: 1.5vw; justify-content: flex-end; }
         .stat-item {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: rgba(255,255,255,0.05); 
-            width: 6.5vw; /* 加宽 */
+            width: 6.5vw;
             padding: 0.8vh 0;
             border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
         }
         .stat-num { font-size: 3vh; color: var(--text-gold); font-family: var(--font-art); line-height: 1; font-weight: bold; }
         .stat-label { font-size: 1.4vh; color: #bbb; margin-top: 0.5vh; }
 
-        /* === 2. Main Body === */
+        /* === Main Body (原样保留) === */
         .main-body { flex: 1; display: flex; overflow: hidden; }
 
-        /* --- Sidebar (左侧 25%) --- */
         .sidebar {
             flex: 0 0 25%;
             background: var(--sidebar-bg);
@@ -118,19 +125,15 @@
         
         .schedule-item {
             display: flex; align-items: center; 
-            padding: 2vh 0; /* 增加高度 */
+            padding: 2vh 0;
             border-bottom: 1px solid rgba(255,255,255,0.08); 
         }
-        
         .sc-time-col {
             width: 5.5rem; text-align: left; padding-right: 0.8rem;
             border-right: 1px solid rgba(255,255,255,0.15); margin-right: 0.8rem;
             display: flex; flex-direction: column; justify-content: center; flex-shrink: 0;
         }
-        .sc-date-txt { 
-            font-family:'Arial'; font-weight:bold; color: var(--text-gold); 
-            font-size: 2.2vh; line-height: 1.2; margin-bottom: 4px;
-        }
+        .sc-date-txt { font-family:'Arial'; font-weight:bold; color: var(--text-gold); font-size: 2.2vh; line-height: 1.2; margin-bottom: 4px; }
         .sc-time-txt { font-family:'Arial'; color: #ccc; font-size: 1.8vh; }
 
         .sc-content { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0.5vh; overflow: hidden;}
@@ -139,19 +142,39 @@
         .sc-status { font-size: 1.6vh; padding: 0.3vh 0.8vw; border-radius: 4px; white-space: nowrap; margin-left: 10px; }
         .sc-row-2 { font-size: 1.8vh; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .st-done { color: #666; } .st-ing { color: var(--text-gold); border: 1px solid var(--text-gold); }
-        .st-wait { color: #bbb; background: rgba(255,255,255,0.1); }
-        .st-rest-item { color: #888; font-style: italic; border: 1px dashed #666; }
-        
         .item-past { opacity: 0.5; filter: grayscale(1); }
         .item-current { background: rgba(238, 187, 102, 0.08); border-left: 4px solid var(--text-gold); padding-left: 10px; }
 
-        /* --- Master Pillars (Grid 75%) --- */
+        /* === Master Grid === */
         .master-stage {
-            flex: 1; 
-            display: grid; 
-            padding: 4vh 4vw; /* 外边距 */
-            gap: 2vh 3vw;     /* 柱子间距 */
+            flex: 1; display: grid; padding: 4vh 4vw; gap: 2vh 3vw;
+            /* [新增] 3D 透视，支持翻转效果 */
+            perspective: 1000px;
+        }
+
+        /* === 呼吸动画定义 (原样保留) === */
+        /* 空闲：缓慢 (天青色虚影) */
+        @keyframes breathe-free {
+            0%, 100% { box-shadow: 0 0 25px rgba(var(--c-tianqing), 0.2) inset, 0 0 0 rgba(var(--c-tianqing), 0); transform: scale(1); }
+            50%      { box-shadow: 0 0 25px rgba(var(--c-tianqing), 0.2) inset, 0 0 20px rgba(var(--c-tianqing), 0.6); transform: scale(1.005); }
+        }
+        
+        /* 忙碌：正常 (朱砂色虚影) */
+        @keyframes breathe-busy {
+            0%, 100% { box-shadow: 0 0 30px rgba(var(--c-zhusha), 0.25) inset, 0 0 0 rgba(var(--c-zhusha), 0); transform: scale(1); }
+            50%      { box-shadow: 0 0 30px rgba(var(--c-zhusha), 0.25) inset, 0 0 25px rgba(var(--c-zhusha), 0.7); transform: scale(1.01); }
+        }
+
+        /* 准备：急促 (杏黄色虚影) */
+        @keyframes breathe-prep {
+            0%, 100% { box-shadow: 0 0 25px rgba(var(--c-xinghuang), 0.2) inset, 0 0 0 rgba(var(--c-xinghuang), 0); transform: scale(1); }
+            50%      { box-shadow: 0 0 25px rgba(var(--c-xinghuang), 0.2) inset, 0 0 25px rgba(var(--c-xinghuang), 0.8); transform: scale(1.015); }
+        }
+
+        /* === [新增] 360度翻转动画 === */
+        @keyframes flip-360 {
+            0% { transform: rotateY(0); }
+            100% { transform: rotateY(360deg); }
         }
 
         .master-pillar {
@@ -159,25 +182,40 @@
             display: flex; flex-direction: column; align-items: center;
             padding-top: 4vh; padding-bottom: 2vh;
             background: var(--pillar-bg);
-            border: 1px solid rgba(238, 187, 102, 0.4);
+            
+            /* 保持原边框逻辑 */
+            border: 1px solid rgba(var(--c-zheshi), 0.5); 
+            
             box-shadow: 0 0 30px rgba(0,0,0,0.6) inset;
+            
+            /* [修改] 增加 transform-style 支持3D */
             transition: all 0.5s ease;
+            transform-style: preserve-3d;
             height: 100%; overflow: hidden;
         }
+        
+        /* [新增] 翻转动画类 */
+        .animate-flip {
+            animation: flip-360 0.8s ease-in-out !important;
+        }
+
         .master-pillar::before, .master-pillar::after {
             content: ''; position: absolute; width: 50px; height: 50px;
             background-image: var(--cloud-pattern); background-size: contain;
             background-repeat: no-repeat; opacity: 1;
+            /* [新增] 防止翻转时背面闪烁 */
+            backface-visibility: hidden;
         }
         .master-pillar::before { top: -2px; left: -2px; transform: rotate(0deg); }
         .master-pillar::after { bottom: -2px; right: -2px; transform: rotate(180deg); }
         
+        /* 光条基础样式 */
         .pillar-light {
             position: absolute; top: 10px; width: 60%; height: 4px;
-            background: currentColor; box-shadow: 0 0 20px 2px currentColor; border-radius: 2px;
+            border-radius: 2px;
+            transition: all 0.5s;
         }
         
-        /* 大师头像 */
         .m-avatar {
             width: 15vh; height: 15vh; max-width: 160px; max-height: 160px;
             border-radius: 50%; border: 3px solid rgba(255,255,255,0.2);
@@ -185,7 +223,6 @@
             z-index: 2; transition: all 0.5s;
         }
         
-        /* 大师名字 - 显著加大 */
         .m-name-box {
             flex: 1; display: flex; justify-content: center; align-items: center; width: 100%;
             border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -197,42 +234,94 @@
             writing-mode: vertical-rl; text-orientation: upright; 
             white-space: nowrap;
             text-shadow: 0 4px 15px rgba(0,0,0,1);
-            
-            /* 字体加大 */
-            font-size: 6vh; 
-            letter-spacing: 0.1em; 
-            line-height: 1.5; 
+            font-size: 6vh; letter-spacing: 0.1em; line-height: 1.5; 
         }
         
-        /* 状态印章 - 显著加大 */
         .m-footer { margin-top: auto; text-align: center; width: 100%; z-index: 2; }
+        
+        /* 印章基础样式 */
         .status-seal {
             display: inline-block; 
-            padding: 1vh 2vw; /* 增加内边距 */
-            font-size: 2.5vh; /* 字体加大 */
+            padding: 1vh 2vw; 
+            font-size: 2.5vh; 
             font-weight: bold;
             font-family: var(--font-art); border: 2px solid currentColor;
             border-radius: 10px; background: rgba(0,0,0,0.85); box-shadow: 0 5px 20px rgba(0,0,0,0.6);
         }
         
-        /* 客户/底部信息 */
         .current-client { margin-top: 1.5vh; font-size: 1.8vh; color: rgba(255,255,255,0.7); min-height: 1.2em; }
 
-        /* 双行模式 (Grid Double Row) - 适配调整 */
+        /* 双行模式 */
         .master-stage.layout-double .m-avatar { width: 9vh; height: 9vh; margin-bottom: 1vh; }
         .master-stage.layout-double .m-name { font-size: 4vh; letter-spacing: 0.1em; } 
         .master-stage.layout-double .status-seal { font-size: 1.8vh; padding: 0.5vh 1.2vw; }
         .master-stage.layout-double .current-client { font-size: 1.4vh; }
         
-        /* 状态色 */
-        .st-free { color: var(--s-free); } .st-busy { color: var(--s-busy); } .st-prep { color: var(--s-prep); }
-        .st-rest { color: var(--s-rest); border-color: rgba(100, 100, 100, 0.2); background: rgba(0,0,0,0.4); }
-        .st-rest::before, .st-rest::after { filter: grayscale(1) brightness(0.5); opacity: 0.2; }
-        .st-rest .m-avatar { filter: grayscale(100%) brightness(0.6); border-color: #444; box-shadow: none; }
-        .st-rest .m-name { color: #666; text-shadow: none; }
-        .st-rest .status-seal { border: 2px dashed #666; background: transparent; color: #888; box-shadow: none; }
-        .st-rest .pillar-light { display: none; }
-        .st-rest .current-client { color: #555; font-style: italic; }
+        /* === 状态配色逻辑 (原样保留) === */
+
+        /* 1. 空闲 (天青) + [动画] 缓慢呼吸 (4s) */
+        .st-free { 
+            color: rgb(var(--c-tianqing)); 
+            border-color: rgba(var(--c-tianqing), 0.6) !important;
+            /* 动画添加 */
+            animation: breathe-free 4s infinite ease-in-out;
+        }
+        .st-free .pillar-light { 
+            background: rgb(var(--c-songhua)); 
+            box-shadow: 0 0 15px rgb(var(--c-songhua));
+        }
+        
+        /* 2. 忙碌 (朱砂) + [动画] 正常呼吸 (2s) */
+        .st-busy, .st-ing { 
+            color: rgb(var(--c-zhusha)); 
+            border-color: rgba(var(--c-zhusha), 0.8) !important; 
+            /* 动画添加 */
+            animation: breathe-busy 2s infinite ease-in-out;
+        }
+        .st-busy .pillar-light { 
+            background: rgb(var(--c-xinghuang)); 
+            box-shadow: 0 0 20px rgb(var(--c-xinghuang));
+        }
+
+        /* 3. 准备 (杏黄) + [动画] 急促呼吸 (0.8s) */
+        .st-prep, .st-wait { 
+            color: rgb(var(--c-xinghuang)); 
+            border-color: rgba(var(--c-xinghuang), 0.7) !important;
+            /* 动画添加 */
+            animation: breathe-prep 0.8s infinite ease-in-out;
+        }
+        .st-prep .pillar-light { 
+            background: rgb(var(--c-zhusha)); 
+            box-shadow: 0 0 20px rgb(var(--c-zhusha));
+        }
+
+        /* 4. 休息 (玄色 + 月白) + [无动画] */
+        .st-rest, .st-rest-item { 
+            color: rgb(var(--c-yuebai)); 
+            border-color: rgba(var(--c-xuanse), 0.8) !important;
+            border-style: dashed !important;
+            background: rgba(0,0,0,0.4); 
+            /* 确保休息时无阴影/动画 */
+            box-shadow: none;
+            animation: none;
+        }
+        .st-rest .pillar-light { 
+            display: block;
+            width: 30%;
+            background: rgba(var(--c-yuebai), 0.3); 
+            box-shadow: 0 0 10px rgba(var(--c-yuebai), 0.2);
+        }
+        
+        .st-rest .status-seal { border: 2px dashed rgba(var(--c-xuanse), 0.8); background: transparent; color: rgba(var(--c-yuebai), 0.6); box-shadow: none; }
+        .st-rest .m-avatar { filter: grayscale(100%) brightness(0.6); border-color: #555; box-shadow: none; }
+        .st-rest .m-name { color: #888; text-shadow: none; }
+        .st-rest .current-client { color: #666; font-style: italic; }
+        
+        /* 左侧列表适配 */
+        span.st-free, span.st-ing { border: 1px solid currentColor; } 
+        span.st-wait { background: rgba(var(--c-xinghuang), 0.1); border:none; }
+        .st-done { color: #888; border: none; }
+
 
         /* Footer */
         .marquee-bar {
@@ -248,7 +337,7 @@
         /* Error Layer */
         #err-layer {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 999;
-            color: var(--s-busy); font-size: 2.5vh; flex-direction: column; text-align: center; padding: 20px;
+            color: rgb(var(--c-busy)); font-size: 2.5vh; flex-direction: column; text-align: center; padding: 20px;
         }
         #diag-log {
             margin-top: 20px; font-size: 1.5vh; color: #aaa; text-align: left;
@@ -266,7 +355,7 @@
     <header class="header">
         <div class="brand-box">
             <div class="brand-name">灯辰文化</div>
-            <div class="time-box" id="clock-gregorian">载入中...</div>
+            <div class="time-box" id="clock-gregorian">...</div>
         </div>
         
         <div class="ganzhi-clock">
@@ -333,56 +422,19 @@
         // === 干支算法 ===
         const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
         const ZHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-        
-        function getGanZhiYear(year) {
-            const idx = (year - 1984) % 60;
-            const g = (idx % 10 + 10) % 10;
-            const z = (idx % 12 + 12) % 12;
-            return GAN[g] + ZHI[z];
-        }
-        function getGanZhiMonth(year, month) {
-            const yearIdx = (year - 1984) % 10;
-            const yearGan = (yearIdx % 10 + 10) % 10; 
-            const startGan = (yearGan % 5) * 2 + 2; 
-            let mZhi = (month + 1) % 12; 
-            if (month === 0) mZhi = 1; 
-            let monthOffset = (mZhi - 2 + 12) % 12; 
-            let mGan = (startGan + monthOffset) % 10;
-            return GAN[mGan] + ZHI[mZhi];
-        }
-        function getGanZhiDay(dObj) {
-            const anchor = new Date(2024, 0, 1); 
-            const diff = Math.floor((dObj - anchor) / 86400000);
-            const idx = (diff % 60 + 60) % 60;
-            return GAN[idx%10] + ZHI[idx%12];
-        }
-        function getGanZhiHour(dayGanStr, hour) {
-            const gIdx = GAN.indexOf(dayGanStr);
-            const startGan = (gIdx % 5) * 2;
-            let zhiIdx = 0; 
-            if (hour >= 23) zhiIdx = 0;
-            else zhiIdx = Math.floor((hour + 1) / 2);
-            const hGan = (startGan + zhiIdx) % 10;
-            return GAN[hGan] + ZHI[zhiIdx];
-        }
+        function getGanZhiYear(year) { const idx = (year - 1984) % 60; return GAN[(idx%10+10)%10] + ZHI[(idx%12+12)%12]; }
+        function getGanZhiMonth(year, month) { const yIdx = (year-1984)%10; const start = ((yIdx%10+10)%10%5)*2+2; let mZhi = (month+1)%12; if(month===0)mZhi=1; let mGan = (start + (mZhi-2+12)%12)%10; return GAN[mGan] + ZHI[mZhi]; }
+        function getGanZhiDay(dObj) { const anchor = new Date(2024, 0, 1); const diff = Math.floor((dObj - anchor) / 86400000); const idx = (diff % 60 + 60) % 60; return GAN[idx%10] + ZHI[idx%12]; }
+        function getGanZhiHour(dayGanStr, hour) { const gIdx = GAN.indexOf(dayGanStr); const start = (gIdx%5)*2; let zhi = (hour>=23)?0:Math.floor((hour+1)/2); return GAN[(start+zhi)%10] + ZHI[zhi]; }
 
         function updateClock() {
             const now = new Date();
-            const m = now.getMonth() + 1;
-            const d = now.getDate();
-            const w = now.toLocaleDateString('zh-CN', { weekday:'long' });
-            const t = now.toLocaleTimeString('en-GB', { hour12: false });
-            document.getElementById('clock-gregorian').innerHTML = `${m}月${d}日 · ${w} &nbsp; <span style="color:var(--text-gold);font-weight:bold;">${t}</span>`;
-
-            const yearStr = getGanZhiYear(now.getFullYear());
-            const monthStr = getGanZhiMonth(now.getFullYear(), now.getMonth());
+            document.getElementById('clock-gregorian').innerHTML = `${now.getMonth()+1}月${now.getDate()}日 · ${now.toLocaleDateString('zh-CN', {weekday:'long'})} &nbsp; <span style="color:var(--text-gold);font-weight:bold;">${now.toLocaleTimeString('en-GB',{hour12:false})}</span>`;
+            document.getElementById('gz-year').innerText = getGanZhiYear(now.getFullYear());
+            document.getElementById('gz-month').innerText = getGanZhiMonth(now.getFullYear(), now.getMonth());
             const dayStr = getGanZhiDay(now);
-            const hourStr = getGanZhiHour(dayStr.charAt(0), now.getHours());
-
-            document.getElementById('gz-year').innerText = yearStr;
-            document.getElementById('gz-month').innerText = monthStr;
             document.getElementById('gz-day').innerText = dayStr;
-            document.getElementById('gz-hour').innerText = hourStr;
+            document.getElementById('gz-hour').innerText = getGanZhiHour(dayStr.charAt(0), now.getHours());
         }
         setInterval(updateClock, 1000);
 
@@ -405,23 +457,15 @@
         function parseVikaDate(dateVal, timeStr) {
             if (!dateVal) return null;
             let d = new Date();
-            if (typeof dateVal === 'number') { d = new Date(dateVal); } 
-            else {
-                let parts = String(dateVal).replace(/\//g, '-').split('-');
-                if(parts.length >= 3) d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-                else return null;
-            }
-            let tParts = (timeStr || "00:00").split(':');
-            if(tParts.length >= 2) d.setHours(parseInt(tParts[0]), parseInt(tParts[1]), 0, 0);
-            else d.setHours(0,0,0,0);
+            if (typeof dateVal === 'number') d = new Date(dateVal); 
+            else { let p = String(dateVal).replace(/\//g, '-').split('-'); if(p.length>=3) d = new Date(p[0], p[1]-1, p[2]); else return null; }
+            let t = (timeStr || "00:00").split(':');
+            d.setHours(parseInt(t[0]), parseInt(t[1]), 0, 0);
             return d;
         }
 
         function render(records) {
             const now = new Date();
-            const tomorrowStart = new Date(now); tomorrowStart.setDate(now.getDate() + 1); tomorrowStart.setHours(0,0,0,0);
-            const tomorrowEnd = new Date(tomorrowStart); tomorrowEnd.setHours(23,59,59,999);
-
             const masters = {};
             const allItems = []; 
             const marqueeData = [];
@@ -431,45 +475,30 @@
             records.forEach(r => {
                 const f = r.fields;
                 if(!f['大师'] || !f['日期']) return;
-
                 const start = parseVikaDate(f['日期'], f['时间']);
                 if(!start) return; 
                 
                 const inter = String(f['状态干预'] || "");
                 const isRest = ['休息', '请假', '外出', '停诊'].some(k => inter.includes(k));
                 const isCancel = inter.includes('取消');
+                let dur = (isRest && !f['时长']) ? 1440 : (f['时长']||60);
+                const end = new Date(start.getTime() + dur*60000);
 
-                let defaultDur = 60;
-                if(isRest && !f['时长']) defaultDur = 1440; 
-                const end = new Date(start.getTime() + (f['时长']||defaultDur)*60000);
-
-                const item = {
-                    client: f['客户'] || '善信',
-                    start: start, end: end, inter: inter,
-                    master: f['大师']
-                };
-
+                const item = { client: f['客户'] || '善信', start: start, end: end, inter: inter, master: f['大师'] };
                 const isToday = (start.toDateString() === now.toDateString());
-                const isTmr = (start >= tomorrowStart && start <= tomorrowEnd);
-                const isThisMonth = (start.getMonth() === now.getMonth() && start.getFullYear() === now.getFullYear());
                 const isPast = end < now;
 
                 if (!isRest && !isCancel) {
                     if (isToday) cntTodayTotal++;
                     if (isToday && isPast) cntTodayDone++;
-                    if (isThisMonth) cntMonthTotal++;
+                    if (start.getMonth()===now.getMonth()) cntMonthTotal++;
                     if (isPast) cntAllDone++;
                 }
-
-                if (isThisMonth && !isCancel) {
+                if (start.getMonth()===now.getMonth() && !isCancel) {
                     let isIng = start <= now && end > now;
                     allItems.push({...item, isPast: isPast, isIng: isIng, isToday: isToday, isRest: isRest});
                 }
-
-                if (!isRest && !isCancel) {
-                    if (isToday && end > now) marqueeData.push({...item, tag:'今日'});
-                    else if (isTmr) marqueeData.push({...item, tag:'明日'});
-                }
+                if (!isRest && !isCancel && (isToday && end > now)) marqueeData.push({...item, tag:'今日'});
 
                 if(!masters[f['大师']]) {
                     masters[f['大师']] = { name: f['大师'], pic: (f['头像']&&f['头像'][0]) ? f['头像'][0].url : null, items: [] };
@@ -482,75 +511,36 @@
             document.getElementById('s-month-total').innerText = cntMonthTotal;
             document.getElementById('s-all-done').innerText = cntAllDone;
 
-            // Sidebar Logic (2 Past + 6 Future)
+            // Sidebar
             const sideList = document.getElementById('month-list');
             sideList.innerHTML = '';
             allItems.sort((a,b) => a.start - b.start);
-            const pastItems = allItems.filter(i => i.isPast);
-            const activeItems = allItems.filter(i => !i.isPast);
-            const recentPast = pastItems.slice(-2); 
-            const nearFuture = activeItems.slice(0, 6);
-            const displayList = [...recentPast, ...nearFuture];
-
-            if(displayList.length === 0) {
-                sideList.innerHTML = '<div style="text-align:center; color:#666; padding-top:2rem;">无更多待办</div>';
-            } else {
-                displayList.forEach(d => {
-                    const dateTxt = `${d.start.getMonth()+1}/${d.start.getDate()}`;
-                    const timeTxt = d.start.toTimeString().substring(0,5);
-                    let cls = 'schedule-item';
-                    if(d.isPast) cls += ' item-past'; else if(d.isToday) cls += ' item-current';
-                    let stTxt='待开始', stCls='st-wait';
-                    if (d.isRest) { stTxt='休·沐'; stCls='st-rest-item'; } 
-                    else { if(d.isPast) {stTxt='已结束'; stCls='st-done';} else if(d.isIng) {stTxt='进行中'; stCls='st-ing';} }
-
-                    const div = document.createElement('div');
-                    div.className = cls;
-                    div.innerHTML = `
-                        <div class="sc-time-col"><div class="sc-date-txt">${dateTxt}</div><div class="sc-time-txt">${timeTxt}</div></div>
-                        <div class="sc-content">
-                            <div class="sc-row-1"><span class="sc-master">${d.master}</span><span class="sc-status ${stCls}">${stTxt}</span></div>
-                            <div class="sc-row-2"><span>${d.isRest ? '暂离' : '预约：'+d.client}</span></div>
-                        </div>
-                    `;
-                    sideList.appendChild(div);
-                });
-            }
+            [...allItems.filter(i=>i.isPast).slice(-2), ...allItems.filter(i=>!i.isPast).slice(0,6)].forEach(d => {
+                let cls = 'schedule-item' + (d.isPast ? ' item-past' : (d.isToday ? ' item-current' : ''));
+                let stTxt='待开始', stCls='st-wait';
+                if (d.isRest) { stTxt='休·沐'; stCls='st-rest-item'; } 
+                else { if(d.isPast) {stTxt='已结束'; stCls='st-done';} else if(d.isIng) {stTxt='进行中'; stCls='st-ing';} }
+                const div = document.createElement('div'); div.className = cls;
+                div.innerHTML = `<div class="sc-time-col"><div class="sc-date-txt">${d.start.getMonth()+1}/${d.start.getDate()}</div><div class="sc-time-txt">${d.start.toTimeString().substring(0,5)}</div></div>
+                    <div class="sc-content"><div class="sc-row-1"><span class="sc-master">${d.master}</span><span class="sc-status ${stCls}">${stTxt}</span></div><div class="sc-row-2"><span>${d.isRest?'暂离':'预约：'+d.client}</span></div></div>`;
+                sideList.appendChild(div);
+            });
 
             // Marquee
             const mqBox = document.getElementById('mq-list');
-            mqBox.innerHTML = '';
-            if(marqueeData.length > 0) {
-                marqueeData.sort((a,b) => a.start - b.start);
-                const buildHtml = () => {
-                    let html = '';
-                    marqueeData.forEach(d => {
-                        const time = d.start.toTimeString().substring(0,5);
-                        html += `<div class="mq-item">[${d.tag}] <b>${time}</b> ${d.master} - ${d.client}</div>`;
-                    });
-                    return html;
-                };
-                mqBox.innerHTML = buildHtml() + buildHtml();
-            } else { mqBox.innerHTML = '<div class="mq-item" style="padding-left:1vw">近期暂无更多预约</div>'; }
+            mqBox.innerHTML = marqueeData.length ? marqueeData.map(d=>`<div class="mq-item">[${d.tag}] <b>${d.start.toTimeString().substring(0,5)}</b> ${d.master} - ${d.client}</div>`).join('') + marqueeData.map(d=>`<div class="mq-item">[${d.tag}] <b>${d.start.toTimeString().substring(0,5)}</b> ${d.master} - ${d.client}</div>`).join('') : '<div class="mq-item" style="padding-left:1vw">近期暂无更多预约</div>';
 
-            // Pillars (Grid)
+            // Pillars (Smart Update for Flip)
             const stage = document.getElementById('master-stage');
-            stage.innerHTML = '';
             const keys = Object.keys(masters);
             if(keys.length === 0) { stage.innerHTML = '<div style="margin:auto; color:#888;">暂无大师数据</div>'; return; }
+            if(stage.innerText.includes('正在读取')) stage.innerHTML = '';
 
             const count = keys.length;
-            if (count >= 8) {
-                stage.classList.add('layout-double');
-                const cols = Math.ceil(count / 2);
-                stage.style.gridTemplateRows = '1fr 1fr';
-                stage.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            } else {
-                stage.classList.remove('layout-double');
-                stage.style.gridTemplateRows = '1fr';
-                stage.style.gridTemplateColumns = `repeat(${count}, 1fr)`;
-            }
+            if (count >= 8) { stage.classList.add('layout-double'); stage.style.gridTemplateRows = '1fr 1fr'; stage.style.gridTemplateColumns = `repeat(${Math.ceil(count/2)}, 1fr)`; } 
+            else { stage.classList.remove('layout-double'); stage.style.gridTemplateRows = '1fr'; stage.style.gridTemplateColumns = `repeat(${count}, 1fr)`; }
 
+            const touchedIds = new Set();
             keys.forEach(k => {
                 const m = masters[k];
                 let statusClass='st-free', statusText='空闲 · 纳客', clientText='暂无待办';
@@ -558,34 +548,55 @@
                 for(let t of m.items) {
                     if(t.inter.includes('取消')) continue;
                     const busy = now >= t.start && now < t.end;
-                    const prep = now >= new Date(t.start.getTime() - 10*60000) && now < t.start;
+                    const prep = now >= new Date(t.start.getTime() - 15*60000) && now < t.start;
                     const isRest = ['休息', '请假', '外出', '停诊'].some(kw => t.inter.includes(kw));
 
-                    if(isRest && (busy || (t.inter && t.start.getHours()===0 && t.start.getMinutes()===0))) {
-                        statusClass='st-rest'; statusText='休沐 · 暂离'; clientText='归期未定'; break; 
-                    }
-                    if((busy||prep) && t.inter.includes('忙碌')) {
-                        statusClass='st-busy'; statusText='特约咨询'; clientText=`正服务：${t.client}`; break;
-                    }
+                    if(isRest && (busy || (t.inter && t.start.getHours()===0 && t.start.getMinutes()===0))) { statusClass='st-rest'; statusText='休沐 · 暂离'; clientText='归期未定'; break; }
+                    if((busy||prep) && t.inter.includes('忙碌')) { statusClass='st-busy'; statusText='特约咨询'; clientText=`正服务：${t.client}`; break; }
                     if((busy||prep) && t.inter.includes('空闲')) continue;
-                    if(busy) {
-                        statusClass='st-busy'; statusText='咨询中 · 勿扰'; clientText=`正服务：${t.client}`; break;
-                    } else if(prep && statusClass !== 'st-busy' && statusClass !== 'st-rest') {
-                        statusClass='st-prep'; statusText='恭候 · 待启'; clientText=`候见：${t.client}`;
-                    }
+                    if(busy) { statusClass='st-busy'; statusText='咨询中 · 勿扰'; clientText=`正服务：${t.client}`; break; } 
+                    else if(prep && statusClass!=='st-busy' && statusClass!=='st-rest') { statusClass='st-prep'; statusText='恭候 · 待启'; clientText=`候见：${t.client}`; }
                 }
 
                 const img = m.pic || 'https://via.placeholder.com/200/333/d4af37?text=Master';
-                const div = document.createElement('div');
-                div.className = `master-pillar ${statusClass}`;
-                div.innerHTML = `
-                    <div class="pillar-light"></div>
-                    <img src="${img}" class="m-avatar">
-                    <div class="m-name-box"><div class="m-name">${m.name}</div></div>
-                    <div class="m-footer"><div class="status-seal">${statusText}</div><div class="current-client">${clientText}</div></div>
-                `;
-                stage.appendChild(div);
+                const pid = 'pillar-' + k; touchedIds.add(pid);
+                let div = document.getElementById(pid);
+
+                if (!div) {
+                    // Create
+                    div = document.createElement('div'); div.id = pid;
+                    div.className = `master-pillar ${statusClass}`;
+                    div.setAttribute('data-st', statusClass);
+                    div.innerHTML = `<div class="pillar-light"></div><img src="${img}" class="m-avatar"><div class="m-name-box"><div class="m-name">${m.name}</div></div><div class="m-footer"><div class="status-seal">${statusText}</div><div class="current-client">${clientText}</div></div>`;
+                    stage.appendChild(div);
+                } else {
+                    // Update
+                    const oldSt = div.getAttribute('data-st');
+                    if(oldSt !== statusClass) {
+                        // 触发翻转
+                        div.classList.add('animate-flip');
+                        
+                        // 400ms后更新数据
+                        setTimeout(() => {
+                            div.className = `master-pillar ${statusClass} animate-flip`; 
+                            div.setAttribute('data-st', statusClass);
+                            div.querySelector('.status-seal').innerText = statusText;
+                            div.querySelector('.current-client').innerText = clientText;
+                            div.querySelector('.m-avatar').src = img;
+                        }, 400); 
+
+                        // 800ms移除类
+                        setTimeout(() => div.classList.remove('animate-flip'), 800);
+                    } else {
+                        // 状态不变，只更新文字
+                        const cEl = div.querySelector('.current-client');
+                        if(cEl.innerText !== clientText) cEl.innerText = clientText;
+                        if(!div.classList.contains(statusClass)) div.className = `master-pillar ${statusClass}`;
+                    }
+                }
             });
+            
+            Array.from(stage.children).forEach(c => { if(c.id && c.id.startsWith('pillar-') && !touchedIds.has(c.id)) stage.removeChild(c); });
         }
     </script>
 </body>

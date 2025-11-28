@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="no-referrer">
-    <title>灯辰文化 - 咨询看板 </title>
+    <title>灯辰文化 - 咨询看板 (全屏按钮版)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,11 +71,11 @@
             white-space: nowrap;
         }
         
-        /* === [唯一修改点] 时间字体调大 === */
+        /* 时间字体 (原样保留：您之前要求的大号字体) */
         .time-box { 
-            font-size: 2.5vh;  /* 原 1.6vh -> 2.5vh */
+            font-size: 2.5vh;  
             color: #ccc; 
-            margin-top: 1vh;   /* 原 0.5vh -> 1vh */
+            margin-top: 1vh;   
             font-family: 'Arial', sans-serif; 
             letter-spacing: 1px;
         }
@@ -145,33 +145,27 @@
         .item-past { opacity: 0.5; filter: grayscale(1); }
         .item-current { background: rgba(238, 187, 102, 0.08); border-left: 4px solid var(--text-gold); padding-left: 10px; }
 
-        /* === Master Grid === */
+        /* === Master Grid (原样保留) === */
         .master-stage {
             flex: 1; display: grid; padding: 4vh 4vw; gap: 2vh 3vw;
-            /* [新增] 3D 透视，支持翻转效果 */
             perspective: 1000px;
         }
 
-        /* === 呼吸动画定义 (原样保留) === */
-        /* 空闲：缓慢 (天青色虚影) */
+        /* === 动画定义 (原样保留) === */
+        /* 呼吸动画 */
         @keyframes breathe-free {
             0%, 100% { box-shadow: 0 0 25px rgba(var(--c-tianqing), 0.2) inset, 0 0 0 rgba(var(--c-tianqing), 0); transform: scale(1); }
             50%      { box-shadow: 0 0 25px rgba(var(--c-tianqing), 0.2) inset, 0 0 20px rgba(var(--c-tianqing), 0.6); transform: scale(1.005); }
         }
-        
-        /* 忙碌：正常 (朱砂色虚影) */
         @keyframes breathe-busy {
             0%, 100% { box-shadow: 0 0 30px rgba(var(--c-zhusha), 0.25) inset, 0 0 0 rgba(var(--c-zhusha), 0); transform: scale(1); }
             50%      { box-shadow: 0 0 30px rgba(var(--c-zhusha), 0.25) inset, 0 0 25px rgba(var(--c-zhusha), 0.7); transform: scale(1.01); }
         }
-
-        /* 准备：急促 (杏黄色虚影) */
         @keyframes breathe-prep {
             0%, 100% { box-shadow: 0 0 25px rgba(var(--c-xinghuang), 0.2) inset, 0 0 0 rgba(var(--c-xinghuang), 0); transform: scale(1); }
             50%      { box-shadow: 0 0 25px rgba(var(--c-xinghuang), 0.2) inset, 0 0 25px rgba(var(--c-xinghuang), 0.8); transform: scale(1.015); }
         }
-
-        /* === [新增] 360度翻转动画 === */
+        /* 360度翻转动画 */
         @keyframes flip-360 {
             0% { transform: rotateY(0); }
             100% { transform: rotateY(360deg); }
@@ -183,18 +177,14 @@
             padding-top: 4vh; padding-bottom: 2vh;
             background: var(--pillar-bg);
             
-            /* 保持原边框逻辑 */
             border: 1px solid rgba(var(--c-zheshi), 0.5); 
-            
             box-shadow: 0 0 30px rgba(0,0,0,0.6) inset;
             
-            /* [修改] 增加 transform-style 支持3D */
             transition: all 0.5s ease;
             transform-style: preserve-3d;
             height: 100%; overflow: hidden;
         }
         
-        /* [新增] 翻转动画类 */
         .animate-flip {
             animation: flip-360 0.8s ease-in-out !important;
         }
@@ -203,16 +193,14 @@
             content: ''; position: absolute; width: 50px; height: 50px;
             background-image: var(--cloud-pattern); background-size: contain;
             background-repeat: no-repeat; opacity: 1;
-            /* [新增] 防止翻转时背面闪烁 */
             backface-visibility: hidden;
         }
         .master-pillar::before { top: -2px; left: -2px; transform: rotate(0deg); }
         .master-pillar::after { bottom: -2px; right: -2px; transform: rotate(180deg); }
         
-        /* 光条基础样式 */
         .pillar-light {
             position: absolute; top: 10px; width: 60%; height: 4px;
-            border-radius: 2px;
+            background: currentColor; box-shadow: 0 0 15px currentColor; border-radius: 2px;
             transition: all 0.5s;
         }
         
@@ -232,26 +220,20 @@
             font-family: var(--font-main); 
             font-weight: 900; color: #fff;
             writing-mode: vertical-rl; text-orientation: upright; 
-            white-space: nowrap;
-            text-shadow: 0 4px 15px rgba(0,0,0,1);
+            white-space: nowrap; text-shadow: 0 4px 15px rgba(0,0,0,1);
             font-size: 6vh; letter-spacing: 0.1em; line-height: 1.5; 
         }
         
         .m-footer { margin-top: auto; text-align: center; width: 100%; z-index: 2; }
         
-        /* 印章基础样式 */
         .status-seal {
-            display: inline-block; 
-            padding: 1vh 2vw; 
-            font-size: 2.5vh; 
-            font-weight: bold;
+            display: inline-block; padding: 1vh 2vw; font-size: 2.5vh; font-weight: bold;
             font-family: var(--font-art); border: 2px solid currentColor;
             border-radius: 10px; background: rgba(0,0,0,0.85); box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            transition: all 0.5s;
         }
-        
         .current-client { margin-top: 1.5vh; font-size: 1.8vh; color: rgba(255,255,255,0.7); min-height: 1.2em; }
 
-        /* 双行模式 */
         .master-stage.layout-double .m-avatar { width: 9vh; height: 9vh; margin-bottom: 1vh; }
         .master-stage.layout-double .m-name { font-size: 4vh; letter-spacing: 0.1em; } 
         .master-stage.layout-double .status-seal { font-size: 1.8vh; padding: 0.5vh 1.2vw; }
@@ -259,11 +241,10 @@
         
         /* === 状态配色逻辑 (原样保留) === */
 
-        /* 1. 空闲 (天青) + [动画] 缓慢呼吸 (4s) */
+        /* 1. 空闲 (天青) + [动画] 缓慢呼吸 */
         .st-free { 
             color: rgb(var(--c-tianqing)); 
             border-color: rgba(var(--c-tianqing), 0.6) !important;
-            /* 动画添加 */
             animation: breathe-free 4s infinite ease-in-out;
         }
         .st-free .pillar-light { 
@@ -271,11 +252,10 @@
             box-shadow: 0 0 15px rgb(var(--c-songhua));
         }
         
-        /* 2. 忙碌 (朱砂) + [动画] 正常呼吸 (2s) */
+        /* 2. 忙碌 (朱砂) + [动画] 正常呼吸 */
         .st-busy, .st-ing { 
             color: rgb(var(--c-zhusha)); 
             border-color: rgba(var(--c-zhusha), 0.8) !important; 
-            /* 动画添加 */
             animation: breathe-busy 2s infinite ease-in-out;
         }
         .st-busy .pillar-light { 
@@ -283,11 +263,10 @@
             box-shadow: 0 0 20px rgb(var(--c-xinghuang));
         }
 
-        /* 3. 准备 (杏黄) + [动画] 急促呼吸 (0.8s) */
+        /* 3. 准备 (杏黄) + [动画] 急促呼吸 */
         .st-prep, .st-wait { 
             color: rgb(var(--c-xinghuang)); 
             border-color: rgba(var(--c-xinghuang), 0.7) !important;
-            /* 动画添加 */
             animation: breathe-prep 0.8s infinite ease-in-out;
         }
         .st-prep .pillar-light { 
@@ -301,7 +280,6 @@
             border-color: rgba(var(--c-xuanse), 0.8) !important;
             border-style: dashed !important;
             background: rgba(0,0,0,0.4); 
-            /* 确保休息时无阴影/动画 */
             box-shadow: none;
             animation: none;
         }
@@ -317,13 +295,37 @@
         .st-rest .m-name { color: #888; text-shadow: none; }
         .st-rest .current-client { color: #666; font-style: italic; }
         
-        /* 左侧列表适配 */
         span.st-free, span.st-ing { border: 1px solid currentColor; } 
         span.st-wait { background: rgba(var(--c-xinghuang), 0.1); border:none; }
         .st-done { color: #888; border: none; }
 
+        /* === [新增] 全屏按钮样式 === */
+        #fs-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--text-gold);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-gold);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 9999;
+            opacity: 0.1; /* 默认几乎隐形 */
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        #fs-btn:hover {
+            opacity: 1; /* 悬停变亮 */
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 20px var(--text-gold);
+        }
 
-        /* Footer */
         .marquee-bar {
             flex: 0 0 6vh; background: rgba(0,0,0,0.85); border-top: 1px solid rgba(255,255,255,0.15);
             display: flex; align-items: center; padding-left: 1vw; font-size: 2.2vh;
@@ -334,7 +336,6 @@
         .mq-item { margin-right: 4vw; color: #ddd; }
         @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* Error Layer */
         #err-layer {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; justify-content: center; align-items: center; z-index: 999;
             color: rgb(var(--c-busy)); font-size: 2.5vh; flex-direction: column; text-align: center; padding: 20px;
@@ -347,7 +348,9 @@
 </head>
 <body>
 
-    <div id="err-layer">
+    <div id="fs-btn" title="点击全屏/退出全屏">⛶</div>
+
+    <div id="err-layer" style="display:none;">
         <div id="err-msg">系统连接中...</div>
         <div id="diag-log">等待 API 响应...</div>
     </div>
@@ -418,6 +421,18 @@
         }
 
         init();
+
+        // === [新增] 全屏功能 JS ===
+        const fsBtn = document.getElementById('fs-btn');
+        if(fsBtn) {
+            fsBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(e => console.log(e));
+                } else {
+                    if(document.exitFullscreen) document.exitFullscreen();
+                }
+            });
+        }
         
         // === 干支算法 ===
         const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
@@ -573,22 +588,16 @@
                     // Update
                     const oldSt = div.getAttribute('data-st');
                     if(oldSt !== statusClass) {
-                        // 触发翻转
                         div.classList.add('animate-flip');
-                        
-                        // 400ms后更新数据
                         setTimeout(() => {
-                            div.className = `master-pillar ${statusClass} animate-flip`; 
+                            div.className = `master-pillar ${statusClass} animate-flip`;
                             div.setAttribute('data-st', statusClass);
                             div.querySelector('.status-seal').innerText = statusText;
                             div.querySelector('.current-client').innerText = clientText;
                             div.querySelector('.m-avatar').src = img;
                         }, 400); 
-
-                        // 800ms移除类
                         setTimeout(() => div.classList.remove('animate-flip'), 800);
                     } else {
-                        // 状态不变，只更新文字
                         const cEl = div.querySelector('.current-client');
                         if(cEl.innerText !== clientText) cEl.innerText = clientText;
                         if(!div.classList.contains(statusClass)) div.className = `master-pillar ${statusClass}`;
